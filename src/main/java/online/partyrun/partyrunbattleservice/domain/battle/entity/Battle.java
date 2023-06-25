@@ -3,8 +3,10 @@ package online.partyrun.partyrunbattleservice.domain.battle.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -14,8 +16,7 @@ import java.util.List;
 public class Battle {
     static final int RUNNER_SIZE = 3;
 
-    @Id
-    String id;
+    @Id String id;
 
     List<Runner> runners;
 

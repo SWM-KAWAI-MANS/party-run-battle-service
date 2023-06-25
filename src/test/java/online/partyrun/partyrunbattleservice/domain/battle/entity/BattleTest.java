@@ -1,23 +1,24 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+
 import org.junit.jupiter.api.*;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @DisplayName("Battle")
 class BattleTest {
-
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들이_주어졌을_때 {
 
-        List<Runner> runners = List.of(new Runner("1", "박성우"), new Runner("2", "노준혁"), new Runner("3", "박현준"));
+        List<Runner> runners =
+                List.of(new Runner("1", "박성우"), new Runner("2", "노준혁"), new Runner("3", "박현준"));
 
         @Test
         @DisplayName("방을 생성한다.")

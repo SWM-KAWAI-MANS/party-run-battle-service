@@ -1,6 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.dto;
 
 import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,5 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BattleCreateRequest {
 
-    @NotNull
-    List<String> runnerIds;
+    @NotNull List<String> runnerIds;
 }
