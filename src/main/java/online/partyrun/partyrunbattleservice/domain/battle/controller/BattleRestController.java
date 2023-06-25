@@ -1,5 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class BattleRestController {
 
     @PostMapping("/battle")
     @ResponseStatus(HttpStatus.CREATED)
-    public BattleResponse createBattle(@RequestBody BattleCreateRequest request) {
+    public BattleResponse createBattle(@RequestBody @Valid BattleCreateRequest request) {
 
         return battleService.createBattle(request);
     }

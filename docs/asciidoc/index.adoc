@@ -1,0 +1,13 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+== Battle
+=== 방 생성
+operation::create battle[snippets='http-request,http-response']
+=== 방 생성 인원 부족 실패
+operation::number of runner is invalid[snippets='http-request,http-response']
+
