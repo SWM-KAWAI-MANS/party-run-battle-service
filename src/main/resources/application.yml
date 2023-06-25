@@ -2,8 +2,22 @@ server:
   servlet:
     context-path: /api
 
-
 spring:
+  profiles:
+    active: test
+jwt:
+  access-secret-key: "asfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasd"
+  access-expire-second: 1000000
+  refresh-secret-key: "assfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasads"
+  refresh-expire-second: 2000000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   data:
     mongodb:
       uri: ${DB_URI}
+
+
