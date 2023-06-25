@@ -23,7 +23,7 @@ public class BattleRestController {
 
     BattleService battleService;
 
-    @PostMapping("/battle")
+    @PostMapping("battle")
     @ResponseStatus(HttpStatus.CREATED)
     public BattleResponse createBattle(@RequestBody @Valid BattleCreateRequest request) {
 
