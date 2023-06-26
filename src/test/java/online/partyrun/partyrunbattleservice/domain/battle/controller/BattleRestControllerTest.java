@@ -1,11 +1,16 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerNoneAuthTest;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,10 +22,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("BattleRestController")
 class BattleRestControllerTest extends RestControllerNoneAuthTest {
@@ -64,7 +65,8 @@ class BattleRestControllerTest extends RestControllerNoneAuthTest {
         public static Stream<Arguments> invalidBattleRequest() {
             return Stream.of(
                     Arguments.of(null, "body is null"),
-                    Arguments.of(new BattleCreateRequest(List.of("2", "3")), "number of runners error"),
+                    Arguments.of(
+                            new BattleCreateRequest(List.of("2", "3")), "number of runners error"),
                     Arguments.of(new BattleCreateRequest(null), "runner is null"));
         }
 
