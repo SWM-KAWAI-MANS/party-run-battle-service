@@ -3,7 +3,9 @@ package online.partyrun.partyrunbattleservice.global.controller;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -23,7 +25,11 @@ public class HttpControllerAdvice {
     static String BAD_REQUEST_MESSAGE = "잘못된 요청입니다.";
     static String SERVER_ERROR_MESSAGE = "알 수 없는 에러입니다.";
 
-    @ExceptionHandler({BadRequestException.class, HttpMessageNotReadableException.class, MissingRequestHeaderException.class})
+    @ExceptionHandler({
+        BadRequestException.class,
+        HttpMessageNotReadableException.class,
+        MissingRequestHeaderException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBadRequestException(BadRequestException exception) {
         log.warn(exception.getMessage());
@@ -33,11 +39,15 @@ public class HttpControllerAdvice {
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBindException(BindException exception) {
-        final String message = exception.getBindingResult()
-                .getAllErrors()
-                .stream()
-                .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
-                .collect(Collectors.joining(", "));
+        final String message =
+                exception.getBindingResult().getAllErrors().stream()
+                        .map(
+                                error ->
+                                        String.format(
+                                                "%s: %s",
+                                                ((FieldError) error).getField(),
+                                                error.getDefaultMessage()))
+                        .collect(Collectors.joining(", "));
 
         log.warn(message);
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
