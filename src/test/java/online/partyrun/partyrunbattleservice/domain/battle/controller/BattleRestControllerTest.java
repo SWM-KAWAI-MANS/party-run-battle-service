@@ -1,23 +1,26 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerNoneAuthTest;
-
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("BattleRestController")
 class BattleRestControllerTest extends RestControllerNoneAuthTest {
@@ -56,13 +59,20 @@ class BattleRestControllerTest extends RestControllerNoneAuthTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너들의_인원이_잘못되었을_때 {
+    class 러너_요청이_잘못되었을_때 {
 
-        BattleCreateRequest invalidRequest = new BattleCreateRequest(List.of("2", "3"));
+        public static Stream<Arguments> invalidBattleRequest() {
+            return Stream.of(
+                    Arguments.of(null, 1),
+                    Arguments.of(new BattleCreateRequest(List.of("2", "3")), 2),
+                    Arguments.of(new BattleCreateRequest(null), 3)
+            );
+        }
 
-        @Test
+        @ParameterizedTest
+        @MethodSource("invalidBattleRequest")
         @DisplayName("BadRequest를 응답한다.")
-        void returnException() throws Exception {
+        void returnException(BattleCreateRequest invalidRequest, int order) throws Exception {
             given(battleService.createBattle(invalidRequest))
                     .willThrow(new InvalidNumberOfBattleRunnerException(2));
 
@@ -74,7 +84,8 @@ class BattleRestControllerTest extends RestControllerNoneAuthTest {
                                     .content(toRequestBody(invalidRequest)));
             actions.andExpect(status().isBadRequest());
 
-            setPrintDocs(actions, "number of runner is invalid");
+            setPrintDocs(actions, String.format("number of runner is invalid %d", order));
         }
+
     }
 }
