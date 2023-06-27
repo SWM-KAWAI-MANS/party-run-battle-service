@@ -27,7 +27,7 @@ public class BattleService {
 
     public BattleResponse createBattle(BattleCreateRequest request) {
         final List<String> runnerIds = request.getRunnerIds();
-        final List<Runner> runners = runnerService.findByIds(runnerIds);
+        final List<Runner> runners = runnerService.findAllById(runnerIds);
 
         final Battle battle = battleRepository.save(new Battle(runners));
 

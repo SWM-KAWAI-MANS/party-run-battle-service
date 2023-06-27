@@ -1,16 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerNoneAuthTest;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,10 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @DisplayName("BattleRestController")
 class BattleRestControllerTest extends RestControllerNoneAuthTest {
 
-    @MockBean BattleService battleService;
+    @MockBean
+    BattleService battleService;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -38,13 +37,7 @@ class BattleRestControllerTest extends RestControllerNoneAuthTest {
         @DisplayName("방 생성을 수행한다")
         void createBattle() throws Exception {
             given(battleService.createBattle(request))
-                    .willReturn(
-                            new BattleResponse(
-                                    "battle_id",
-                                    List.of(
-                                            new RunnerResponse("1", "박성우"),
-                                            new RunnerResponse("2", "노준혁"),
-                                            new RunnerResponse("3", "박현준"))));
+                    .willReturn(new BattleResponse("battle_id"));
 
             final ResultActions actions =
                     mockMvc.perform(

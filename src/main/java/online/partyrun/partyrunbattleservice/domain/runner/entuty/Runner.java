@@ -11,10 +11,7 @@ import org.springframework.data.annotation.Id;
 public class Runner {
     @Id String id;
 
-    String name;
-
-    public Runner(String id, String name) {
+    public Runner(String id) {
         this.id = id;
-        this.name = name;
     }
 }
