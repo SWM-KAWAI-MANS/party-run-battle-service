@@ -1,0 +1,11 @@
+package online.partyrun.partyrunbattleservice.domain.runner.exception;
+
+import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
+
+import java.util.List;
+
+public class InvalidRunnerException extends BadRequestException {
+    public InvalidRunnerException(List<String> runnerIds) {
+        super(String.format("%s에 존재하지 않는 유저가 포함되어 있습니다.", runnerIds));
+    }
+}
