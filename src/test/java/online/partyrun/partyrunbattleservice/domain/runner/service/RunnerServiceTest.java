@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRunnerException;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +31,8 @@ class RunnerServiceTest {
         @Test
         @DisplayName("러너들을 반환한다.")
         void returnRunners() {
-            final List<Runner> runners = runnerService.findAllById(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId()));
+            final List<Runner> runners =
+                    runnerService.findAllById(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId()));
             assertThat(runners).hasSize(3);
         }
 
@@ -39,7 +40,7 @@ class RunnerServiceTest {
         @DisplayName("존재하지 않는 러너라면 예외를 던진다.")
         void throwException() {
             assertThatThrownBy(() -> runnerService.findAllById(List.of(박성우.getId(), "invalid_id")))
-                   .isInstanceOf(InvalidRunnerException.class);
+                    .isInstanceOf(InvalidRunnerException.class);
         }
     }
 }
