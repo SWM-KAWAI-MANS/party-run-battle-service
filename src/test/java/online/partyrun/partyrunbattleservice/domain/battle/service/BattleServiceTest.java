@@ -20,11 +20,14 @@ import java.util.List;
 @DisplayName("BattleService")
 class BattleServiceTest {
 
-    @Autowired BattleService battleService;
+    @Autowired
+    BattleService battleService;
 
-    @Autowired RunnerRepository runnerRepository;
+    @Autowired
+    RunnerRepository runnerRepository;
 
-    @Autowired MongoTemplate mongoTemplate;
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @AfterEach
     void setUp() {
@@ -33,7 +36,7 @@ class BattleServiceTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 배틀에_참가하는_러너들의_id가_주어지면 {
+    class 배틀을_생성할_때 {
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
         Runner 박현준 = runnerRepository.save(new Runner("박현준"));
         Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
@@ -41,39 +44,53 @@ class BattleServiceTest {
         BattleCreateRequest request =
                 new BattleCreateRequest(List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
 
-        @Test
-        @DisplayName("현재 배틀에 참여하는 러너가 없다면, 생성된 배틀의 정보를 반환한다.")
-        void returnBattle() {
-            final BattleResponse response = battleService.createBattle(request);
-            assertThat(response.id()).isNotNull();
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 현재_배틀에_참여하고_있는_러너가_없다면 {
+            @Test
+            @DisplayName(" 생성된 배틀의 정보를 반환한다.")
+            void returnBattle() {
+                final BattleResponse response = battleService.createBattle(request);
+                assertThat(response.id()).isNotNull();
+            }
         }
 
-        @Test
-        @DisplayName("러너들이 현재 다른 배틀에 모두 참여하고 있다면, 예외를 던진다.")
-        void throwExceptionsByAllRunner() {
-            battleService.createBattle(request);
 
-            assertThatThrownBy(() -> battleService.createBattle(request))
-                    .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 러너들이_현재_다른_배틀에_모두_참여하고_있다면 {
+            BattleResponse battleResponse = battleService.createBattle(request);
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwExceptionsByAllRunner() {
+
+                assertThatThrownBy(() -> battleService.createBattle(request))
+                        .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
+            }
         }
 
-        @Test
-        @DisplayName("한명이라도 다른 배틀에 참여하고 있는 러너가 있다면, 예외를 던진다.")
-        void throwExceptionsByOneRunner() {
-            Runner 장세연 = runnerRepository.save(new Runner("장세연"));
-            Runner 이승열 = runnerRepository.save(new Runner("이승열"));
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 한명이라도_다른_배틀에_참여하고_있는_러너가_있다면 {
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwExceptionsByOneRunner() {
+                Runner 장세연 = runnerRepository.save(new Runner("장세연"));
+                Runner 이승열 = runnerRepository.save(new Runner("이승열"));
 
-            battleService.createBattle(request);
+                battleService.createBattle(request);
 
-            assertThatThrownBy(
-                            () ->
-                                    battleService.createBattle(
-                                            new BattleCreateRequest(
-                                                    List.of(
-                                                            박성우.getId(),
-                                                            장세연.getId(),
-                                                            이승열.getId()))))
-                    .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
+                assertThatThrownBy(
+                        () ->
+                                battleService.createBattle(
+                                        new BattleCreateRequest(
+                                                List.of(
+                                                        박성우.getId(),
+                                                        장세연.getId(),
+                                                        이승열.getId()))))
+                        .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
+            }
         }
     }
 }
