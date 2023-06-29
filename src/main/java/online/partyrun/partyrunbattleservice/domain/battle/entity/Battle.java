@@ -18,7 +18,7 @@ public class Battle {
     @Id String id;
 
     List<Runner> runners;
-
+    BattleStatus status = BattleStatus.RUNNING;
     @CreatedDate LocalDateTime createdAt;
 
     public Battle(List<Runner> runners) {

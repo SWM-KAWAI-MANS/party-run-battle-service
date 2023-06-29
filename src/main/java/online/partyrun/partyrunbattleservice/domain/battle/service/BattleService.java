@@ -8,6 +8,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateReque
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
+import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
@@ -29,8 +31,16 @@ public class BattleService {
         final List<String> runnerIds = request.getRunnerIds();
         final List<Runner> runners = runnerService.findAllById(runnerIds);
 
-        final Battle battle = battleRepository.save(new Battle(runners));
+        validateRunnerInRunningBattle(runners);
 
+        final Battle battle = battleRepository.save(new Battle(runners));
         return battleMapper.toResponse(battle);
+    }
+
+    private void validateRunnerInRunningBattle(List<Runner> runners) {
+        final List<Battle> runningBattle = battleRepository.findByStatusAndRunnersIn(BattleStatus.RUNNING, runners);
+        if (!runningBattle.isEmpty()) {
+            throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
+        }
     }
 }
