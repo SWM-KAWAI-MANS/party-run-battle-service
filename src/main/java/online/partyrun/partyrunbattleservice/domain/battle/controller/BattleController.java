@@ -11,10 +11,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,5 +26,13 @@ public class BattleController {
     public BattleResponse createBattle(@RequestBody @Valid BattleCreateRequest request) {
 
         return battleService.createBattle(request);
+    }
+
+    @GetMapping("battle/running")
+    @ResponseStatus(HttpStatus.OK)
+    public BattleResponse getRunningBattle(Authentication auth) {
+        final String runnerId = (String) auth.getPrincipal();
+
+        return battleService.getRunningBattle(runnerId);
     }
 }
