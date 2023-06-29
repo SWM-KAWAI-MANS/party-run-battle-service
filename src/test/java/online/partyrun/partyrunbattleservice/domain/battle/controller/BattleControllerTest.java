@@ -29,55 +29,59 @@ class BattleControllerTest extends RestControllerNoneAuthTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 정상적인_러너들의_id가_주어졌을_때 {
+    class 배틀을_생성할_때 {
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 정상적인_러너들의_id가_주어지면 {
 
-        BattleCreateRequest request = new BattleCreateRequest(List.of("1", "2", "3"));
+            BattleCreateRequest request = new BattleCreateRequest(List.of("1", "2", "3"));
 
-        @Test
-        @DisplayName("방 생성을 수행한다")
-        void createBattle() throws Exception {
-            given(battleService.createBattle(request)).willReturn(new BattleResponse("battle_id"));
+            @Test
+            @DisplayName("배틀 생성을 수행한다")
+            void createBattle() throws Exception {
+                given(battleService.createBattle(request)).willReturn(new BattleResponse("battle_id"));
 
-            final ResultActions actions =
-                    mockMvc.perform(
-                            post("/battle")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .characterEncoding(StandardCharsets.UTF_8)
-                                    .content(toRequestBody(request)));
-            actions.andExpect(status().isCreated());
+                final ResultActions actions =
+                        mockMvc.perform(
+                                post("/battle")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding(StandardCharsets.UTF_8)
+                                        .content(toRequestBody(request)));
+                actions.andExpect(status().isCreated());
 
-            setPrintDocs(actions, "create battle");
-        }
-    }
-
-    @Nested
-    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너_요청이_잘못되었을_때 {
-
-        public static Stream<Arguments> invalidBattleRequest() {
-            return Stream.of(
-                    Arguments.of(null, "body is null"),
-                    Arguments.of(
-                            new BattleCreateRequest(List.of("2", "3")), "number of runners error"),
-                    Arguments.of(new BattleCreateRequest(null), "runner is null"));
+                setPrintDocs(actions, "create battle");
+            }
         }
 
-        @ParameterizedTest
-        @MethodSource("invalidBattleRequest")
-        @DisplayName("BadRequest를 응답한다.")
-        void returnException(BattleCreateRequest invalidRequest, String message) throws Exception {
-            given(battleService.createBattle(invalidRequest))
-                    .willThrow(new InvalidNumberOfBattleRunnerException(2));
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 러너_요청이_잘못되었다면 {
 
-            final ResultActions actions =
-                    mockMvc.perform(
-                            post("/battle")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .characterEncoding(StandardCharsets.UTF_8)
-                                    .content(toRequestBody(invalidRequest)));
-            actions.andExpect(status().isBadRequest());
+            public static Stream<Arguments> invalidBattleRequest() {
+                return Stream.of(
+                        Arguments.of(null, "body is null"),
+                        Arguments.of(
+                                new BattleCreateRequest(List.of("2", "3")), "number of runners error"),
+                        Arguments.of(new BattleCreateRequest(null), "runner is null"));
+            }
 
-            setPrintDocs(actions, String.format("runner request is invalid, %s", message));
+            @ParameterizedTest
+            @MethodSource("invalidBattleRequest")
+            @DisplayName("BadRequest를 응답한다.")
+            void returnException(BattleCreateRequest invalidRequest, String message) throws Exception {
+                given(battleService.createBattle(invalidRequest))
+                        .willThrow(new InvalidNumberOfBattleRunnerException(2));
+
+                final ResultActions actions =
+                        mockMvc.perform(
+                                post("/battle")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding(StandardCharsets.UTF_8)
+                                        .content(toRequestBody(invalidRequest)));
+                actions.andExpect(status().isBadRequest());
+
+                setPrintDocs(actions, String.format("runner request is invalid, %s", message));
+            }
         }
     }
 }
