@@ -7,5 +7,4 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @EnableMongoAuditing
 @EnableMongoRepositories("online.partyrun.partyrunbattleservice")
-public class MongoConfig {
-}
+public class MongoConfig {}

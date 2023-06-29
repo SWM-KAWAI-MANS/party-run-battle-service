@@ -38,7 +38,8 @@ public class BattleService {
     }
 
     private void validateRunnerInRunningBattle(List<Runner> runners) {
-        final List<Battle> runningBattle = battleRepository.findByStatusAndRunnersIn(BattleStatus.RUNNING, runners);
+        final List<Battle> runningBattle =
+                battleRepository.findByStatusAndRunnersIn(BattleStatus.RUNNING, runners);
         if (!runningBattle.isEmpty()) {
             throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
         }
