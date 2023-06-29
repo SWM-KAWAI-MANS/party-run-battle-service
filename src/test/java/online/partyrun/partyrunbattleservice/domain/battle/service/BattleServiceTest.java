@@ -1,17 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
-import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
+import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 
@@ -21,21 +22,58 @@ class BattleServiceTest {
 
     @Autowired BattleService battleService;
 
-    @MockBean RunnerService runnerService;
+    @Autowired RunnerRepository runnerRepository;
+
+    @Autowired MongoTemplate mongoTemplate;
+
+    @AfterEach
+    void setUp() {
+        mongoTemplate.getDb().drop();
+    }
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀에_참가하는_러너들의_id가_주어지면 {
-        BattleCreateRequest request = new BattleCreateRequest(List.of("1", "2", "3"));
+        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
+        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+
+        BattleCreateRequest request =
+                new BattleCreateRequest(List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
 
         @Test
-        @DisplayName("생성된 방의 정보를 반환한다.")
+        @DisplayName("현재 배틀에 참여하는 러너가 없다면, 생성된 배틀의 정보를 반환한다.")
         void returnBattle() {
-            given(runnerService.findAllById(request.getRunnerIds()))
-                    .willReturn(List.of(new Runner("1"), new Runner("2"), new Runner("3")));
-
             final BattleResponse response = battleService.createBattle(request);
             assertThat(response.id()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("러너들이 현재 다른 배틀에 모두 참여하고 있다면, 예외를 던진다.")
+        void throwExceptionsByAllRunner() {
+            battleService.createBattle(request);
+
+            assertThatThrownBy(() -> battleService.createBattle(request))
+                    .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
+        }
+
+        @Test
+        @DisplayName("한명이라도 다른 배틀에 참여하고 있는 러너가 있다면, 예외를 던진다.")
+        void throwExceptionsByOneRunner() {
+            Runner 장세연 = runnerRepository.save(new Runner("장세연"));
+            Runner 이승열 = runnerRepository.save(new Runner("이승열"));
+
+            battleService.createBattle(request);
+
+            assertThatThrownBy(
+                            () ->
+                                    battleService.createBattle(
+                                            new BattleCreateRequest(
+                                                    List.of(
+                                                            박성우.getId(),
+                                                            장세연.getId(),
+                                                            이승열.getId()))))
+                    .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
         }
     }
 }

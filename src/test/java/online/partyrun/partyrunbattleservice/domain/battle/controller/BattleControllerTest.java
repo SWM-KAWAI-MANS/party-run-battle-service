@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @DisplayName("BattleRestController")
-class BattleRestControllerTest extends RestControllerNoneAuthTest {
+class BattleControllerTest extends RestControllerNoneAuthTest {
 
     @MockBean BattleService battleService;
 
