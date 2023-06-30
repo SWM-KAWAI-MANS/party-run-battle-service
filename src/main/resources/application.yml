@@ -1,9 +1,6 @@
 server:
   servlet:
     context-path: /api
-auth:
-  filter:
-    exclusions: "battle"
 
 spring:
   profiles:

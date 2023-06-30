@@ -30,6 +30,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
     @Autowired RunnerRepository runnerRepository;
 
     @Autowired JwtGenerator jwtGenerator;
+    private static final String SYSTEM_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6Im1hdGNoaW5nIiwicm9sZSI6WyJST0xFX1NZU1RFTSJdLCJleHAiOjMxNTU3MzEyNjF9.IGEtuEEaRKD9k-1EcvG3GWfs9nFgkz2UScHphRB-EUmufwPEtPrLF26T4CNoYeD9cfArKqz1km2m0pXYzo-9UA";
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -47,6 +48,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
             void returnCreated() {
                 final ExtractableResponse<Response> response =
                         배틀_생성_요청(
+                                SYSTEM_TOKEN,
                                 new BattleCreateRequest(
                                         List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
                 assertAll(
@@ -76,7 +78,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
             @Test
             @DisplayName("OK와 배틀 정보를 응답한다.")
             void returnOK() {
-                배틀_생성_요청(new BattleCreateRequest(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
+                배틀_생성_요청(SYSTEM_TOKEN, new BattleCreateRequest(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
                 final ExtractableResponse<Response> response = 배틀_조회_요청(박성우_accessToken);
 
                 assertAll(

@@ -14,6 +14,6 @@ public class BattleAuthorizationRegistry implements AuthorizationRegistry {
                     AuthorizeHttpRequestsConfigurer<HttpSecurity>
                                     .AuthorizationManagerRequestMatcherRegistry
                             r) {
-        return r.requestMatchers("/battle").permitAll().anyRequest().hasRole("USER");
+        return r.requestMatchers("/battle").hasRole("SYSTEM").anyRequest().hasRole("USER");
     }
 }
