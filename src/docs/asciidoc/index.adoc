@@ -5,15 +5,32 @@
 :toclevels: 4
 :sectlinks:
 
-== Battle
-=== 배틀 생성
+= Battle
+== 배틀 생성
 operation::create battle[snippets='http-request,http-response']
-=== 배틀 생성 인원 부족 실패
+
+=== 배틀 생성 실패
+body가 null일 때
+
 operation::runner request is invalid, body is null[snippets='http-request,http-response']
+---
+
+number of runners error
+
 operation::runner request is invalid, number of runners error[snippets='http-request,http-response']
+---
+
+runner is null
+
 operation::runner request is invalid, runner is null[snippets='http-request,http-response']
+---
 
 === 배틀 조회
 operation::get battle[snippets='http-request,http-response']
+---
+
+=== 배틀 조회 실패
+현재 배틀을 진행하고 있지 않은 러너가 조회요청을 했을 때
+
 operation::battle not found[snippets='http-request,http-response']
 
