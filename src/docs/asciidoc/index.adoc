@@ -15,4 +15,5 @@ operation::runner request is invalid, runner is null[snippets='http-request,http
 
 === 배틀 조회
 operation::get battle[snippets='http-request,http-response']
+operation::battle not found[snippets='http-request,http-response']
 

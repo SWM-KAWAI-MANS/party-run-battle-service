@@ -77,5 +77,18 @@ public class BattleAcceptanceTest extends AcceptanceTest {
                 );
             }
         }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 요청에_잘못된_토큰을_요청하면 {
+
+            @Test
+            @DisplayName("Forbidden을 반환한다.")
+            void returnBadRequest() {
+                final ExtractableResponse<Response> response = 배틀_조회_요청("invalidToken");
+
+                assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+            }
+        }
     }
 }
