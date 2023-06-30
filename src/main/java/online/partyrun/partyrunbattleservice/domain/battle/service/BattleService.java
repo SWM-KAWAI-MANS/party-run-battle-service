@@ -10,6 +10,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
@@ -43,5 +44,14 @@ public class BattleService {
         if (!runningBattle.isEmpty()) {
             throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
         }
+    }
+
+    public BattleResponse getRunningBattle(String runnerId) {
+        final Battle battle =
+                battleRepository
+                        .findByStatusAndRunnersId(BattleStatus.RUNNING, runnerId)
+                        .orElseThrow(() -> new RunningBattleNotFoundException(runnerId));
+
+        return battleMapper.toResponse(battle);
     }
 }

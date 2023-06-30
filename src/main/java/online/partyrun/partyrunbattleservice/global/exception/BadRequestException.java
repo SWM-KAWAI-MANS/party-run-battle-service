@@ -1,11 +1,11 @@
 package online.partyrun.partyrunbattleservice.global.exception;
 
-public class BadRequestException extends RuntimeException {
-    public BadRequestException() {
+public abstract class BadRequestException extends RuntimeException {
+    protected BadRequestException() {
         super("잘못된 요청입니다.");
     }
 
-    public BadRequestException(String message) {
+    protected BadRequestException(String message) {
         super(message);
     }
 }

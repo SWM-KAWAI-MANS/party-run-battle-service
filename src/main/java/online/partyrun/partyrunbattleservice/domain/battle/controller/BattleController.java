@@ -11,22 +11,27 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("battle")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleController {
 
     BattleService battleService;
 
-    @PostMapping("battle")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BattleResponse createBattle(@RequestBody @Valid BattleCreateRequest request) {
 
         return battleService.createBattle(request);
+    }
+
+    @GetMapping("running")
+    @ResponseStatus(HttpStatus.OK)
+    public BattleResponse getRunningBattle(Authentication auth) {
+        return battleService.getRunningBattle(auth.getName());
     }
 }

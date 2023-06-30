@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
+import online.partyrun.partyrunbattleservice.global.exception.NotFoundException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class HttpControllerAdvice {
 
     static String BAD_REQUEST_MESSAGE = "잘못된 요청입니다.";
+    static String NOT_FOUND_EXCEPTION_MESSAGE = "요청한 리소스를 찾을 수 없습니다.";
     static String SERVER_ERROR_MESSAGE = "알 수 없는 에러입니다.";
 
     @ExceptionHandler({
@@ -51,6 +53,13 @@ public class HttpControllerAdvice {
 
         log.warn(message);
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionResponse handleNotFoundException(NotFoundException exception) {
+        log.warn(exception.getMessage());
+        return new ExceptionResponse(NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     @ExceptionHandler({RuntimeException.class, Exception.class})
