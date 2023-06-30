@@ -11,7 +11,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,14 +19,11 @@ import java.util.Optional;
 @DisplayName("BattleRepository")
 class BattleRepositoryTest {
 
-    @Autowired
-    private RunnerRepository runnerRepository;
+    @Autowired private RunnerRepository runnerRepository;
 
-    @Autowired
-    private BattleRepository battleRepository;
+    @Autowired private BattleRepository battleRepository;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
+    @Autowired MongoTemplate mongoTemplate;
 
     @AfterEach
     void tearDown() {
@@ -76,8 +72,14 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("현재 진행중인 상태의 배틀이 존재하면 반환한다.")
             void returnRunningBattle() {
-                final Battle 박성우_진행중_배틀 = battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, 박성우.getId()).orElseThrow();
-                final Battle 박현준_진행중_배틀 = battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, 박현준.getId()).orElseThrow();
+                final Battle 박성우_진행중_배틀 =
+                        battleRepository
+                                .findByStatusAndRunnersId(BattleStatus.RUNNING, 박성우.getId())
+                                .orElseThrow();
+                final Battle 박현준_진행중_배틀 =
+                        battleRepository
+                                .findByStatusAndRunnersId(BattleStatus.RUNNING, 박현준.getId())
+                                .orElseThrow();
 
                 assertThat(박성우_진행중_배틀)
                         .usingRecursiveComparison()
@@ -88,7 +90,9 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("현재 진행중인 상태의 배틀이 존재하지않으면 빈 값을 반환한다.")
             void returnEmpty() {
-                final Optional<Battle> 노준혁_진행중_배틀 = battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, 노준혁.getId());
+                final Optional<Battle> 노준혁_진행중_배틀 =
+                        battleRepository.findByStatusAndRunnersId(
+                                BattleStatus.RUNNING, 노준혁.getId());
 
                 assertThat(노준혁_진행중_배틀).isEmpty();
             }

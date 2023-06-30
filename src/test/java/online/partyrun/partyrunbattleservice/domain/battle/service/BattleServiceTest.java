@@ -1,11 +1,15 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,21 +17,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @SpringBootTest
 @DisplayName("BattleService")
 class BattleServiceTest {
 
-    @Autowired
-    BattleService battleService;
+    @Autowired BattleService battleService;
 
-    @Autowired
-    RunnerRepository runnerRepository;
+    @Autowired RunnerRepository runnerRepository;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
+    @Autowired MongoTemplate mongoTemplate;
 
     @AfterEach
     void setUp() {
@@ -41,7 +39,8 @@ class BattleServiceTest {
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
         Runner 박현준 = runnerRepository.save(new Runner("박현준"));
         Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
-        BattleCreateRequest request = new BattleCreateRequest(List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
+        BattleCreateRequest request =
+                new BattleCreateRequest(List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -53,7 +52,6 @@ class BattleServiceTest {
                 assertThat(response.id()).isNotNull();
             }
         }
-
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -82,12 +80,13 @@ class BattleServiceTest {
                 battleService.createBattle(request);
 
                 assertThatThrownBy(
-                        () -> battleService.createBattle(
-                                new BattleCreateRequest(
-                                        List.of(
-                                                박성우.getId(),
-                                                장세연.getId(),
-                                                이승열.getId()))))
+                                () ->
+                                        battleService.createBattle(
+                                                new BattleCreateRequest(
+                                                        List.of(
+                                                                박성우.getId(),
+                                                                장세연.getId(),
+                                                                이승열.getId()))))
                         .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
             }
         }

@@ -3,8 +3,10 @@ package online.partyrun.partyrunbattleservice.global.controller;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
 import online.partyrun.partyrunbattleservice.global.exception.NotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -26,9 +28,9 @@ public class HttpControllerAdvice {
     static String SERVER_ERROR_MESSAGE = "알 수 없는 에러입니다.";
 
     @ExceptionHandler({
-            BadRequestException.class,
-            HttpMessageNotReadableException.class,
-            MissingRequestHeaderException.class
+        BadRequestException.class,
+        HttpMessageNotReadableException.class,
+        MissingRequestHeaderException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBadRequestException(BadRequestException exception) {

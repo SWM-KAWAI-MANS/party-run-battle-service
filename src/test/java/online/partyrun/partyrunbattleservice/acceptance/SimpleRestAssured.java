@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
 import org.springframework.http.MediaType;
 
 import java.util.Map;
@@ -17,7 +18,8 @@ public class SimpleRestAssured {
         return post(path, null, request);
     }
 
-    public static ExtractableResponse<Response> post(String path, Map<String, String> headers, Object request) {
+    public static ExtractableResponse<Response> post(
+            String path, Map<String, String> headers, Object request) {
         final RequestSpecification given = givenWithHeaders(headers);
         if (request != null) {
             given.body(request);

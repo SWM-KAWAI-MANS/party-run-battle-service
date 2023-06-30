@@ -47,8 +47,10 @@ public class BattleService {
     }
 
     public BattleResponse getRunningBattle(String runnerId) {
-        final Battle battle = battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, runnerId)
-                .orElseThrow(() -> new RunningBattleNotFoundException(runnerId));
+        final Battle battle =
+                battleRepository
+                        .findByStatusAndRunnersId(BattleStatus.RUNNING, runnerId)
+                        .orElseThrow(() -> new RunningBattleNotFoundException(runnerId));
 
         return battleMapper.toResponse(battle);
     }
