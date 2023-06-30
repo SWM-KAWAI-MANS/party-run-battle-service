@@ -16,19 +16,20 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("battle")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleController {
 
     BattleService battleService;
 
-    @PostMapping("battle")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BattleResponse createBattle(@RequestBody @Valid BattleCreateRequest request) {
 
         return battleService.createBattle(request);
     }
 
-    @GetMapping("battle/running")
+    @GetMapping("running")
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getRunningBattle(Authentication auth) {
         return battleService.getRunningBattle(auth.getName());
