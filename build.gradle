@@ -69,6 +69,7 @@ dependencies {
 
     testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

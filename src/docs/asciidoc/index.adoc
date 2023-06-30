@@ -6,10 +6,13 @@
 :sectlinks:
 
 == Battle
-=== 방 생성
+=== 배틀 생성
 operation::create battle[snippets='http-request,http-response']
-=== 방 생성 인원 부족 실패
+=== 배틀 생성 인원 부족 실패
 operation::runner request is invalid, body is null[snippets='http-request,http-response']
 operation::runner request is invalid, number of runners error[snippets='http-request,http-response']
 operation::runner request is invalid, runner is null[snippets='http-request,http-response']
+
+=== 배틀 조회
+operation::get battle[snippets='http-request,http-response']
 
