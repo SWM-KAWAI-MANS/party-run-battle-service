@@ -31,8 +31,6 @@ public class BattleController {
     @GetMapping("battle/running")
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getRunningBattle(Authentication auth) {
-        final String runnerId = (String) auth.getPrincipal();
-
-        return battleService.getRunningBattle(runnerId);
+        return battleService.getRunningBattle(auth.getName());
     }
 }
