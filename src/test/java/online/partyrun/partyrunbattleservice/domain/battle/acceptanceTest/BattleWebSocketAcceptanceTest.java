@@ -1,7 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -12,15 +16,11 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.util.concurrent.CompletableFuture;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @Import(WebSocketTestConfiguration.class)
 @DisplayName("BattleWebSocketAcceptance")
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
-    @Autowired
-    WebSocketStompClient webSocketStompClient;
+    @Autowired WebSocketStompClient webSocketStompClient;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -29,7 +29,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 정상적인_러너가_요청한다면 {
-            String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IuuwleyEseyasCIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTAxNjg4MTk0Mzk2fQ.zRmofIpdozhKUCNijYkrOnUIlC5y4oY136FAJqJLKL_CMAdZR1c_QDbxaGym5nmrAJJ2c7dyf7qgAig70n5org";
+            String accessToken =
+                    "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IuuwleyEseyasCIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTAxNjg4MTk0Mzk2fQ.zRmofIpdozhKUCNijYkrOnUIlC5y4oY136FAJqJLKL_CMAdZR1c_QDbxaGym5nmrAJJ2c7dyf7qgAig70n5org";
 
             @Test
             @DisplayName("연결에 성공한다.")
@@ -38,11 +39,11 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
                 headers.add("Authorization", accessToken);
 
-                final CompletableFuture<StompSession> stompSessionFuture = webSocketStompClient.connectAsync(
-                        "ws://localhost:" + port + "/api/battle/ws",
-                        headers,
-                        new StompSessionHandlerAdapter() {
-                        });
+                final CompletableFuture<StompSession> stompSessionFuture =
+                        webSocketStompClient.connectAsync(
+                                "ws://localhost:" + port + "/api/battle/ws",
+                                headers,
+                                new StompSessionHandlerAdapter() {});
 
                 assertThat(stompSessionFuture.get()).isNotNull();
             }
@@ -60,14 +61,13 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
                 headers.add("Authorization", invalidAccessToken);
 
-                final CompletableFuture<StompSession> stompSessionFuture = webSocketStompClient.connectAsync(
-                        "ws://localhost:" + port + "/api/battle/ws",
-                        headers,
-                        new StompSessionHandlerAdapter() {
-                        });
+                final CompletableFuture<StompSession> stompSessionFuture =
+                        webSocketStompClient.connectAsync(
+                                "ws://localhost:" + port + "/api/battle/ws",
+                                headers,
+                                new StompSessionHandlerAdapter() {});
 
-                assertThatThrownBy(stompSessionFuture::get)
-                        .isInstanceOf(Exception.class);
+                assertThatThrownBy(stompSessionFuture::get).isInstanceOf(Exception.class);
             }
         }
     }
