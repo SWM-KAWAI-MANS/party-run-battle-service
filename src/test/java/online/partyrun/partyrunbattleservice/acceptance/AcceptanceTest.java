@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
 
-    @LocalServerPort private int port;
+    @LocalServerPort protected int port;
 
     @BeforeEach
     public void setUp() {
