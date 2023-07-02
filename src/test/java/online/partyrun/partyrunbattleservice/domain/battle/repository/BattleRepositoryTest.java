@@ -1,12 +1,9 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -15,15 +12,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DataMongoTest
 @DisplayName("BattleRepository")
 class BattleRepositoryTest {
 
-    @Autowired private RunnerRepository runnerRepository;
-
-    @Autowired private BattleRepository battleRepository;
-
-    @Autowired MongoTemplate mongoTemplate;
+    @Autowired
+    MongoTemplate mongoTemplate;
+    @Autowired
+    private RunnerRepository runnerRepository;
+    @Autowired
+    private BattleRepository battleRepository;
 
     @AfterEach
     void tearDown() {
@@ -95,6 +96,31 @@ class BattleRepositoryTest {
                                 BattleStatus.RUNNING, 노준혁.getId());
 
                 assertThat(노준혁_진행중_배틀).isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class existsByIdAndRunnersIdAndStatus는 {
+            Battle battle1 = battleRepository.save(new Battle(List.of(박성우, 박현준)));
+
+            @Test
+            @DisplayName("battleId, runnerId, status를 만족하는 데이터의 존재하면 true를 반환한다.")
+            void returnTrue() {
+                final boolean result = battleRepository.existsByIdAndRunnersIdAndStatus(battle1.getId(), 박성우.getId(), BattleStatus.RUNNING);
+                assertThat(result).isTrue();
+            }
+
+            @Test
+            @DisplayName("battleId, runnerId, status를 만족하는 데이터가 없으면 false를 반환한다.")
+            void returnFalse() {
+                final boolean result1 = battleRepository.existsByIdAndRunnersIdAndStatus(battle1.getId(), 박성우.getId(), BattleStatus.FINISHED);
+                final boolean result2 = battleRepository.existsByIdAndRunnersIdAndStatus(battle1.getId(), 노준혁.getId(), BattleStatus.RUNNING);
+
+                assertAll(
+                        () -> assertThat(result1).isFalse(),
+                        () -> assertThat(result2).isFalse()
+                );
             }
         }
     }
