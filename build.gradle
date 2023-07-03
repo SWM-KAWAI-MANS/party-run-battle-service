@@ -134,6 +134,7 @@ jacocoTestCoverageVerification {
                     '**.*Exception*',
                     '**.*Mapper*',
                     '**.*ControllerAdvice*',
+                    '**.*Interceptor*'
             ]
         }
 

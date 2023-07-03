@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
-import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidSubscribeRequestException;
+import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -21,7 +21,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleChannelInterceptor implements ChannelInterceptor {
 
-    static String BATTLE_TOPIC_PREFIX = "/topic/battle";
+    static String BATTLE_TOPIC_PREFIX = "/topic/battle/";
     BattleRepository battleRepository;
 
     @Override
@@ -37,16 +37,18 @@ public class BattleChannelInterceptor implements ChannelInterceptor {
 
     private boolean isSubscribeToBattleTopic(StompHeaderAccessor accessor) {
         final String destination = accessor.getDestination();
-        return StompCommand.SUBSCRIBE.equals(accessor.getCommand()) &&
-                Objects.nonNull(destination) &&
-                destination.startsWith(BATTLE_TOPIC_PREFIX);
+        return StompCommand.SUBSCRIBE.equals(accessor.getCommand())
+                && Objects.nonNull(destination)
+                && destination.contains(BATTLE_TOPIC_PREFIX);
     }
 
     private void validateSubscription(StompHeaderAccessor accessor) {
         final String runnerId = getRunnerId(accessor);
         String battleId = extractBattleId(accessor);
 
-        if (!battleRepository.existsByIdAndRunnersIdAndStatus(battleId, runnerId, BattleStatus.RUNNING)) {
+        if (!battleRepository.existsByIdAndRunnersIdAndStatus(
+                battleId, runnerId, BattleStatus.RUNNING)) {
+
             throw new InvalidSubscribeRequestException(battleId, runnerId);
         }
     }
