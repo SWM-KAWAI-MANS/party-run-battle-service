@@ -1,6 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.runner.repository;
 
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

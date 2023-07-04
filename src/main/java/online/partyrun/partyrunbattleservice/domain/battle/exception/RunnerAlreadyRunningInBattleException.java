@@ -1,7 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.exception;
 
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
 
 import java.util.List;

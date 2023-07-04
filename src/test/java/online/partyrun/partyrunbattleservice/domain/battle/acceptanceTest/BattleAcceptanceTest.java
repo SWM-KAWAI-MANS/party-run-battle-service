@@ -14,7 +14,7 @@ import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
 import org.junit.jupiter.api.*;

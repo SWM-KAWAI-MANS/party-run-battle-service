@@ -1,4 +1,4 @@
-package online.partyrun.partyrunbattleservice.domain.runner.entuty;
+package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
 import lombok.AccessLevel;
 import lombok.Getter;

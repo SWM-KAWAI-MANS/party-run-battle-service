@@ -7,7 +7,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateReque
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
 import org.junit.jupiter.api.*;

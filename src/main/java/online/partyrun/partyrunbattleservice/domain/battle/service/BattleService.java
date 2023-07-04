@@ -12,7 +12,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 
 import org.springframework.stereotype.Service;
