@@ -3,20 +3,22 @@ package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.LocationDto;
+import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,6 +35,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     RunnerRepository runnerRepository;
     @Autowired
     JwtGenerator jwtGenerator;
+    BlockingQueue<LocationDto> locationQueue = new LinkedBlockingDeque<>();
 
     private CompletableFuture<StompSession> 웹소켓_연결(String accessToken) {
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
@@ -43,15 +46,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         "ws://localhost:" + port + "/api/battle/ws",
                         headers,
                         new StompSessionHandlerAdapter() {
-                            @Override
-                            public void handleException(
-                                    StompSession session,
-                                    StompCommand command,
-                                    StompHeaders headers,
-                                    byte[] payload,
-                                    Throwable exception) {
-                                session.disconnect();
-                            }
                         });
         return stompSessionFuture;
     }
@@ -59,9 +53,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 웹_소켓_연결을_실행할_때 {
-
-        String accessToken =
-                "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IuuwleyEseyasCIsInJvbGUiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTAxNjg4MTk0Mzk2fQ.zRmofIpdozhKUCNijYkrOnUIlC5y4oY136FAJqJLKL_CMAdZR1c_QDbxaGym5nmrAJJ2c7dyf7qgAig70n5org";
+        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        String accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -90,6 +83,35 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
                 assertThatThrownBy(() -> stompSessionFuture.get(5, TimeUnit.SECONDS))
                         .isInstanceOf(Exception.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 웹소켓_연결에_성공했을_때 {
+        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        String accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
+        Battle 배틀 = battleRepository.save(new Battle(List.of(박성우)));
+        CompletableFuture<StompSession> stompSessionFuture = 웹소켓_연결(accessToken);
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 구독_요청에_성공하면 {
+
+            @Test
+            @DisplayName("메시지를 받을 수 있다")
+            void getMessage() throws ExecutionException, InterruptedException, TimeoutException {
+                System.out.println(accessToken);
+                StompSession stompSession = stompSessionFuture.get(5, TimeUnit.SECONDS);
+                stompSession.subscribe(
+                        String.format("/topic/battle/%s", 배틀.getId()),
+                        new StompFrameHandlerImpl<>(new LocationDto(), locationQueue)
+                );
+
+                stompSession.send(String.format("/pub/battle/%s", 배틀.getId()), new LocationDto(1, 2));
+                LocationDto result = locationQueue.poll(5, TimeUnit.SECONDS);
+                assertThat(result).isEqualTo(new LocationDto(1, 2));
             }
         }
     }
