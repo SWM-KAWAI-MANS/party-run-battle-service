@@ -8,11 +8,11 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateReque
 
 import java.util.Map;
 
-public class BattleRestAssuredRequest {
+public abstract class BattleRestAssuredRequest {
     private static final String PREFIX_URL = "api";
     private static final String BATTLE_URL = "battle";
 
-    public static final ExtractableResponse<Response> 배틀_생성_요청(
+    public static ExtractableResponse<Response> 배틀_생성_요청(
             String systemToken, BattleCreateRequest request) {
         return SimpleRestAssured.post(
                 String.format("/%s/%s", PREFIX_URL, BATTLE_URL),
@@ -20,7 +20,7 @@ public class BattleRestAssuredRequest {
                 request);
     }
 
-    public static final ExtractableResponse<Response> 배틀_조회_요청(String accessToken) {
+    public static ExtractableResponse<Response> 배틀_조회_요청(String accessToken) {
         return SimpleRestAssured.get(
                 String.format("/%s/%s/running", PREFIX_URL, BATTLE_URL),
                 Map.of("Authorization", accessToken));

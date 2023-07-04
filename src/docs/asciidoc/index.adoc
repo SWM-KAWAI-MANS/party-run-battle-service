@@ -6,8 +6,11 @@
 :sectlinks:
 
 = Battle
-== 배틀 생성
+
+=== 배틀 생성
+
 operation::create battle[snippets='http-request,http-response']
+---
 
 === 배틀 생성 실패
 body가 null일 때

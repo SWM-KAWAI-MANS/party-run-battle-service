@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRunnerException;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
@@ -18,6 +18,8 @@ import java.util.List;
 public class RunnerService {
 
     RunnerRepository runnerRepository;
+
+    // TODO: 2023/07/04 MemberRepository에서 가져와서 runner 생성하는 로직으로 변경하기
 
     public List<Runner> findAllById(List<String> runnerIds) {
         final List<Runner> runners = runnerRepository.findAllById(runnerIds);

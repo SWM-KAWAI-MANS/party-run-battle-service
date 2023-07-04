@@ -3,7 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.runner.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import online.partyrun.partyrunbattleservice.domain.runner.entuty.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRunnerException;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
