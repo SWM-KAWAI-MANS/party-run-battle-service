@@ -1,5 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
@@ -8,6 +11,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -20,21 +24,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @Import(WebSocketTestConfiguration.class)
 @DisplayName("BattleWebSocketAcceptance")
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
-    @Autowired
-    WebSocketStompClient webSocketStompClient;
-    @Autowired
-    BattleRepository battleRepository;
-    @Autowired
-    RunnerRepository runnerRepository;
-    @Autowired
-    JwtGenerator jwtGenerator;
+    @Autowired WebSocketStompClient webSocketStompClient;
+    @Autowired BattleRepository battleRepository;
+    @Autowired RunnerRepository runnerRepository;
+    @Autowired JwtGenerator jwtGenerator;
     BlockingQueue<LocationDto> locationQueue = new LinkedBlockingDeque<>();
 
     private CompletableFuture<StompSession> 웹소켓_연결(String accessToken) {
@@ -45,8 +42,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 webSocketStompClient.connectAsync(
                         "ws://localhost:" + port + "/api/battle/ws",
                         headers,
-                        new StompSessionHandlerAdapter() {
-                        });
+                        new StompSessionHandlerAdapter() {});
         return stompSessionFuture;
     }
 
@@ -106,14 +102,13 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 StompSession stompSession = stompSessionFuture.get(5, TimeUnit.SECONDS);
                 stompSession.subscribe(
                         String.format("/topic/battle/%s", 배틀.getId()),
-                        new StompFrameHandlerImpl<>(new LocationDto(), locationQueue)
-                );
+                        new StompFrameHandlerImpl<>(new LocationDto(), locationQueue));
 
-                stompSession.send(String.format("/pub/battle/%s", 배틀.getId()), new LocationDto(1, 2));
+                stompSession.send(
+                        String.format("/pub/battle/%s", 배틀.getId()), new LocationDto(1, 2));
                 LocationDto result = locationQueue.poll(5, TimeUnit.SECONDS);
                 assertThat(result).isEqualTo(new LocationDto(1, 2));
             }
         }
     }
 }
-
