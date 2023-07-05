@@ -5,6 +5,10 @@ public enum BattleStatus {
     RUNNING,
     FINISHED;
 
+    public boolean isReady() {
+        return this == READY;
+    }
+
     public boolean isFinished() {
         return this == FINISHED;
     }

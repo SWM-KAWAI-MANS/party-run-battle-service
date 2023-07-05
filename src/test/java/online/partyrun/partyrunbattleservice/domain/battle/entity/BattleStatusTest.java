@@ -34,4 +34,32 @@ class BattleStatusTest {
             }
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class isReady_메소드는 {
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀_상태가_READY_일_때 {
+            BattleStatus battleStatus = BattleStatus.READY;
+
+            @Test
+            @DisplayName("True를 반환한다.")
+            void returnTrue() {
+                assertThat(battleStatus.isReady()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀_상태가_READY가_아닐_때 {
+            BattleStatus battleStatus = BattleStatus.RUNNING;
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void returnTrue() {
+                assertThat(battleStatus.isFinished()).isFalse();
+            }
+        }
+    }
 }
