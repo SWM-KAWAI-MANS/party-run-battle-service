@@ -34,7 +34,7 @@ public class BattleService {
 
         validateRunnerInBattle(runners);
 
-        final Battle battle = battleRepository.save(new Battle(runners));
+        final Battle battle = battleRepository.save(new Battle(request.getDistance(), runners));
         return battleMapper.toResponse(battle);
     }
 

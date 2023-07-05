@@ -51,8 +51,8 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("현재 참여중인 배틀이 있으면 참여한 배틀 리스트를 반환한다.")
             void returnListBattle() {
-                final Battle 배틀1 = battleRepository.save(new Battle(List.of(박성우, 박현준)));
-                final Battle 배틀2 = battleRepository.save(new Battle(List.of(노준혁)));
+                final Battle 배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+                final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
                 배틀2.changeStatus(BattleStatus.RUNNING);
                 battleRepository.save(배틀2);
 
@@ -67,7 +67,7 @@ class BattleRepositoryTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class findByStatusInAndRunnersId는 {
-            Battle battle = battleRepository.save(new Battle(List.of(박성우, 박현준)));
+            Battle battle = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
             @Test
             @DisplayName("현재 진행중인 상태의 배틀이 존재하면 반환한다.")
@@ -101,7 +101,7 @@ class BattleRepositoryTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class existsByIdAndRunnersIdAndStatus는 {
-            Battle battle1 = battleRepository.save(new Battle(List.of(박성우, 박현준)));
+            Battle battle1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
             @Test
             @DisplayName("battleId, runnerId, status를 만족하는 데이터의 존재하면 true를 반환한다.")

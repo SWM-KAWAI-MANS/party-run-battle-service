@@ -48,7 +48,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
                         배틀_생성_요청(
                                 SYSTEM_TOKEN,
                                 new BattleCreateRequest(
-                                        List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
+                                        1000, List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
                 assertAll(
                         () ->
                                 assertThat(response.statusCode())
@@ -78,7 +78,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
             void returnOK() {
                 배틀_생성_요청(
                         SYSTEM_TOKEN,
-                        new BattleCreateRequest(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
+                        new BattleCreateRequest(1000, List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
                 final ExtractableResponse<Response> response = 준비_상태인_배틀_조회_요청(박성우_accessToken);
 
                 assertAll(

@@ -1,8 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
@@ -11,7 +8,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -23,6 +19,9 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import(WebSocketTestConfiguration.class)
 @DisplayName("BattleWebSocketAcceptance")
@@ -89,7 +88,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
         String accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
-        Battle 배틀 = battleRepository.save(new Battle(List.of(박성우)));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
         CompletableFuture<StompSession> stompSessionFuture = 웹소켓_연결(accessToken);
 
         @Nested
@@ -115,7 +114,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 구독_요청에_실패하면 {
             Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-            Battle 박현준_배틀 = battleRepository.save(new Battle(List.of(박현준)));
+            Battle 박현준_배틀 = battleRepository.save(new Battle(1000, List.of(박현준)));
 
             @Test
             @DisplayName("메시지를 받을 수 없다")

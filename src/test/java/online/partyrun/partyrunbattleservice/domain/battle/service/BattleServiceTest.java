@@ -39,7 +39,7 @@ class BattleServiceTest {
         Runner 박현준 = runnerRepository.save(new Runner("박현준"));
         Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
         BattleCreateRequest request =
-                new BattleCreateRequest(List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
+                new BattleCreateRequest(1000, List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -82,6 +82,7 @@ class BattleServiceTest {
                                 () ->
                                         battleService.createBattle(
                                                 new BattleCreateRequest(
+                                                        1000,
                                                         List.of(
                                                                 박성우.getId(),
                                                                 장세연.getId(),
@@ -96,7 +97,7 @@ class BattleServiceTest {
     class 배틀을_조회할_때 {
 
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        BattleCreateRequest request = new BattleCreateRequest(List.of(박성우.getId()));
+        BattleCreateRequest request = new BattleCreateRequest(1000, List.of(박성우.getId()));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)

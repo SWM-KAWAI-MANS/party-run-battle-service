@@ -39,7 +39,7 @@ class BattleControllerTest extends RestControllerTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 정상적인_러너들의_id가_주어지면 {
 
-            BattleCreateRequest request = new BattleCreateRequest(List.of("1", "2", "3"));
+            BattleCreateRequest request = new BattleCreateRequest(1000, List.of("1", "2", "3"));
             BattleResponse response = new BattleResponse("battle_id");
 
             @Test
@@ -69,9 +69,9 @@ class BattleControllerTest extends RestControllerTest {
                 return Stream.of(
                         Arguments.of(null, "body is null"),
                         Arguments.of(
-                                new BattleCreateRequest(List.of("2", "3")),
+                                new BattleCreateRequest(1000, List.of("2", "3")),
                                 "number of runners error"),
-                        Arguments.of(new BattleCreateRequest(null), "runner is null"));
+                        Arguments.of(new BattleCreateRequest(1000, null), "runner is null"));
             }
 
             @ParameterizedTest
