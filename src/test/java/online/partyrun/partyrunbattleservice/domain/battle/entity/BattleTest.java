@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleStatusCannotBeChangedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
@@ -7,8 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ class BattleTest {
             }
 
         }
+
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 거리가_1_미만이라면 {
@@ -49,7 +51,7 @@ class BattleTest {
             @DisplayName("예외를 던진다.")
             void throwException(int distance) {
                 assertThatThrownBy(() -> new Battle(distance, runnerList))
-                      .isInstanceOf(InvalidDistanceException.class);
+                        .isInstanceOf(InvalidDistanceException.class);
             }
         }
 
@@ -97,6 +99,87 @@ class BattleTest {
             void throwException() {
                 assertThatThrownBy(() -> 배틀.changeRunnerStatus(노준혁.getId(), RunnerStatus.RUNNING))
                         .isInstanceOf(RunnerNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀이_FINISHED_상태라면 {
+
+            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                배틀.changeBattleStatus(BattleStatus.FINISHED);
+                assertThatThrownBy(() -> 배틀.changeRunnerStatus(노준혁.getId(), RunnerStatus.RUNNING))
+                        .isInstanceOf(BattleAlreadyFinishedException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀의_상태를_변경할_때 {
+
+        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 상태를_받으면 {
+
+            BattleStatus status = BattleStatus.RUNNING;
+
+            @Test
+            @DisplayName("배틀의 상태를 변경한다.")
+            void changeBattleStatus() {
+                배틀.changeBattleStatus(status);
+                assertThat(배틀.getStatus()).isEqualTo(status);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀이_FINISHED_상태라면 {
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                배틀.changeBattleStatus(BattleStatus.FINISHED);
+                assertThatThrownBy(() -> 배틀.changeBattleStatus(BattleStatus.RUNNING))
+                        .isInstanceOf(BattleAlreadyFinishedException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 새로운_상태가_null_또는_READY라면 {
+
+            private static List<Arguments> BattleStatusProvider() {
+                return List.of(Arguments.of(BattleStatus.READY));
+            }
+            @ParameterizedTest
+            @NullSource
+            @MethodSource("BattleStatusProvider")
+            @DisplayName("예외를 던진다.")
+            void throwException(BattleStatus status) {
+                assertThatThrownBy(() -> 배틀.changeBattleStatus(status))
+                        .isInstanceOf(BattleStatusCannotBeChangedException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 새로운_상태가_현재_상태와_같다면 {
+
+            BattleStatus status = BattleStatus.RUNNING;
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                배틀.changeBattleStatus(status);
+                assertThatThrownBy(() -> 배틀.changeBattleStatus(status))
+                        .isInstanceOf(BattleStatusCannotBeChangedException.class);
             }
         }
     }

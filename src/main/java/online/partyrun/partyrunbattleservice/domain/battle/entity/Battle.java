@@ -4,12 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleStatusCannotBeChangedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
 import org.springframework.data.annotation.CreatedDate;
@@ -51,12 +50,12 @@ public class Battle {
     }
 
     public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
-        validateStatus();
+        validateCurrentStatus();
         final Runner runner = findRunner(runnerId);
         runner.changeStatus(runnerStatus);
     }
 
-    private void validateStatus() {
+    private void validateCurrentStatus() {
         if (this.status.isFinished()) {
             throw new BattleAlreadyFinishedException(this.id);
         }
@@ -64,12 +63,26 @@ public class Battle {
 
     private Runner findRunner(String runnerId) {
         return runners.stream()
-                .filter(r -> r.getId().equals(runnerId))
+                .filter(runner -> runner.hasId(runnerId))
                 .findFirst()
                 .orElseThrow(() -> new RunnerNotFoundException(runnerId));
     }
 
     public void changeBattleStatus(BattleStatus status) {
-        this.status = Objects.requireNonNull(status);
+        validateCurrentStatus();
+        validateStatus(status);
+
+        this.status = status;
+    }
+
+    private void validateStatus(BattleStatus status) {
+        if (Objects.isNull(status) || status.isReady() || this.status.equals(status)) {
+            throw new BattleStatusCannotBeChangedException(status);
+        }
+    }
+
+    public boolean isRunnersAllRunningStatus() {
+        return runners.stream()
+                .allMatch(Runner::isRunning);
     }
 }
