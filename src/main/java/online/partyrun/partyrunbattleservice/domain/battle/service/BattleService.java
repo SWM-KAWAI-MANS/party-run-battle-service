@@ -9,10 +9,12 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 
 import org.springframework.stereotype.Service;
@@ -53,5 +55,12 @@ public class BattleService {
                         .orElseThrow(() -> new ReadyBattleNotFoundException(runnerId));
 
         return battleMapper.toResponse(battle);
+    }
+
+    public void setRunnerRunning(String battleId, String runnerId) {
+        final Battle battle = battleRepository.findById(battleId)
+                      .orElseThrow(() -> new BattleNotFoundException(battleId));
+        battle.changeRunnerStatus(runnerId, RunnerStatus.RUNNING);
+        battleRepository.save(battle);
     }
 }

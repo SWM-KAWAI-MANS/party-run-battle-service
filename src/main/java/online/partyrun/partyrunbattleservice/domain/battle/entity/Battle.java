@@ -9,6 +9,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDist
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 
@@ -45,6 +47,18 @@ public class Battle {
         if (Objects.isNull(runners) || runners.isEmpty()) {
             throw new InvalidRunnerNumberInBattleException();
         }
+    }
+
+    public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
+        final Runner runner = findRunner(runnerId);
+        runner.changeStatus(runnerStatus);
+    }
+
+    private Runner findRunner(String runnerId) {
+        return runners.stream()
+                .filter(r -> r.getId().equals(runnerId))
+                .findFirst()
+                .orElseThrow(() -> new RunnerNotFoundException(runnerId));
     }
 
     public void changeStatus(BattleStatus status) {
