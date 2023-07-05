@@ -3,7 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 import org.junit.jupiter.api.*;
@@ -122,7 +122,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(() -> battleService.getReadyBattle(노준혁.getId()))
-                        .isInstanceOf(RunningBattleNotFoundException.class);
+                        .isInstanceOf(ReadyBattleNotFoundException.class);
             }
         }
     }

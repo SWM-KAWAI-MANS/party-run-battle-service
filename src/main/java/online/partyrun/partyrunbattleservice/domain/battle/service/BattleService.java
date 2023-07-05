@@ -10,7 +10,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
@@ -50,7 +50,7 @@ public class BattleService {
         final Battle battle =
                 battleRepository
                         .findByStatusAndRunnersId(BattleStatus.READY, runnerId)
-                        .orElseThrow(() -> new RunningBattleNotFoundException(runnerId));
+                        .orElseThrow(() -> new ReadyBattleNotFoundException(runnerId));
 
         return battleMapper.toResponse(battle);
     }
