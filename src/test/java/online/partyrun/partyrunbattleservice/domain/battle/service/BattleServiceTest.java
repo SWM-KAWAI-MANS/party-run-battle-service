@@ -3,6 +3,8 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
+import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -161,6 +163,20 @@ class BattleServiceTest {
             void throwException() {
                 assertThatThrownBy(() -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
                       .isInstanceOf(BattleNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀의_상태가_이미_끝난_상태라면 {
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                배틀.changeBattleStatus(BattleStatus.FINISHED);
+                battleRepository.save(배틀);
+                assertThatThrownBy(() -> battleService.setRunnerRunning(배틀.getId(), 박성우.getId()))
+                        .isInstanceOf(BattleAlreadyFinishedException.class);
             }
         }
     }

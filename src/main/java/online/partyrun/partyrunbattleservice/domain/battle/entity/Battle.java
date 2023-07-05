@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
@@ -50,8 +51,15 @@ public class Battle {
     }
 
     public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
+        validateStatus();
         final Runner runner = findRunner(runnerId);
         runner.changeStatus(runnerStatus);
+    }
+
+    private void validateStatus() {
+        if (this.status.isFinished()) {
+            throw new BattleAlreadyFinishedException(this.id);
+        }
     }
 
     private Runner findRunner(String runnerId) {
