@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 import org.springframework.data.annotation.Id;
 
@@ -21,14 +22,30 @@ public class Runner {
         this.id = id;
     }
 
-    public void changeStatus(RunnerStatus runnerStatus) {
-        validateRunnerStatus(runnerStatus);
-        this.status = runnerStatus;
+    public boolean hasId(String id) {
+        return this.id.equals(id);
     }
 
-    private void validateRunnerStatus(RunnerStatus runnerStatus) {
-        if (Objects.isNull(runnerStatus) || runnerStatus.isReady() || this.status.equals(runnerStatus)) {
-            throw new RunnerStatusCannotBeChangedException(runnerStatus);
+    public void changeStatus(RunnerStatus status) {
+        validateCurrentStatus();
+        validateRunnerStatus(status);
+
+        this.status = status;
+    }
+
+    private void validateCurrentStatus() {
+        if (this.status.isFinished()) {
+            throw new RunnerAlreadyFinishedException(this.id);
         }
+    }
+
+    private void validateRunnerStatus(RunnerStatus status) {
+        if (Objects.isNull(status) || status.isReady() || this.status.equals(status)) {
+            throw new RunnerStatusCannotBeChangedException(status);
+        }
+    }
+
+    public boolean isRunning() {
+        return this.status.isRunning();
     }
 }

@@ -12,4 +12,8 @@ public enum RunnerStatus {
     public boolean isRunning() {
         return this == RUNNING;
     }
+
+    public boolean isFinished() {
+        return this == FINISHED;
+    }
 }
