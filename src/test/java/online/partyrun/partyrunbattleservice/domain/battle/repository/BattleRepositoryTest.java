@@ -67,7 +67,7 @@ class BattleRepositoryTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class findByStatusInAndRunnersId는 {
-            Battle battle = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+            Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
             @Test
             @DisplayName("현재 진행중인 상태의 배틀이 존재하면 반환한다.")
@@ -84,7 +84,7 @@ class BattleRepositoryTest {
                 assertThat(박성우_진행중_배틀)
                         .usingRecursiveComparison()
                         .isEqualTo(박현준_진행중_배틀)
-                        .isEqualTo(battle);
+                        .isEqualTo(배틀);
             }
 
             @Test
@@ -101,14 +101,14 @@ class BattleRepositoryTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class existsByIdAndRunnersIdAndStatus는 {
-            Battle battle1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+            Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
             @Test
             @DisplayName("battleId, runnerId, status를 만족하는 데이터의 존재하면 true를 반환한다.")
             void returnTrue() {
                 final boolean result =
                         battleRepository.existsByIdAndRunnersIdAndStatus(
-                                battle1.getId(), 박성우.getId(), BattleStatus.READY);
+                                배틀.getId(), 박성우.getId(), BattleStatus.READY);
                 assertThat(result).isTrue();
             }
 
@@ -117,10 +117,10 @@ class BattleRepositoryTest {
             void returnFalse() {
                 final boolean result1 =
                         battleRepository.existsByIdAndRunnersIdAndStatus(
-                                battle1.getId(), 박성우.getId(), BattleStatus.FINISHED);
+                                배틀.getId(), 박성우.getId(), BattleStatus.FINISHED);
                 final boolean result2 =
                         battleRepository.existsByIdAndRunnersIdAndStatus(
-                                battle1.getId(), 노준혁.getId(), BattleStatus.RUNNING);
+                                배틀.getId(), 노준혁.getId(), BattleStatus.RUNNING);
 
                 assertAll(() -> assertThat(result1).isFalse(), () -> assertThat(result2).isFalse());
             }
