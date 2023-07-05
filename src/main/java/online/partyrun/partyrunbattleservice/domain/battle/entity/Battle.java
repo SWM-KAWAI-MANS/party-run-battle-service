@@ -61,7 +61,7 @@ public class Battle {
                 .orElseThrow(() -> new RunnerNotFoundException(runnerId));
     }
 
-    public void changeStatus(BattleStatus status) {
+    public void changeBattleStatus(BattleStatus status) {
         this.status = Objects.requireNonNull(status);
     }
 }

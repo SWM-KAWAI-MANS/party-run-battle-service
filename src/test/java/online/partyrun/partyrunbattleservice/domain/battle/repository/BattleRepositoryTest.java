@@ -53,7 +53,7 @@ class BattleRepositoryTest {
             void returnListBattle() {
                 final Battle 배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
                 final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
-                배틀2.changeStatus(BattleStatus.RUNNING);
+                배틀2.changeBattleStatus(BattleStatus.RUNNING);
                 battleRepository.save(배틀2);
 
                 final List<Battle> actual =
