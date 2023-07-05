@@ -3,7 +3,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import online.partyrun.partyrunbattleservice.global.config.SystemTime;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
@@ -21,6 +20,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class BattleService {
     BattleMapper battleMapper;
     BattleRepository battleRepository;
     RunnerService runnerService;
-    SystemTime systemTime;
+    Clock clock;
     ApplicationEventPublisher eventPublisher;
 
     public BattleResponse createBattle(BattleCreateRequest request) {
@@ -85,8 +85,9 @@ public class BattleService {
         final Battle battle = findBattle(battleId);
         battle.changeBattleStatus(BattleStatus.RUNNING);
 
-        final LocalDateTime startTime = systemTime.now().plusSeconds(10);
-        battle.setStartTime(startTime);
+        final LocalDateTime now = LocalDateTime.now(clock);
+        final LocalDateTime startTime = now.plusSeconds(10);
+        battle.setStartTime(now, startTime);
         battleRepository.save(battle);
 
         return new BattleStartTimeResponse(startTime);

@@ -1,9 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
+import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
+import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
@@ -15,23 +19,32 @@ import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepo
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 @SpringBootTest
+@Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
 class BattleServiceTest {
 
     @Autowired BattleService battleService;
-
-    @Autowired RunnerRepository runnerRepository;
     @Autowired BattleRepository battleRepository;
-
+    @Autowired RunnerRepository runnerRepository;
     @Autowired MongoTemplate mongoTemplate;
+    @Autowired ApplicationEventPublisher publisher;
+    @Autowired Clock clock;
 
     @AfterEach
     void setUp() {
@@ -138,7 +151,8 @@ class BattleServiceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_RUNNING으로_변경할_때 {
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
+        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁)));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -153,6 +167,7 @@ class BattleServiceTest {
                         .isEqualTo(RunnerStatus.RUNNING);
             }
         }
+
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀이_존재하지_않으면 {
@@ -177,6 +192,72 @@ class BattleServiceTest {
                 battleRepository.save(배틀);
                 assertThatThrownBy(() -> battleService.setRunnerRunning(배틀.getId(), 박성우.getId()))
                         .isInstanceOf(BattleAlreadyFinishedException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모든_러너의_상태가_변경되었다면 {
+
+            @Test
+            @DisplayName("BattleRunningEvent을 publish한다.")
+            void publishEvent() {
+                battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
+                battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
+                then(publisher).should().publishEvent(new BattleRunningEvent(배틀.getId()));
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모든_러너의_상태가_변경되지_않았다면 {
+
+            @Test
+            @DisplayName("BattleRunningEvent을 publish 하지 않는다.")
+            void notPublish() {
+                battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
+                then(publisher).should(never()).publishEvent(any(BattleRunningEvent.class));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀의_상태를_RUNNING으로_변경할_떄 {
+        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀의_id를_받으면 {
+
+            @Test
+            @DisplayName("배틀의 상태를 변경한다.")
+            void changeBattleStatus() {
+                final BattleStartTimeResponse response = battleService.setBattleRunning(배틀.getId());
+                final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(10);
+
+                final Battle 조회된_배틀 = battleRepository.findById(배틀.getId()).orElseThrow();
+
+                assertAll(
+                        () -> assertThat(response.startTime()).isEqualTo(startTime),
+                        () -> assertThat(조회된_배틀.getStatus()).isEqualTo(BattleStatus.RUNNING)
+                );
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀이_존재하지_않으면 {
+
+            String invalidBattleId = "invalidBattleId";
+
+            @Test
+            @DisplayName("배틀의 상태를 변경한다.")
+            void changeBattleStatus() {
+                assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
+                        .isInstanceOf(BattleNotFoundException.class);
             }
         }
     }

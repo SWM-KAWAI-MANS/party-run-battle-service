@@ -3,13 +3,12 @@ package online.partyrun.partyrunbattleservice.global.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
+import java.time.Clock;
 
 @Configuration
 public class TimeConfig {
-
     @Bean
-    public SystemTime systemTime() {
-        return new SystemTime(LocalDateTime.now());
+    public Clock clock() {
+        return Clock.systemDefaultZone();
     }
 }
