@@ -2,9 +2,13 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,7 @@ class BattleServiceTest {
     @Autowired BattleService battleService;
 
     @Autowired RunnerRepository runnerRepository;
+    @Autowired BattleRepository battleRepository;
 
     @Autowired MongoTemplate mongoTemplate;
 
@@ -123,6 +128,39 @@ class BattleServiceTest {
             void throwException() {
                 assertThatThrownBy(() -> battleService.getReadyBattle(노준혁.getId()))
                         .isInstanceOf(ReadyBattleNotFoundException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태를_RUNNING으로_변경할_때 {
+        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀과_러너의_아이디를_받으면 {
+
+            @Test
+            @DisplayName("러너의 상태를 변경한다.")
+            void changeRunnerStatus() {
+                battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
+
+                assertThat(battleRepository.findById(배틀.getId()).orElseThrow().getRunners().get(0).getStatus())
+                        .isEqualTo(RunnerStatus.RUNNING);
+            }
+        }
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 배틀이_존재하지_않으면 {
+
+            String invalidBattleId = "invalidBattleId";
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                assertThatThrownBy(() -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                      .isInstanceOf(BattleNotFoundException.class);
             }
         }
     }
