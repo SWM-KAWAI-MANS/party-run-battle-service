@@ -4,10 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleStatusCannotBeChangedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
@@ -28,7 +25,9 @@ public class Battle {
     int distance;
     List<Runner> runners;
     BattleStatus status = BattleStatus.READY;
+    LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
+
 
     public Battle(int distance, List<Runner> runners) {
         validateDistance(distance);
@@ -84,5 +83,16 @@ public class Battle {
     public boolean isRunnersAllRunningStatus() {
         return runners.stream()
                 .allMatch(Runner::isRunning);
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        validateStartTime(startTime);
+        this.startTime = startTime;
+    }
+
+    private void validateStartTime(LocalDateTime startTime) {
+        if (startTime.isBefore(this.createdAt)) {
+            throw new InvalidBattleStartTimeException(startTime, this.createdAt);
+        }
     }
 }
