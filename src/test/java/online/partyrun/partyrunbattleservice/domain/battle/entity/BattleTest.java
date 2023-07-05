@@ -1,9 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleStatusCannotBeChangedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
@@ -11,7 +8,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -158,6 +157,7 @@ class BattleTest {
             private static List<Arguments> BattleStatusProvider() {
                 return List.of(Arguments.of(BattleStatus.READY));
             }
+
             @ParameterizedTest
             @NullSource
             @MethodSource("BattleStatusProvider")
@@ -180,6 +180,50 @@ class BattleTest {
                 배틀.changeBattleStatus(status);
                 assertThatThrownBy(() -> 배틀.changeBattleStatus(status))
                         .isInstanceOf(BattleStatusCannotBeChangedException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀의_시작_시간을_설정할_떄 {
+        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 시작_시간이_생성_시간_보다_같거나_이후라면 {
+
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime startTime = now.plusSeconds(1);
+
+            @Test
+            @DisplayName("시작 시간을 설정한다")
+            void setStartTime() {
+                배틀.setStartTime(now, startTime);
+
+                assertThat(배틀.getStartTime()).isEqualTo(startTime);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 시작_시간이_생성_시간_보다_같거나_이전이라면 {
+
+            public static Stream<Arguments> invalidStartTime() {
+                final LocalDateTime now = LocalDateTime.now();
+                return Stream.of(
+                        Arguments.of(now, now),
+                        Arguments.of(now, now.minusSeconds(1))
+                );
+            }
+
+            @ParameterizedTest
+            @MethodSource("invalidStartTime")
+            @DisplayName("예외를 던진다.")
+            void throwException(LocalDateTime now, LocalDateTime startTime) {
+
+                assertThatThrownBy(() -> 배틀.setStartTime(now, startTime))
+                        .isInstanceOf(InvalidBattleStartTimeException.class);
             }
         }
     }

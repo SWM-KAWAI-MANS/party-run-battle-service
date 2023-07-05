@@ -85,14 +85,14 @@ public class Battle {
                 .allMatch(Runner::isRunning);
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        validateStartTime(startTime);
+    public void setStartTime(LocalDateTime now, LocalDateTime startTime) {
+        validateStartTime(now, startTime);
         this.startTime = startTime;
     }
 
-    private void validateStartTime(LocalDateTime startTime) {
-        if (startTime.isBefore(this.createdAt)) {
-            throw new InvalidBattleStartTimeException(startTime, this.createdAt);
+    private void validateStartTime(LocalDateTime now, LocalDateTime startTime) {
+        if (!startTime.isAfter(now)) {
+            throw new InvalidBattleStartTimeException(startTime, now);
         }
     }
 }
