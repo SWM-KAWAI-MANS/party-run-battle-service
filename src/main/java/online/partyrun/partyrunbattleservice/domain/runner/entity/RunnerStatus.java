@@ -8,4 +8,8 @@ public enum RunnerStatus {
     public boolean isReady() {
         return this == READY;
     }
+
+    public boolean isRunning() {
+        return this == RUNNING;
+    }
 }

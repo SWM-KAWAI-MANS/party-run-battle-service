@@ -33,5 +33,34 @@ class RunnerStatusTest {
                 assertThat(runnerStatus.isReady()).isFalse();
             }
         }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class isRunning_메소드는 {
+
+            @Nested
+            @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+            class RUNNING_상태라면 {
+                RunnerStatus runnerStatus = RunnerStatus.RUNNING;
+
+                @Test
+                @DisplayName("true를 반환한다.")
+                void returnTrue() {
+                    assertThat(runnerStatus.isRunning()).isTrue();
+                }
+            }
+
+            @Nested
+            @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+            class RUNNING_상태가_아니면 {
+                RunnerStatus runnerStatus = RunnerStatus.READY;
+
+                @Test
+                @DisplayName("false를 반환한다.")
+                void returnTrue() {
+                    assertThat(runnerStatus.isRunning()).isFalse();
+                }
+            }
+        }
     }
 }
