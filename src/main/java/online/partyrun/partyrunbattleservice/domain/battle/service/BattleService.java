@@ -32,24 +32,24 @@ public class BattleService {
         final List<String> runnerIds = request.getRunnerIds();
         final List<Runner> runners = runnerService.findAllById(runnerIds);
 
-        validateRunnerInRunningBattle(runners);
+        validateRunnerInBattle(runners);
 
         final Battle battle = battleRepository.save(new Battle(runners));
         return battleMapper.toResponse(battle);
     }
 
-    private void validateRunnerInRunningBattle(List<Runner> runners) {
+    private void validateRunnerInBattle(List<Runner> runners) {
         final List<Battle> runningBattle =
-                battleRepository.findByStatusAndRunnersIn(BattleStatus.RUNNING, runners);
+                battleRepository.findByStatusInAndRunnersIn(List.of(BattleStatus.READY, BattleStatus.RUNNING), runners);
         if (!runningBattle.isEmpty()) {
             throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
         }
     }
 
-    public BattleResponse getRunningBattle(String runnerId) {
+    public BattleResponse getReadyBattle(String runnerId) {
         final Battle battle =
                 battleRepository
-                        .findByStatusAndRunnersId(BattleStatus.RUNNING, runnerId)
+                        .findByStatusAndRunnersId(BattleStatus.READY, runnerId)
                         .orElseThrow(() -> new RunningBattleNotFoundException(runnerId));
 
         return battleMapper.toResponse(battle);

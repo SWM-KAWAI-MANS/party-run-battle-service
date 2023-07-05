@@ -1,21 +1,20 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @DisplayName("BattleService")
@@ -108,7 +107,7 @@ class BattleServiceTest {
             void returnBattleId() {
                 battleService.createBattle(request);
 
-                final BattleResponse response = battleService.getRunningBattle(박성우.getId());
+                final BattleResponse response = battleService.getReadyBattle(박성우.getId());
                 assertThat(response.id()).isNotNull();
             }
         }
@@ -121,7 +120,7 @@ class BattleServiceTest {
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> battleService.getRunningBattle(노준혁.getId()))
+                assertThatThrownBy(() -> battleService.getReadyBattle(노준혁.getId()))
                         .isInstanceOf(RunningBattleNotFoundException.class);
             }
         }

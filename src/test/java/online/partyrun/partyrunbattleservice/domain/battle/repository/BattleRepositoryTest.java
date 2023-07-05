@@ -1,13 +1,9 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -15,6 +11,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -39,33 +38,35 @@ class BattleRepositoryTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class findByStatusAndRunnersIn은 {
+        class findByStatusInAndRunnersIn는 {
             @Test
             @DisplayName("현재 참여중인 배틀이 없으면 빈 리스트를 반환한다.")
             void returnEmpty() {
                 final List<Battle> actual =
-                        battleRepository.findByStatusAndRunnersIn(
-                                BattleStatus.RUNNING, List.of(박성우, 박현준, 노준혁));
+                        battleRepository.findByStatusInAndRunnersIn(
+                                List.of(BattleStatus.READY), List.of(박성우, 박현준, 노준혁));
                 assertThat(actual).isEmpty();
             }
 
             @Test
             @DisplayName("현재 참여중인 배틀이 있으면 참여한 배틀 리스트를 반환한다.")
             void returnListBattle() {
-                final Battle battle1 = battleRepository.save(new Battle(List.of(박성우, 박현준)));
-                final Battle battle2 = battleRepository.save(new Battle(List.of(노준혁)));
+                final Battle 배틀1 = battleRepository.save(new Battle(List.of(박성우, 박현준)));
+                final Battle 배틀2 = battleRepository.save(new Battle(List.of(노준혁)));
+                배틀2.changeStatus(BattleStatus.RUNNING);
+                battleRepository.save(배틀2);
 
                 final List<Battle> actual =
-                        battleRepository.findByStatusAndRunnersIn(
-                                BattleStatus.RUNNING, List.of(박성우, 박현준, 노준혁));
+                        battleRepository.findByStatusInAndRunnersIn(
+                                List.of(BattleStatus.READY, BattleStatus.RUNNING), List.of(박성우, 박현준, 노준혁));
 
-                assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(battle1, battle2));
+                assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(배틀1, 배틀2));
             }
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class findByStatusAndRunnersId는 {
+        class findByStatusInAndRunnersId는 {
             Battle battle = battleRepository.save(new Battle(List.of(박성우, 박현준)));
 
             @Test
@@ -73,11 +74,11 @@ class BattleRepositoryTest {
             void returnRunningBattle() {
                 final Battle 박성우_진행중_배틀 =
                         battleRepository
-                                .findByStatusAndRunnersId(BattleStatus.RUNNING, 박성우.getId())
+                                .findByStatusAndRunnersId(BattleStatus.READY, 박성우.getId())
                                 .orElseThrow();
                 final Battle 박현준_진행중_배틀 =
                         battleRepository
-                                .findByStatusAndRunnersId(BattleStatus.RUNNING, 박현준.getId())
+                                .findByStatusAndRunnersId(BattleStatus.READY, 박현준.getId())
                                 .orElseThrow();
 
                 assertThat(박성우_진행중_배틀)
@@ -107,7 +108,7 @@ class BattleRepositoryTest {
             void returnTrue() {
                 final boolean result =
                         battleRepository.existsByIdAndRunnersIdAndStatus(
-                                battle1.getId(), 박성우.getId(), BattleStatus.RUNNING);
+                                battle1.getId(), 박성우.getId(), BattleStatus.READY);
                 assertThat(result).isTrue();
             }
 

@@ -1,19 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.testmanager.docs.RestControllerTest;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,6 +18,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BattleController.class)
 @DisplayName("BattleController")
@@ -110,11 +109,11 @@ class BattleControllerTest extends RestControllerTest {
             @Test
             @DisplayName("배틀 정보를 반환한다.")
             void getRunningBattle() throws Exception {
-                given(battleService.getRunningBattle("defaultUser")).willReturn(response);
+                given(battleService.getReadyBattle("defaultUser")).willReturn(response);
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                get("/battle/running")
+                                get("/battle/ready")
                                         .header(
                                                 "Authorization",
                                                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
@@ -135,7 +134,7 @@ class BattleControllerTest extends RestControllerTest {
             @Test
             @DisplayName("not found를 반환한다.")
             void getRunningBattle() throws Exception {
-                given(battleService.getRunningBattle("defaultUser"))
+                given(battleService.getReadyBattle("defaultUser"))
                         .willThrow(new RunningBattleNotFoundException("defaultUser"));
 
                 final ResultActions actions =

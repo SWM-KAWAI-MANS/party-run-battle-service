@@ -12,18 +12,22 @@ import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Battle {
     @Id String id;
-
     List<Runner> runners;
-    BattleStatus status = BattleStatus.RUNNING;
+    BattleStatus status = BattleStatus.READY;
     @CreatedDate LocalDateTime createdAt;
 
     public Battle(List<Runner> runners) {
         this.runners = runners;
+    }
+
+    public void changeStatus(BattleStatus status) {
+        this.status = Objects.requireNonNull(status);
     }
 }
