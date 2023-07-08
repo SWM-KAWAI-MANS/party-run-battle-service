@@ -227,4 +227,55 @@ class BattleTest {
             }
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태를_찾을_떄 {
+        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 러너의_id를_받으면 {
+
+            String runnerId = 박성우.getId();
+
+            @Test
+            @DisplayName("러너의 상태를 반환한다.")
+            void returnRunnerStatus() {
+                RunnerStatus runnerStatus = 배틀.getRunnerStatus(runnerId);
+
+                assertThat(runnerStatus).isEqualTo(박성우.getStatus());
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 존재하지_않는_러너라면 {
+
+            String invalidRunnerId = "invalidRunnerId";
+
+            @Test
+            @DisplayName("러너의 상태를 반환한다.")
+            void returnRunnerStatus() {
+                assertThatThrownBy(() -> 배틀.getRunnerStatus(invalidRunnerId))
+                        .isInstanceOf(RunnerNotFoundException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 참여_러너의_인원을_찾을_떄 {
+
+        List<Runner> runners = List.of(박성우, 박현준);
+
+
+        @Test
+        @DisplayName("러너의 인원을 반환한다")
+        void returnNumberOfRunners() {
+            final Battle battle = new Battle(1000, runners);
+
+            assertThat(battle.getNumberOfRunners()).isEqualTo(runners.size());
+        }
+    }
 }

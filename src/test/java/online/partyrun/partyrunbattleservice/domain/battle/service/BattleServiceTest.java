@@ -7,7 +7,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
-import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
@@ -33,6 +33,7 @@ import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -204,7 +205,7 @@ class BattleServiceTest {
             void publishEvent() {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
                 battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
-                then(publisher).should().publishEvent(new BattleRunningEvent(배틀.getId()));
+                then(publisher).should(times(2)).publishEvent(new RunnerRunningEvent(배틀.getId(), 배틀.getNumberOfRunners()));
             }
         }
 
@@ -216,7 +217,7 @@ class BattleServiceTest {
             @DisplayName("BattleRunningEvent을 publish 하지 않는다.")
             void notPublish() {
                 battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
-                then(publisher).should(never()).publishEvent(any(BattleRunningEvent.class));
+                then(publisher).should(never()).publishEvent(any(RunnerRunningEvent.class));
             }
         }
     }
@@ -234,16 +235,15 @@ class BattleServiceTest {
 
             @Test
             @DisplayName("배틀의 상태를 변경한다.")
-            void changeBattleStatus() {
+            void throwException() {
                 final BattleStartTimeResponse response = battleService.setBattleRunning(배틀.getId());
                 final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(10);
 
                 final Battle 조회된_배틀 = battleRepository.findById(배틀.getId()).orElseThrow();
 
                 assertAll(
-                        () -> assertThat(response.startTime()).isEqualTo(startTime),
-                        () -> assertThat(조회된_배틀.getStatus()).isEqualTo(BattleStatus.RUNNING)
-                );
+                        () -> assertThat(response.getStartTime()).isEqualTo(startTime),
+                        () -> assertThat(조회된_배틀.getStatus()).isEqualTo(BattleStatus.RUNNING));
             }
         }
 
@@ -254,8 +254,8 @@ class BattleServiceTest {
             String invalidBattleId = "invalidBattleId";
 
             @Test
-            @DisplayName("배틀의 상태를 변경한다.")
-            void changeBattleStatus() {
+            @DisplayName("예외를 던진다.")
+            void throwException() {
                 assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
