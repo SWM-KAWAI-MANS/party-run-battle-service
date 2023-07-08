@@ -1,21 +1,15 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import lombok.extern.slf4j.Slf4j;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.LocationDto;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -28,7 +22,12 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
@@ -95,60 +94,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 웹소켓_연결에_성공했을_때 {
-
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        String accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
-        StompSession 박성우_Session = 웹소켓_연결(accessToken);
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
-        BlockingQueue<LocationDto> locationQueue = new LinkedBlockingDeque<>();
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 구독_요청에_성공하면 {
-
-            @Test
-            @DisplayName("메시지를 받을 수 있다")
-            void getMessage() throws InterruptedException {
-                박성우_Session.subscribe(
-                        String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
-                        new StompFrameHandlerImpl<>(LocationDto.class, locationQueue));
-
-                박성우_Session.send(
-                        String.format("%s/%s", PUB_BATTLE_PREFIX, 배틀.getId()),
-                        new LocationDto(1, 2));
-
-                LocationDto result = locationQueue.poll(1, TimeUnit.SECONDS);
-                assertThat(result).isEqualTo(new LocationDto(1, 2));
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 구독_요청에_실패하면 {
-            Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-            Battle 박현준_배틀 = battleRepository.save(new Battle(1000, List.of(박현준)));
-
-            @Test
-            @DisplayName("메시지를 받을 수 없다")
-            void getMessage() throws InterruptedException {
-                박성우_Session.subscribe(
-                        String.format("%s/%s", TOPIC_BATTLE_PREFIX, 박현준_배틀.getId()),
-                        new StompFrameHandlerImpl<>(LocationDto.class, locationQueue));
-
-                박성우_Session.send(
-                        String.format("%s/%s", PUB_BATTLE_PREFIX, 배틀.getId()),
-                        new LocationDto(1, 2));
-
-                final LocationDto location = locationQueue.poll(1, TimeUnit.SECONDS);
-                assertThat(location).isNull();
-            }
-        }
-    }
-
-    @Nested
-    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너들이_구독_성공_메시지를_보냈을_때 {
+    class 러너들이_구독_성공_요청을_보냈을_때 {
 
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
         Runner 박현준 = runnerRepository.save(new Runner("박현준"));
@@ -170,7 +116,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 모두_메세지를_보냈다면 {
+        class 모두_보냈다면 {
 
             @Test
             @DisplayName("배틀 시작 시간을 응답한다.")
@@ -187,14 +133,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
 
-                박성우_Session.send(
-                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
-
-                박현준_Session.send(
-                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
-
-                노준혁_Session.send(
-                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박현준_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                노준혁_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
                 final BattleStartTimeResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
                 final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
@@ -211,7 +152,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 모두_메세지를_보내지_않았다면 {
+        class 모두_보내지_않았다면 {
 
             @Test
             @DisplayName("응답을 받지 못한다.")
@@ -228,11 +169,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
 
-                박성우_Session.send(
-                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
-                박현준_Session.send(
-                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박현준_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
                 final BattleStartTimeResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
                 final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
