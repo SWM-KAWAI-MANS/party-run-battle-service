@@ -1,6 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -11,6 +15,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -25,9 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @Slf4j
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
@@ -35,16 +37,11 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     private static final String TOPIC_BATTLE_PREFIX = "/topic/battle";
     private static final String PUB_BATTLE_PREFIX = "/pub/battle";
 
-    @Autowired
-    WebSocketStompClient webSocketStompClient;
-    @Autowired
-    BattleRepository battleRepository;
-    @Autowired
-    RunnerRepository runnerRepository;
-    @Autowired
-    JwtGenerator jwtGenerator;
-    @Autowired
-    Clock clock;
+    @Autowired WebSocketStompClient webSocketStompClient;
+    @Autowired BattleRepository battleRepository;
+    @Autowired RunnerRepository runnerRepository;
+    @Autowired JwtGenerator jwtGenerator;
+    @Autowired Clock clock;
 
     private StompSession 웹소켓_연결(String accessToken) {
         try {
@@ -55,8 +52,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                     .connectAsync(
                             "ws://localhost:" + port + "/api/battle/ws",
                             headers,
-                            new StompSessionHandlerAdapter() {
-                            })
+                            new StompSessionHandlerAdapter() {})
                     .get(1, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException();
@@ -157,9 +153,12 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         Runner 박성우 = runnerRepository.save(new Runner("박성우"));
         Runner 박현준 = runnerRepository.save(new Runner("박현준"));
         Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
-        String 박성우_accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
-        String 박현준_accessToken = jwtGenerator.generate(박현준.getId(), Set.of("ROLE_USER")).accessToken();
-        String 노준혁_accessToken = jwtGenerator.generate(노준혁.getId(), Set.of("ROLE_USER")).accessToken();
+        String 박성우_accessToken =
+                jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
+        String 박현준_accessToken =
+                jwtGenerator.generate(박현준.getId(), Set.of("ROLE_USER")).accessToken();
+        String 노준혁_accessToken =
+                jwtGenerator.generate(노준혁.getId(), Set.of("ROLE_USER")).accessToken();
         StompSession 박성우_Session = 웹소켓_연결(박성우_accessToken);
         StompSession 박현준_Session = 웹소켓_연결(박현준_accessToken);
         StompSession 노준혁_Session = 웹소켓_연결(노준혁_accessToken);
@@ -184,7 +183,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 박현준_Queue));
 
-
                 노준혁_Session.subscribe(
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
@@ -205,7 +203,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 assertThat(박성우_response)
                         .isEqualTo(박현준_response)
                         .isEqualTo(노준혁_response)
-                        .isEqualTo(new BattleStartTimeResponse(LocalDateTime.now(clock).plusSeconds(10)));
+                        .isEqualTo(
+                                new BattleStartTimeResponse(
+                                        LocalDateTime.now(clock).plusSeconds(10)));
             }
         }
 
@@ -224,7 +224,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 박현준_Queue));
 
-
                 노준혁_Session.subscribe(
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
@@ -239,10 +238,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
                 final BattleStartTimeResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
 
-                assertThat(박성우_response)
-                        .isEqualTo(박현준_response)
-                        .isEqualTo(노준혁_response)
-                        .isNull();
+                assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
             }
         }
     }

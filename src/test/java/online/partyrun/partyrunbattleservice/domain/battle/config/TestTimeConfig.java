@@ -15,6 +15,8 @@ public class TestTimeConfig {
     @Primary
     public Clock testClock() {
         final ZoneOffset zoneOffset = ZoneOffset.UTC;
-        return Clock.fixed(LocalDateTime.of(2024,1,1,1,1,1,1).atOffset(zoneOffset).toInstant(), zoneOffset);
+        return Clock.fixed(
+                LocalDateTime.of(2024, 1, 1, 1, 1, 1, 1).atOffset(zoneOffset).toInstant(),
+                zoneOffset);
     }
 }

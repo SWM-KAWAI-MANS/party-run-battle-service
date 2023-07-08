@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
@@ -17,6 +18,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -52,7 +54,8 @@ public class BattleService {
 
     private void validateRunnerInBattle(List<Runner> runners) {
         final List<Battle> runningBattle =
-                battleRepository.findByStatusInAndRunnersIn(List.of(BattleStatus.READY, BattleStatus.RUNNING), runners);
+                battleRepository.findByStatusInAndRunnersIn(
+                        List.of(BattleStatus.READY, BattleStatus.RUNNING), runners);
         if (!runningBattle.isEmpty()) {
             throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
         }
@@ -77,13 +80,15 @@ public class BattleService {
     }
 
     private void updateRunnerStatus(Battle battle, String runnerId) {
-        Query query = Query.query(Criteria.where("id").is(battle.getId()).and("runners.id").is(runnerId));
+        Query query =
+                Query.query(Criteria.where("id").is(battle.getId()).and("runners.id").is(runnerId));
         Update update = new Update().set("runners.$.status", battle.getRunnerStatus(runnerId));
         mongoTemplate.updateFirst(query, update, Battle.class);
     }
 
     private Battle findBattle(String battleId) {
-        return battleRepository.findById(battleId)
+        return battleRepository
+                .findById(battleId)
                 .orElseThrow(() -> new BattleNotFoundException(battleId));
     }
 

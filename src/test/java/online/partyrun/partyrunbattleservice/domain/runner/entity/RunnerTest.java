@@ -1,16 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
-import org.junit.jupiter.api.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
+
+import org.junit.jupiter.api.*;
 
 @DisplayName("Runner")
 class RunnerTest {
 
     Runner 박성우 = new Runner("박성우");
+
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_변경할_때 {

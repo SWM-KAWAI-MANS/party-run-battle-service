@@ -1,8 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import org.junit.jupiter.api.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.*;
 
 @DisplayName("RunnerStatus")
 class RunnerStatusTest {
@@ -27,6 +27,7 @@ class RunnerStatusTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class READY_상태가_아니면 {
             RunnerStatus runnerStatus = RunnerStatus.RUNNING;
+
             @Test
             @DisplayName("false를 반환한다.")
             void returnTrue() {

@@ -1,6 +1,7 @@
 package online.partyrun.partyrunbattleservice.global.config;
 
 import online.partyrun.partyrunbattleservice.global.controller.AsyncExceptionHandler;
+
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;

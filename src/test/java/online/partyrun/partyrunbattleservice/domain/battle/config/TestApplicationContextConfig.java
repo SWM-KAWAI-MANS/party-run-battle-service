@@ -10,7 +10,8 @@ import org.springframework.context.support.GenericApplicationContext;
 public class TestApplicationContextConfig {
     @Bean
     @Primary
-    public GenericApplicationContext genericApplicationContext(final GenericApplicationContext gac) {
+    public GenericApplicationContext genericApplicationContext(
+            final GenericApplicationContext gac) {
         return Mockito.spy(gac);
     }
 }

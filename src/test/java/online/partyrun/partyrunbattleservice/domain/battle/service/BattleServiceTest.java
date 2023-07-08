@@ -1,5 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
@@ -16,6 +24,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,14 +35,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -164,7 +165,13 @@ class BattleServiceTest {
             void changeRunnerStatus() {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
 
-                assertThat(battleRepository.findById(배틀.getId()).orElseThrow().getRunners().get(0).getStatus())
+                assertThat(
+                                battleRepository
+                                        .findById(배틀.getId())
+                                        .orElseThrow()
+                                        .getRunners()
+                                        .get(0)
+                                        .getStatus())
                         .isEqualTo(RunnerStatus.RUNNING);
             }
         }
@@ -174,11 +181,13 @@ class BattleServiceTest {
         class 배틀이_존재하지_않으면 {
 
             String invalidBattleId = "invalidBattleId";
+
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
-                      .isInstanceOf(BattleNotFoundException.class);
+                assertThatThrownBy(
+                                () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                        .isInstanceOf(BattleNotFoundException.class);
             }
         }
 
@@ -205,7 +214,9 @@ class BattleServiceTest {
             void publishEvent() {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
                 battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
-                then(publisher).should(times(2)).publishEvent(new RunnerRunningEvent(배틀.getId(), 배틀.getNumberOfRunners()));
+                then(publisher)
+                        .should(times(2))
+                        .publishEvent(new RunnerRunningEvent(배틀.getId(), 배틀.getNumberOfRunners()));
             }
         }
 

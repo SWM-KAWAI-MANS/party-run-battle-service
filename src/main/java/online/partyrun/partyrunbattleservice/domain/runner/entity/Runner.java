@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
+
 import org.springframework.data.annotation.Id;
 
 import java.util.Objects;

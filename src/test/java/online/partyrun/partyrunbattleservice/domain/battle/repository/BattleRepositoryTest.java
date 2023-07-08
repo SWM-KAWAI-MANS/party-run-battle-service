@@ -1,9 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -11,9 +15,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -58,7 +59,8 @@ class BattleRepositoryTest {
 
                 final List<Battle> actual =
                         battleRepository.findByStatusInAndRunnersIn(
-                                List.of(BattleStatus.READY, BattleStatus.RUNNING), List.of(박성우, 박현준, 노준혁));
+                                List.of(BattleStatus.READY, BattleStatus.RUNNING),
+                                List.of(박성우, 박현준, 노준혁));
 
                 assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(배틀1, 배틀2));
             }
