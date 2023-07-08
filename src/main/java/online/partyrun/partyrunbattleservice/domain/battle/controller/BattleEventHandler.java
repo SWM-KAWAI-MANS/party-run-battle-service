@@ -35,6 +35,8 @@ public class BattleEventHandler {
             final BattleStartTimeResponse response =
                     battleService.setBattleRunning(event.battleId());
             messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
+
+            RUNNER_RUNNING_EVENTS.remove(event);
         }
     }
 }
