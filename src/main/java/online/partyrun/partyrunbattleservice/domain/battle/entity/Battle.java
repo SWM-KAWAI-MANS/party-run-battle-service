@@ -49,12 +49,12 @@ public class Battle {
     }
 
     public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
-        validateCurrentStatus();
+        validateIsFinishedStatus();
         final Runner runner = findRunner(runnerId);
         runner.changeStatus(runnerStatus);
     }
 
-    private void validateCurrentStatus() {
+    private void validateIsFinishedStatus() {
         if (this.status.isFinished()) {
             throw new BattleAlreadyFinishedException(this.id);
         }
@@ -68,7 +68,7 @@ public class Battle {
     }
 
     public void changeBattleStatus(BattleStatus status) {
-        validateCurrentStatus();
+        validateIsFinishedStatus();
         validateStatus(status);
 
         this.status = status;
@@ -80,9 +80,9 @@ public class Battle {
         }
     }
 
-    public boolean isRunnersAllRunningStatus() {
-        return runners.stream()
-                .allMatch(Runner::isRunning);
+    public RunnerStatus getRunnerStatus(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+        return runner.getStatus();
     }
 
     public void setStartTime(LocalDateTime now, LocalDateTime startTime) {
@@ -94,5 +94,9 @@ public class Battle {
         if (!startTime.isAfter(now)) {
             throw new InvalidBattleStartTimeException(startTime, now);
         }
+    }
+
+    public int getNumberOfRunners() {
+        return this.runners.size();
     }
 }

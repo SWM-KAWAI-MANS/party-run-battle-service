@@ -9,7 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
-import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -18,6 +18,10 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -32,8 +36,9 @@ public class BattleService {
     BattleMapper battleMapper;
     BattleRepository battleRepository;
     RunnerService runnerService;
-    Clock clock;
     ApplicationEventPublisher eventPublisher;
+    MongoTemplate mongoTemplate;
+    Clock clock;
 
     public BattleResponse createBattle(BattleCreateRequest request) {
         final List<String> runnerIds = request.getRunnerIds();
@@ -65,20 +70,21 @@ public class BattleService {
     public void setRunnerRunning(String battleId, String runnerId) {
         final Battle battle = findBattle(battleId);
         battle.changeRunnerStatus(runnerId, RunnerStatus.RUNNING);
-        battleRepository.save(battle);
 
-        publishBattleRunningEvent(battle);
+        updateRunnerStatus(battle, runnerId);
+
+        eventPublisher.publishEvent(new RunnerRunningEvent(battleId, battle.getNumberOfRunners()));
+    }
+
+    private void updateRunnerStatus(Battle battle, String runnerId) {
+        Query query = Query.query(Criteria.where("id").is(battle.getId()).and("runners.id").is(runnerId));
+        Update update = new Update().set("runners.$.status", battle.getRunnerStatus(runnerId));
+        mongoTemplate.updateFirst(query, update, Battle.class);
     }
 
     private Battle findBattle(String battleId) {
         return battleRepository.findById(battleId)
                 .orElseThrow(() -> new BattleNotFoundException(battleId));
-    }
-
-    private void publishBattleRunningEvent(Battle battle) {
-        if (battle.isRunnersAllRunningStatus()) {
-            eventPublisher.publishEvent(new BattleRunningEvent(battle.getId()));
-        }
     }
 
     public BattleStartTimeResponse setBattleRunning(String battleId) {
