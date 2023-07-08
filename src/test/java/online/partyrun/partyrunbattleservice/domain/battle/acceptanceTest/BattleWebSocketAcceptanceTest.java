@@ -1,6 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -10,6 +14,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -25,9 +30,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
@@ -133,9 +135,12 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
 
-                박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
-                박현준_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
-                노준혁_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박성우_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박현준_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                노준혁_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
                 final BattleStartTimeResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
                 final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
@@ -169,9 +174,11 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
                         new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
 
-                박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박성우_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
-                박현준_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+                박현준_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
 
                 final BattleStartTimeResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
                 final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
