@@ -208,5 +208,42 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(new BattleStartTimeResponse(LocalDateTime.now(clock).plusSeconds(10)));
             }
         }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모두_메세지를_보내지_않았다면 {
+
+            @Test
+            @DisplayName("응답을 받지 못한다.")
+            void getBattleStartTime() throws InterruptedException {
+                박성우_Session.subscribe(
+                        String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
+                        new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 박성우_Queue));
+
+                박현준_Session.subscribe(
+                        String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
+                        new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 박현준_Queue));
+
+
+                노준혁_Session.subscribe(
+                        String.format("%s/%s", TOPIC_BATTLE_PREFIX, 배틀.getId()),
+                        new StompFrameHandlerImpl<>(BattleStartTimeResponse.class, 노준혁_Queue));
+
+                박성우_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+
+                박현준_Session.send(
+                        String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+
+                final BattleStartTimeResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                final BattleStartTimeResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
+                final BattleStartTimeResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+
+                assertThat(박성우_response)
+                        .isEqualTo(박현준_response)
+                        .isEqualTo(노준혁_response)
+                        .isNull();
+            }
+        }
     }
 }
