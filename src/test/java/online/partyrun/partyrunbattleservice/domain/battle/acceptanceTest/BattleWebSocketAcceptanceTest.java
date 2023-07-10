@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -12,8 +14,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestC
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
     @Autowired WebSocketStompClient webSocketStompClient;
     @Autowired BattleRepository battleRepository;
-    @Autowired RunnerRepository runnerRepository;
+    @Autowired MemberRepository memberRepository;
     @Autowired JwtGenerator jwtGenerator;
     @Autowired Clock clock;
 
@@ -63,7 +65,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 웹_소켓_연결을_실행할_때 {
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
         String accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
 
         @Nested
@@ -98,9 +100,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들이_구독_성공_요청을_보냈을_때 {
 
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
         String 박성우_accessToken =
                 jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
         String 박현준_accessToken =
