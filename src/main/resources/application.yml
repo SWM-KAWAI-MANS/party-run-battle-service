@@ -1,6 +1,10 @@
 server:
   servlet:
     context-path: /api
+spring:
+  profiles:
+    active: test
+
 logging:
   level:
     org:
@@ -9,9 +13,7 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
-spring:
-  profiles:
-    active: test
+
 jwt:
   access-secret-key: "asfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasd"
   access-expire-second: 1000000
