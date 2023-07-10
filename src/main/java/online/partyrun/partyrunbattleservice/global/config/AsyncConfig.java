@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {
 
-    private static final int THREAD_COUNT = 4;
+    private static final int THREAD_COUNT = 2;
 
     @Override
     public Executor getAsyncExecutor() {
