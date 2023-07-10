@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BattleRepository extends MongoRepository<Battle, String> {
-    List<Battle> findByStatusAndRunnersIn(BattleStatus status, List<Runner> runners);
+    List<Battle> findByStatusInAndRunnersIn(List<BattleStatus> statuses, List<Runner> runners);
 
     Optional<Battle> findByStatusAndRunnersId(BattleStatus status, String runnersId);
 

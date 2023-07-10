@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.RunningBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.testmanager.docs.RestControllerTest;
 
@@ -40,7 +40,7 @@ class BattleControllerTest extends RestControllerTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 정상적인_러너들의_id가_주어지면 {
 
-            BattleCreateRequest request = new BattleCreateRequest(List.of("1", "2", "3"));
+            BattleCreateRequest request = new BattleCreateRequest(1000, List.of("1", "2", "3"));
             BattleResponse response = new BattleResponse("battle_id");
 
             @Test
@@ -70,9 +70,9 @@ class BattleControllerTest extends RestControllerTest {
                 return Stream.of(
                         Arguments.of(null, "body is null"),
                         Arguments.of(
-                                new BattleCreateRequest(List.of("2", "3")),
+                                new BattleCreateRequest(1000, List.of("2", "3")),
                                 "number of runners error"),
-                        Arguments.of(new BattleCreateRequest(null), "runner is null"));
+                        Arguments.of(new BattleCreateRequest(1000, null), "runner is null"));
             }
 
             @ParameterizedTest
@@ -110,11 +110,11 @@ class BattleControllerTest extends RestControllerTest {
             @Test
             @DisplayName("배틀 정보를 반환한다.")
             void getRunningBattle() throws Exception {
-                given(battleService.getRunningBattle("defaultUser")).willReturn(response);
+                given(battleService.getReadyBattle("defaultUser")).willReturn(response);
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                get("/battle/running")
+                                get("/battle/ready")
                                         .header(
                                                 "Authorization",
                                                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
@@ -135,8 +135,8 @@ class BattleControllerTest extends RestControllerTest {
             @Test
             @DisplayName("not found를 반환한다.")
             void getRunningBattle() throws Exception {
-                given(battleService.getRunningBattle("defaultUser"))
-                        .willThrow(new RunningBattleNotFoundException("defaultUser"));
+                given(battleService.getReadyBattle("defaultUser"))
+                        .willThrow(new ReadyBattleNotFoundException("defaultUser"));
 
                 final ResultActions actions =
                         mockMvc.perform(

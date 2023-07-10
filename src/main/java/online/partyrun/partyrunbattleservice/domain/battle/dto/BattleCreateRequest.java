@@ -14,5 +14,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BattleCreateRequest {
 
+    int distance;
     @NotNull List<String> runnerIds;
 }

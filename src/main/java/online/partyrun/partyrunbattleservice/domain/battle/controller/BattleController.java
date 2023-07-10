@@ -29,9 +29,9 @@ public class BattleController {
         return battleService.createBattle(request);
     }
 
-    @GetMapping("running")
+    @GetMapping("ready")
     @ResponseStatus(HttpStatus.OK)
-    public BattleResponse getRunningBattle(Authentication auth) {
-        return battleService.getRunningBattle(auth.getName());
+    public BattleResponse getReadyBattle(Authentication auth) {
+        return battleService.getReadyBattle(auth.getName());
     }
 }

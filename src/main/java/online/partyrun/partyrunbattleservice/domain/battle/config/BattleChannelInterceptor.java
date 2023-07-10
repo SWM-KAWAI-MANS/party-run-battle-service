@@ -49,7 +49,7 @@ public class BattleChannelInterceptor implements ChannelInterceptor {
         String battleId = extractBattleId(accessor);
 
         if (!battleRepository.existsByIdAndRunnersIdAndStatus(
-                battleId, runnerId, BattleStatus.RUNNING)) {
+                battleId, runnerId, BattleStatus.READY)) {
 
             throw new InvalidSubscribeRequestException(battleId, runnerId);
         }

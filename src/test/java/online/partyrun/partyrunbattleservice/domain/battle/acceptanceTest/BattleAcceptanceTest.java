@@ -2,7 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
 import static online.partyrun.partyrunbattleservice.acceptance.SimpleRestAssured.toObject;
 import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_생성_요청;
-import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_조회_요청;
+import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.준비_상태인_배틀_조회_요청;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -51,7 +51,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
                         배틀_생성_요청(
                                 SYSTEM_TOKEN,
                                 new BattleCreateRequest(
-                                        List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
+                                        1000, List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
                 assertAll(
                         () ->
                                 assertThat(response.statusCode())
@@ -81,8 +81,9 @@ public class BattleAcceptanceTest extends AcceptanceTest {
             void returnOK() {
                 배틀_생성_요청(
                         SYSTEM_TOKEN,
-                        new BattleCreateRequest(List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
-                final ExtractableResponse<Response> response = 배틀_조회_요청(박성우_accessToken);
+                        new BattleCreateRequest(
+                                1000, List.of(박성우.getId(), 노준혁.getId(), 박현준.getId())));
+                final ExtractableResponse<Response> response = 준비_상태인_배틀_조회_요청(박성우_accessToken);
 
                 assertAll(
                         () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -99,7 +100,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
             @Test
             @DisplayName("Forbidden을 반환한다.")
             void returnBadRequest() {
-                final ExtractableResponse<Response> response = 배틀_조회_요청("invalidToken");
+                final ExtractableResponse<Response> response = 준비_상태인_배틀_조회_요청("invalidToken");
 
                 assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
             }
