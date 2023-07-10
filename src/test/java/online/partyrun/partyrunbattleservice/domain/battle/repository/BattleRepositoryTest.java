@@ -1,13 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -16,12 +11,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DataMongoTest
 @DisplayName("BattleRepository")
 class BattleRepositoryTest {
 
     @Autowired MongoTemplate mongoTemplate;
-    @Autowired private RunnerRepository runnerRepository;
     @Autowired private BattleRepository battleRepository;
 
     @AfterEach
@@ -33,9 +30,9 @@ class BattleRepositoryTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들이_존재할_때 {
 
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+        Runner 박성우 = new Runner("박성우");
+        Runner 박현준 = new Runner("박현준");
+        Runner 노준혁 = new Runner("노준혁");
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)

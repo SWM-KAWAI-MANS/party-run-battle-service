@@ -1,13 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
@@ -21,10 +13,9 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFo
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +27,15 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
@@ -43,7 +43,7 @@ class BattleServiceTest {
 
     @Autowired BattleService battleService;
     @Autowired BattleRepository battleRepository;
-    @Autowired RunnerRepository runnerRepository;
+    @Autowired MemberRepository memberRepository;
     @Autowired MongoTemplate mongoTemplate;
     @Autowired ApplicationEventPublisher publisher;
     @Autowired Clock clock;
@@ -57,9 +57,9 @@ class BattleServiceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_생성할_때 {
 
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
         BattleCreateRequest request =
                 new BattleCreateRequest(1000, List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
 
@@ -91,8 +91,8 @@ class BattleServiceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 한명이라도_다른_배틀에_참여하고_있는_러너가_있다면 {
-            Runner 장세연 = runnerRepository.save(new Runner("장세연"));
-            Runner 이승열 = runnerRepository.save(new Runner("이승열"));
+            Runner 장세연 = new Runner(memberRepository.save(멤버_장세연).getId());
+            Runner 이승열 = new Runner(memberRepository.save(멤버_이승열).getId());
 
             @Test
             @DisplayName("예외를 던진다.")
@@ -118,7 +118,7 @@ class BattleServiceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_조회할_때 {
 
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
         BattleCreateRequest request = new BattleCreateRequest(1000, List.of(박성우.getId()));
 
         @Nested
@@ -138,7 +138,7 @@ class BattleServiceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 현재_배틀에_참여하고있지_않는_runner의_id가_주어지면 {
-            Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+            Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
 
             @Test
             @DisplayName("예외를 던진다.")
@@ -152,8 +152,8 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_RUNNING으로_변경할_때 {
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
         Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁)));
 
         @Nested
@@ -236,9 +236,9 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_상태를_RUNNING으로_변경할_떄 {
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁)));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)

@@ -1,22 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static online.partyrun.partyrunbattleservice.acceptance.SimpleRestAssured.toObject;
-import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_생성_요청;
-import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.준비_상태인_배틀_조회_요청;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-import online.partyrun.partyrunbattleservice.domain.runner.repository.RunnerRepository;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,10 +15,17 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Set;
 
+import static online.partyrun.partyrunbattleservice.acceptance.SimpleRestAssured.toObject;
+import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_생성_요청;
+import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.준비_상태인_배틀_조회_요청;
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DisplayName("BattleAcceptanceTest")
 public class BattleAcceptanceTest extends AcceptanceTest {
 
-    @Autowired RunnerRepository runnerRepository;
+    @Autowired MemberRepository memberRepository;
 
     @Autowired JwtGenerator jwtGenerator;
     private static final String SYSTEM_TOKEN =
@@ -36,9 +34,9 @@ public class BattleAcceptanceTest extends AcceptanceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀_생성을_할_때 {
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -66,9 +64,9 @@ public class BattleAcceptanceTest extends AcceptanceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_조회_할_때 {
-        Runner 박성우 = runnerRepository.save(new Runner("박성우"));
-        Runner 노준혁 = runnerRepository.save(new Runner("노준혁"));
-        Runner 박현준 = runnerRepository.save(new Runner("박현준"));
+        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
         String 박성우_accessToken =
                 jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
 
