@@ -1,27 +1,27 @@
 package online.partyrun.partyrunbattleservice.domain.member.service;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박성우;
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박현준;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박성우;
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박현준;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @SpringBootTest
 @DisplayName("MemberService")
 class MemberServiceTest {
 
-    @Autowired
-    MemberRepository memberRepository;
+    @Autowired MemberRepository memberRepository;
 
-    @Autowired
-    MemberService memberService;
+    @Autowired MemberService memberService;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -30,7 +30,10 @@ class MemberServiceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 존재하는_멤버들의_아이디를_받으면 {
-            List<String> 멤버_ids = List.of(memberRepository.save(멤버_박성우).getId(), memberRepository.save(멤버_박현준).getId());
+            List<String> 멤버_ids =
+                    List.of(
+                            memberRepository.save(멤버_박성우).getId(),
+                            memberRepository.save(멤버_박현준).getId());
 
             @Test
             @DisplayName("멤버를 반환한다.")
