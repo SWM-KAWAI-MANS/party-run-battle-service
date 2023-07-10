@@ -4,11 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
-
-import org.springframework.data.annotation.Id;
 
 import java.util.Objects;
 
@@ -16,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Runner {
-    @Id String id;
+    String id;
     RunnerStatus status = RunnerStatus.READY;
 
     public Runner(String id) {
