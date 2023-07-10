@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleEventHandler {
-    static Map<RunnerRunningEvent, Integer> RUNNER_RUNNING_EVENTS = new ConcurrentHashMap<>();
+    Map<RunnerRunningEvent, Integer> RUNNER_RUNNING_EVENTS = new ConcurrentHashMap<>();
     SimpMessagingTemplate messagingTemplate;
     BattleService battleService;
 
