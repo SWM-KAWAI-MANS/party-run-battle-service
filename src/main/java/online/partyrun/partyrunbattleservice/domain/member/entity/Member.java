@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Member {
     @Id String id;

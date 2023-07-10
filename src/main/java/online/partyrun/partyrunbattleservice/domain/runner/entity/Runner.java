@@ -11,7 +11,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatu
 import java.util.Objects;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Runner {
     String id;

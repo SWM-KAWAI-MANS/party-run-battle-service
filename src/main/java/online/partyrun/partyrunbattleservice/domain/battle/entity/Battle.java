@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Battle {
     static int MIN_DISTANCE = 1;
