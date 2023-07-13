@@ -257,4 +257,40 @@ class BattleTest {
             }
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀의_러너들이_모두_RUNNING_상태인지_확인할_때 {
+
+        Runner 박성우 = new Runner("박성우");
+        Runner 노준혁 = new Runner("노준혁");
+        Battle 배틀 = new Battle(1000, List.of(박성우, 노준혁));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모두_맞다면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeStatus(RunnerStatus.RUNNING);
+                노준혁.changeStatus(RunnerStatus.RUNNING);
+
+                assertThat(배틀.isAllRunnersRunningStatus()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 한명이라도_아니라면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeStatus(RunnerStatus.FINISHED);
+
+                assertThat(배틀.isAllRunnersRunningStatus()).isFalse();
+            }
+        }
+    }
 }
