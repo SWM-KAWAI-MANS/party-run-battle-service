@@ -23,7 +23,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleChannelInterceptor implements ChannelInterceptor {
 
-    static String BATTLE_TOPIC_PREFIX = "/topic/battle/";
+    private final static String BATTLE_TOPIC_PREFIX = "/topic/battle/";
     BattleRepository battleRepository;
 
     @Override
