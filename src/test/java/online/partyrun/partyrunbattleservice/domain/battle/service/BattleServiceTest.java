@@ -1,15 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
@@ -17,7 +7,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
-import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
@@ -26,7 +16,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +26,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -217,8 +215,8 @@ class BattleServiceTest {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
                 battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
                 then(publisher)
-                        .should(times(2))
-                        .publishEvent(new RunnerRunningEvent(배틀.getId(), 배틀.getNumberOfRunners()));
+                        .should(times(1))
+                        .publishEvent(new BattleRunningEvent(배틀.getId()));
             }
         }
 
@@ -230,7 +228,7 @@ class BattleServiceTest {
             @DisplayName("BattleRunningEvent을 publish 하지 않는다.")
             void notPublish() {
                 battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
-                then(publisher).should(never()).publishEvent(any(RunnerRunningEvent.class));
+                then(publisher).should(never()).publishEvent(any(BattleRunningEvent.class));
             }
         }
     }
@@ -250,7 +248,7 @@ class BattleServiceTest {
             @DisplayName("배틀의 상태를 변경한다.")
             void throwException() {
                 final BattleStartTimeResponse response = battleService.setBattleRunning(배틀.getId());
-                final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(10);
+                final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(5);
 
                 final Battle 조회된_배틀 = battleRepository.findById(배틀.getId()).orElseThrow();
 

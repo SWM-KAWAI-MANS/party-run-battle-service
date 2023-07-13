@@ -1,12 +1,9 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import static org.assertj.core.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -14,6 +11,8 @@ import org.junit.jupiter.params.provider.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -256,21 +255,6 @@ class BattleTest {
                 assertThatThrownBy(() -> 배틀.getRunnerStatus(invalidRunnerId))
                         .isInstanceOf(RunnerNotFoundException.class);
             }
-        }
-    }
-
-    @Nested
-    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 참여_러너의_인원을_찾을_떄 {
-
-        List<Runner> runners = List.of(박성우, 박현준);
-
-        @Test
-        @DisplayName("러너의 인원을 반환한다")
-        void returnNumberOfRunners() {
-            final Battle battle = new Battle(1000, runners);
-
-            assertThat(battle.getNumberOfRunners()).isEqualTo(runners.size());
         }
     }
 }

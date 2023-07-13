@@ -26,7 +26,7 @@ public class Battle {
     @Id String id;
     int distance;
     List<Runner> runners;
-    BattleStatus status = BattleStatus.READY;
+    BattleStatus status;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
@@ -35,6 +35,7 @@ public class Battle {
         validateRunners(runners);
         this.distance = distance;
         this.runners = runners;
+        this.status = BattleStatus.READY;
     }
 
     private void validateDistance(int distance) {
@@ -97,7 +98,9 @@ public class Battle {
         }
     }
 
-    public int getNumberOfRunners() {
-        return this.runners.size();
+
+    public boolean isAllRunnersRunningStatus() {
+        return this.runners.stream()
+                .allMatch(Runner::isRunning);
     }
 }

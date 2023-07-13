@@ -15,10 +15,11 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Runner {
     String id;
-    RunnerStatus status = RunnerStatus.READY;
+    RunnerStatus status;
 
     public Runner(String id) {
         this.id = id;
+        this.status = RunnerStatus.READY;
     }
 
     public boolean hasId(String id) {
@@ -42,5 +43,9 @@ public class Runner {
         if (Objects.isNull(status) || status.isReady() || this.status.equals(status)) {
             throw new RunnerStatusCannotBeChangedException(status);
         }
+    }
+
+    public boolean isRunning() {
+        return this.status.isRunning();
     }
 }

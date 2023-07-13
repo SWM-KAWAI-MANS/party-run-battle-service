@@ -3,14 +3,14 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import lombok.extern.slf4j.Slf4j;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
-import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -18,8 +18,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
-
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,6 +30,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -73,17 +74,9 @@ public class BattleService {
     public void setRunnerRunning(String battleId, String runnerId) {
         final Battle battle = findBattle(battleId);
         battle.changeRunnerStatus(runnerId, RunnerStatus.RUNNING);
+        final Battle updatedBattle = updateRunnerStatus(battle, runnerId);
 
-        updateRunnerStatus(battle, runnerId);
-
-        eventPublisher.publishEvent(new RunnerRunningEvent(battleId, battle.getNumberOfRunners()));
-    }
-
-    private void updateRunnerStatus(Battle battle, String runnerId) {
-        Query query =
-                Query.query(Criteria.where("id").is(battle.getId()).and("runners.id").is(runnerId));
-        Update update = new Update().set("runners.$.status", battle.getRunnerStatus(runnerId));
-        mongoTemplate.updateFirst(query, update, Battle.class);
+        publishBattleRunningEvent(updatedBattle);
     }
 
     private Battle findBattle(String battleId) {
@@ -92,12 +85,28 @@ public class BattleService {
                 .orElseThrow(() -> new BattleNotFoundException(battleId));
     }
 
+    private Battle updateRunnerStatus(Battle battle, String runnerId) {
+        Query query =
+                Query.query(Criteria.where("id").is(battle.getId()).and("runners.id").is(runnerId));
+        Update update = new Update().set("runners.$.status", battle.getRunnerStatus(runnerId));
+
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+
+        return mongoTemplate.findAndModify(query, update, options, Battle.class);
+    }
+
+    private void publishBattleRunningEvent(Battle battle) {
+        if (battle.isAllRunnersRunningStatus()) {
+            eventPublisher.publishEvent(new BattleRunningEvent(battle.getId()));
+        }
+    }
+
     public BattleStartTimeResponse setBattleRunning(String battleId) {
         final Battle battle = findBattle(battleId);
         battle.changeBattleStatus(BattleStatus.RUNNING);
 
         final LocalDateTime now = LocalDateTime.now(clock);
-        final LocalDateTime startTime = now.plusSeconds(10);
+        final LocalDateTime startTime = now.plusSeconds(5);
         battle.setStartTime(now, startTime);
         battleRepository.save(battle);
 
