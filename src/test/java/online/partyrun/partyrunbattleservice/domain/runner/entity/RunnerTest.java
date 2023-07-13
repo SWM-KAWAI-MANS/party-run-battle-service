@@ -1,12 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
-
 import org.junit.jupiter.api.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -110,6 +109,37 @@ class RunnerTest {
             @DisplayName("false를 반환한다.")
             void returnTrue() {
                 assertThat(박성우.hasId(id)).isFalse();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태가_RUNNING인지_확인할_때 {
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class RUNNING_이라면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeStatus(RunnerStatus.RUNNING);
+
+                assertThat(박성우.isRunning()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class RUNNING이_아니라면 {
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void returnFalse() {
+                박성우.changeStatus(RunnerStatus.FINISHED);
+
+                assertThat(박성우.isRunning()).isFalse();
             }
         }
     }
