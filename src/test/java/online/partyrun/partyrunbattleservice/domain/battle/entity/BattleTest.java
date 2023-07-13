@@ -1,9 +1,12 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import static org.assertj.core.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -11,8 +14,6 @@ import org.junit.jupiter.params.provider.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {

@@ -1,25 +1,24 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DisplayName("BattleDao")
 @SpringBootTest
 class BattleDaoTest {
 
-    @Autowired
-    BattleDao battleDao;
+    @Autowired BattleDao battleDao;
 
-    @Autowired
-    BattleRepository battleRepository;
+    @Autowired BattleRepository battleRepository;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -33,11 +32,11 @@ class BattleDaoTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 러너의_상태를_받으면 {
 
-
             @Test
             @DisplayName("배틀을 업데이트 후 반환한다.")
             void updateBattle() {
-                Battle battle = battleDao.updateRunnerStatus(배틀.getId(), 박성우.getId(), RunnerStatus.RUNNING);
+                Battle battle =
+                        battleDao.updateRunnerStatus(배틀.getId(), 박성우.getId(), RunnerStatus.RUNNING);
 
                 assertThat(battle.getRunnerStatus(박성우.getId())).isEqualTo(RunnerStatus.RUNNING);
             }

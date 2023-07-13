@@ -98,9 +98,7 @@ public class Battle {
         }
     }
 
-
     public boolean isAllRunnersRunningStatus() {
-        return this.runners.stream()
-                .allMatch(Runner::isRunning);
+        return this.runners.stream().allMatch(Runner::isRunning);
     }
 }
