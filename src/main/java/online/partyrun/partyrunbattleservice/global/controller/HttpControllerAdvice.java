@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HttpControllerAdvice {
 
-    private final static String BAD_REQUEST_MESSAGE = "잘못된 요청입니다.";
-    private final static String NOT_FOUND_EXCEPTION_MESSAGE = "요청한 리소스를 찾을 수 없습니다.";
-    private final static String SERVER_ERROR_MESSAGE = "알 수 없는 에러입니다.";
+    private static final String BAD_REQUEST_MESSAGE = "잘못된 요청입니다.";
+    private static final String NOT_FOUND_EXCEPTION_MESSAGE = "요청한 리소스를 찾을 수 없습니다.";
+    private static final String SERVER_ERROR_MESSAGE = "알 수 없는 에러입니다.";
 
     @ExceptionHandler({
         BadRequestException.class,
