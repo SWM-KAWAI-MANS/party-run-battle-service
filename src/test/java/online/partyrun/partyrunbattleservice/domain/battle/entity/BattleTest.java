@@ -261,16 +261,37 @@ class BattleTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 참여_러너의_인원을_찾을_떄 {
+    class 배틀의_러너들이_모두_RUNNING_상태인지_확인할_때 {
 
-        List<Runner> runners = List.of(박성우, 박현준);
+        Runner 박성우 = new Runner("박성우");
+        Runner 노준혁 = new Runner("노준혁");
+        Battle 배틀 = new Battle(1000, List.of(박성우, 노준혁));
 
-        @Test
-        @DisplayName("러너의 인원을 반환한다")
-        void returnNumberOfRunners() {
-            final Battle battle = new Battle(1000, runners);
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모두_맞다면 {
 
-            assertThat(battle.getNumberOfRunners()).isEqualTo(runners.size());
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeStatus(RunnerStatus.RUNNING);
+                노준혁.changeStatus(RunnerStatus.RUNNING);
+
+                assertThat(배틀.isAllRunnersRunningStatus()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 한명이라도_아니라면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeStatus(RunnerStatus.FINISHED);
+
+                assertThat(배틀.isAllRunnersRunningStatus()).isFalse();
+            }
         }
     }
 }

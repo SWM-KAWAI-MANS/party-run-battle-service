@@ -153,7 +153,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(노준혁_response)
                         .isEqualTo(
                                 new BattleStartTimeResponse(
-                                        LocalDateTime.now(clock).plusSeconds(10)));
+                                        LocalDateTime.now(clock).plusSeconds(5)));
             }
         }
 
