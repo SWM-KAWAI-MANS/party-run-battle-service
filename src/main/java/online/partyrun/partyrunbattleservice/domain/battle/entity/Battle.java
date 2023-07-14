@@ -21,7 +21,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Battle {
-    static int MIN_DISTANCE = 1;
+    private static final int MIN_DISTANCE = 1;
 
     @Id String id;
     int distance;
