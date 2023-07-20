@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +26,8 @@ public class RunnerRecordDao {
     MongoTemplate mongoTemplate;
 
     public List<String> getRunnerIds(String battleId) {
+        Assert.notNull(battleId, "battleId must not be null");
+
         Aggregation agg =
                 Aggregation.newAggregation(
                         match(where("_id").is(battleId)),
@@ -40,6 +43,9 @@ public class RunnerRecordDao {
     }
 
     public void saveAll(List<RunnerRecord> records) {
+        Assert.notNull(records, "records must not be null");
+        Assert.notEmpty(records, "records must not be empty");
+
         mongoTemplate.insertAll(records);
     }
 }
