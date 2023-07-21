@@ -101,7 +101,7 @@ public class BattleService {
         return new BattleStartTimeResponse(startTime);
     }
 
-    public Battle findRunningRunner(String battleId, String runnerId) {
+    public Battle findRunningBattle(String battleId, String runnerId) {
         final Battle battle = battleRepository
                 .findByIdAndRunnersId(battleId, runnerId)
                 .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
@@ -111,7 +111,7 @@ public class BattleService {
     }
 
     private void validateRunning(Battle battle, String runnerId) {
-        if (battle.isRunnerRunning(runnerId)) {
+        if (!battle.isRunnerRunning(runnerId)) {
             throw new RunnerIsNotRunningException(battle.getId(), runnerId);
         }
     }

@@ -34,7 +34,7 @@ public class RunnerRecordService {
     }
 
     public RunnerDistanceResponse calculateDistance(String battleId, String runnerId, RecordRequest request) {
-        final Battle battle = battleService.findRunningRunner(battleId, runnerId);
+        final Battle battle = battleService.findRunningBattle(battleId, runnerId);
 
         final GpsDatas gpsDatas = createNewGpsDatas(request, battle.getStartTime());
         final List<Record> newRecords = createNewRecords(battleId, runnerId, gpsDatas);

@@ -1,15 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
@@ -18,15 +8,11 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeRe
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleAlreadyFinishedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +23,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -270,6 +265,40 @@ class BattleServiceTest {
                 assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 현재_달리는_러너를_조회할_때 {
+
+        @Test
+        @DisplayName("배틀과 러너의 id로 조회에 실패하면 예외를 던진다")
+        void throwNotFoundException() {
+            assertThatThrownBy(() -> battleService.findRunningBattle("invalid Battle id", "invalid runner id"))
+                    .isInstanceOf(BattleNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("러너가 RUNNING 상태가 아니라면 예외를 던진다.")
+        void throwNotRunningException() {
+            Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+            Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
+
+            assertThatThrownBy(() -> battleService.findRunningBattle(배틀.getId(), 박성우.getId()))
+                    .isInstanceOf(RunnerIsNotRunningException.class);
+        }
+
+        @Test
+        @DisplayName("배틀, 러너의 아이디로 조회한다.")
+        void returnBattle() {
+            Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+            박성우.changeStatus(RunnerStatus.RUNNING);
+            Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
+
+            final Battle result = battleService.findRunningBattle(배틀.getId(), 박성우.getId());
+
+            assertThat(result.getId()).isEqualTo(배틀.getId());
         }
     }
 }
