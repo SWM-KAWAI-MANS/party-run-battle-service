@@ -101,4 +101,18 @@ public class Battle {
     public boolean isAllRunnersRunningStatus() {
         return this.runners.stream().allMatch(Runner::isRunning);
     }
+
+    public boolean isRunning(String runnerId) {
+        validateIsFinishedStatus();
+
+        final Runner runner = findRunner(runnerId);
+        return runner.isRunning();
+    }
+
+    public boolean isRunnerRunning(String runnerId) {
+        validateIsFinishedStatus();
+
+        final Runner runner = findRunner(runnerId);
+        return runner.isRunning();
+    }
 }

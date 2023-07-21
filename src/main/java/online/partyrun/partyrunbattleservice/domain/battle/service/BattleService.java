@@ -14,6 +14,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEv
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerIsNotRunningException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
@@ -98,5 +99,20 @@ public class BattleService {
         battleRepository.save(battle);
 
         return new BattleStartTimeResponse(startTime);
+    }
+
+    public Battle findRunningRunner(String battleId, String runnerId) {
+        final Battle battle = battleRepository
+                .findByIdAndRunnersId(battleId, runnerId)
+                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
+
+        validateRunning(battle, runnerId);
+        return battle;
+    }
+
+    private void validateRunning(Battle battle, String runnerId) {
+        if (battle.isRunnerRunning(runnerId)) {
+            throw new RunnerIsNotRunningException(battle.getId(), runnerId);
+        }
     }
 }

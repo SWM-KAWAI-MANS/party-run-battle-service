@@ -15,4 +15,6 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     Optional<Battle> findByStatusAndRunnersId(BattleStatus status, String runnersId);
 
     boolean existsByIdAndRunnersIdAndStatus(String battleId, String runnerId, BattleStatus status);
+
+    Optional<Battle> findByIdAndRunnersId(String battleId, String runnerId);
 }
