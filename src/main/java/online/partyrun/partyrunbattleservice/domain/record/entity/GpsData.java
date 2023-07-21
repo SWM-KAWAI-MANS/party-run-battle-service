@@ -2,6 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.record.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
 
 import java.time.LocalDateTime;
 
@@ -21,8 +22,7 @@ public class GpsData implements Comparable<GpsData> {
 
     private static void validateMinTime(LocalDateTime time, LocalDateTime minTime) {
         if (time.isBefore(minTime)) {
-            // TODO: 2023/07/21 예외 변경하기
-            throw new IllegalArgumentException(String.format("%s, %s", time, minTime));
+            throw new InvalidGpsDataTimeException(time, minTime);
         }
     }
 
