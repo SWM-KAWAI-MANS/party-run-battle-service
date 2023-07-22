@@ -24,6 +24,7 @@ public class Battle {
     private static final int MIN_DISTANCE = 1;
 
     @Id String id;
+    // TODO: 2023/07/22 변수 명 변경 -> targetDistance
     int distance;
     List<Runner> runners;
     BattleStatus status;
@@ -100,13 +101,6 @@ public class Battle {
 
     public boolean isAllRunnersRunningStatus() {
         return this.runners.stream().allMatch(Runner::isRunning);
-    }
-
-    public boolean isRunning(String runnerId) {
-        validateIsFinishedStatus();
-
-        final Runner runner = findRunner(runnerId);
-        return runner.isRunning();
     }
 
     public boolean isRunnerRunning(String runnerId) {

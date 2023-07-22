@@ -1,12 +1,9 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import static org.assertj.core.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -15,19 +12,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.*;
+
 @DisplayName("Battle")
 class BattleTest {
 
-    Runner 박성우 = new Runner("박성우");
-    Runner 노준혁 = new Runner("노준혁");
-    Runner 박현준 = new Runner("박현준");
+    Runner 박성우;
+    Runner 노준혁;
+    Runner 박현준;
+    Battle 배틀;
+
+    @BeforeEach
+    void setUp() {
+        박성우 = new Runner("박성우");
+        노준혁 = new Runner("노준혁");
+        박현준 = new Runner("박현준");
+        배틀 = new Battle(1000, List.of(박성우, 박현준, 노준혁));
+    }
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_생성할_때 {
-
-        List<Runner> runnerList = List.of(박성우, 노준혁, 박현준);
-        int distance = 1000;
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -36,6 +41,8 @@ class BattleTest {
             @Test
             @DisplayName("배틀을 생성한다.")
             void createBattle() {
+                int distance = 1000;
+                List<Runner> runnerList = List.of(박성우, 노준혁, 박현준);
                 assertThatCode(() -> new Battle(distance, runnerList)).doesNotThrowAnyException();
             }
         }
@@ -48,6 +55,8 @@ class BattleTest {
             @ValueSource(ints = {-1, 0})
             @DisplayName("예외를 던진다.")
             void throwException(int distance) {
+                List<Runner> runnerList = List.of(박성우, 노준혁, 박현준);
+
                 assertThatThrownBy(() -> new Battle(distance, runnerList))
                         .isInstanceOf(InvalidDistanceException.class);
             }
@@ -61,6 +70,7 @@ class BattleTest {
             @NullAndEmptySource
             @DisplayName("예외를 던진다.")
             void throwException(List<Runner> runners) {
+                int distance = 1000;
                 assertThatThrownBy(() -> new Battle(distance, runners))
                         .isInstanceOf(InvalidRunnerNumberInBattleException.class);
             }
@@ -70,32 +80,23 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_변경할_때 {
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 상태를_받으면 {
-
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-            RunnerStatus runnerStatus = RunnerStatus.RUNNING;
-
-            @Test
-            @DisplayName("러너의 상태를 변경한다.")
-            void changeRunnerStatus() {
-                배틀.changeRunnerStatus(박성우.getId(), runnerStatus);
-                assertThat(박성우.getStatus()).isEqualTo(runnerStatus);
-            }
+        RunnerStatus runnerStatus = RunnerStatus.RUNNING;
+        @Test
+        @DisplayName("상태를_받으면 러너의 상태를 변경한다.")
+        void changeRunnerStatus() {
+            배틀.changeRunnerStatus(박성우.getId(), runnerStatus);
+            assertThat(박성우.getStatus()).isEqualTo(runnerStatus);
         }
+
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀_내에_러너가_존재하지_않으면 {
-
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> 배틀.changeRunnerStatus(노준혁.getId(), RunnerStatus.RUNNING))
+                String notExistRunnerId = "not exist runnerId";
+                assertThatThrownBy(() -> 배틀.changeRunnerStatus(notExistRunnerId, RunnerStatus.RUNNING))
                         .isInstanceOf(RunnerNotFoundException.class);
             }
         }
@@ -103,9 +104,6 @@ class BattleTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀이_FINISHED_상태라면 {
-
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
@@ -119,8 +117,6 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_상태를_변경할_때 {
-
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -186,8 +182,6 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_시작_시간을_설정할_떄 {
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 시작_시간이_생성_시간_보다_같거나_이후라면 {
@@ -227,18 +221,13 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_찾을_떄 {
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 러너의_id를_받으면 {
-
-            String runnerId = 박성우.getId();
-
             @Test
             @DisplayName("러너의 상태를 반환한다.")
             void returnRunnerStatus() {
-                RunnerStatus runnerStatus = 배틀.getRunnerStatus(runnerId);
+                RunnerStatus runnerStatus = 배틀.getRunnerStatus(박성우.getId());
 
                 assertThat(runnerStatus).isEqualTo(박성우.getStatus());
             }
@@ -262,11 +251,6 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_러너들이_모두_RUNNING_상태인지_확인할_때 {
-
-        Runner 박성우 = new Runner("박성우");
-        Runner 노준혁 = new Runner("노준혁");
-        Battle 배틀 = new Battle(1000, List.of(박성우, 노준혁));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 모두_맞다면 {
@@ -275,6 +259,7 @@ class BattleTest {
             @DisplayName("true를 반환한다.")
             void returnTrue() {
                 박성우.changeStatus(RunnerStatus.RUNNING);
+                박현준.changeStatus(RunnerStatus.RUNNING);
                 노준혁.changeStatus(RunnerStatus.RUNNING);
 
                 assertThat(배틀.isAllRunnersRunningStatus()).isTrue();
@@ -292,6 +277,34 @@ class BattleTest {
 
                 assertThat(배틀.isAllRunnersRunningStatus()).isFalse();
             }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_Running_상태인지_확인할_때 {
+
+        @Test
+        @DisplayName("배틀이 종료되었다면 예외를 던진다.")
+        void throwFinishedException() {
+            배틀.changeBattleStatus(BattleStatus.FINISHED);
+
+            assertThatThrownBy(() -> 배틀.isRunnerRunning(박성우.getId()))
+                    .isInstanceOf(BattleAlreadyFinishedException.class);
+        }
+
+        @Test
+        @DisplayName("러너가 존재하지 않는다면 예외를 던진다.")
+        void throwException() {
+            final String notExistRunnerId = "not exist runner id";
+            assertThatThrownBy(() -> 배틀.isRunnerRunning(notExistRunnerId))
+                    .isInstanceOf(RunnerNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("러너가 Running 상태인지 확인한다.")
+        void checkIsRunning() {
+            assertThat(배틀.isRunnerRunning(박성우.getId())).isFalse();
         }
     }
 }
