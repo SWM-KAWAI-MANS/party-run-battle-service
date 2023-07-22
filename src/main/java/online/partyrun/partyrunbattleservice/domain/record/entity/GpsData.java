@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -27,8 +28,14 @@ public class GpsData implements Comparable<GpsData> {
     }
 
     public double calculateDistance(GpsData other) {
-        // TODO: 2023/07/22 null check
+        validateGpsData(other);
         return this.location.calculateDistance(other.location, new HaversineDistanceCalculator());
+    }
+
+    private void validateGpsData(GpsData other) {
+        if (Objects.isNull(other)) {
+            throw new InvalidGpsDataException();
+        }
     }
 
     @Override
