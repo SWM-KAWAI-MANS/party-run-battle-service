@@ -54,6 +54,9 @@ public class RunnerRecordDao {
     }
 
     public Optional<Record> findLatestRecord(String battleId, String runnerId) {
+        Assert.notNull(battleId, "battleId must not be null");
+        Assert.notNull(runnerId, "runnerId must not be null");
+
         Aggregation aggregation =
                 Aggregation.newAggregation(
                         RunnerRecord.class,
@@ -74,6 +77,11 @@ public class RunnerRecordDao {
     }
 
     public void pushNewRecords(String battleId, String runnerId, List<Record> records) {
+        Assert.notNull(battleId, "battleId must not be null");
+        Assert.notNull(runnerId, "runnerId must not be null");
+        Assert.notNull(records, "records must not be null");
+        Assert.notEmpty(records, "records must not be empty");
+
         Query query = Query.query(where("battleId").is(battleId).and("runnerId").is(runnerId));
         Update update = new Update().push("records").each(records.toArray());
 
