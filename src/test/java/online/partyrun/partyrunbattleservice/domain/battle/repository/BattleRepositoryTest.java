@@ -1,8 +1,12 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -10,9 +14,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -134,7 +135,8 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("배틀, 러너의 아이디에 해당하는 배틀을 반환한.")
             void returnBattle() {
-                final Optional<Battle> result = battleRepository.findByIdAndRunnersId(배틀.getId(), 박성우.getId());
+                final Optional<Battle> result =
+                        battleRepository.findByIdAndRunnersId(배틀.getId(), 박성우.getId());
 
                 assertThat(result).isPresent();
             }
@@ -142,13 +144,13 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("배틀, 러너의 아이디가 존재하지 않으면 배틀을 반환하지 않는다.")
             void noReturnBattle() {
-                final Optional<Battle> result1 = battleRepository.findByIdAndRunnersId(배틀.getId(), "invalidRunnerId");
-                final Optional<Battle> result2 = battleRepository.findByIdAndRunnersId("invalidBattleId", 박성우.getId());
+                final Optional<Battle> result1 =
+                        battleRepository.findByIdAndRunnersId(배틀.getId(), "invalidRunnerId");
+                final Optional<Battle> result2 =
+                        battleRepository.findByIdAndRunnersId("invalidBattleId", 박성우.getId());
 
                 Assertions.assertAll(
-                        () -> assertThat(result1).isEmpty(),
-                        () -> assertThat(result2).isEmpty()
-                );
+                        () -> assertThat(result1).isEmpty(), () -> assertThat(result2).isEmpty());
             }
         }
     }

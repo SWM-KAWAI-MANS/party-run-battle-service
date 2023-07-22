@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.record.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.partyrunbattleservice.domain.record.dto.RecordRequest;
@@ -12,6 +13,7 @@ import online.partyrun.partyrunbattleservice.domain.record.entity.GpsDatas;
 import online.partyrun.partyrunbattleservice.domain.record.entity.Record;
 import online.partyrun.partyrunbattleservice.domain.record.entity.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.record.repository.RunnerRecordDao;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,7 +35,8 @@ public class RunnerRecordService {
         runnerRecordDao.saveAll(records);
     }
 
-    public RunnerDistanceResponse calculateDistance(String battleId, String runnerId, RecordRequest request) {
+    public RunnerDistanceResponse calculateDistance(
+            String battleId, String runnerId, RecordRequest request) {
         final Battle battle = battleService.findRunningBattle(battleId, runnerId);
 
         final GpsDatas gpsDatas = createNewGpsDatas(request, battle.getStartTime());
@@ -41,14 +44,13 @@ public class RunnerRecordService {
         runnerRecordDao.pushNewRecords(battleId, runnerId, newRecords);
 
         // TODO: 2023/07/21 현재는 종료 로직이 들어가지 않았으므로 무조건 isFinished에 false 적용
-        return new RunnerDistanceResponse(runnerId, false, newRecords.get(newRecords.size() - 1).getDistance());
+        return new RunnerDistanceResponse(
+                runnerId, false, newRecords.get(newRecords.size() - 1).getDistance());
     }
 
     private GpsDatas createNewGpsDatas(RecordRequest request, LocalDateTime minTime) {
         final List<GpsData> gpsData =
-                request.getRecord().stream()
-                        .map(r -> r.toEntity(minTime))
-                        .toList();
+                request.getRecord().stream().map(r -> r.toEntity(minTime)).toList();
 
         return new GpsDatas(gpsData);
     }

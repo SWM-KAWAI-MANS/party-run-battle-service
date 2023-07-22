@@ -1,11 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
-import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalRecordDistanceException;
-import org.junit.jupiter.api.*;
-
 import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalRecordDistanceException;
+
+import org.junit.jupiter.api.*;
 
 @DisplayName("Record")
 class RecordTest {

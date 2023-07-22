@@ -1,16 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_1;
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_2;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
-
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_1;
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_2;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("GpsData")
 class GpsDataTest {
@@ -68,7 +70,6 @@ class GpsDataTest {
         assertAll(
                 () -> assertThat(result1).isNegative(),
                 () -> assertThat(result2).isZero(),
-                () -> assertThat(result3).isPositive()
-        );
+                () -> assertThat(result3).isPositive());
     }
 }

@@ -1,7 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.record.repository;
 
+import static online.partyrun.partyrunbattleservice.fixture.Battle.BattleFixture.*;
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 import online.partyrun.partyrunbattleservice.domain.record.entity.Record;
 import online.partyrun.partyrunbattleservice.domain.record.entity.RunnerRecord;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,11 +24,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static online.partyrun.partyrunbattleservice.fixture.Battle.BattleFixture.*;
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @DataMongoTest
 @DisplayName("RunnerRecordDao")
@@ -140,7 +142,8 @@ class RunnerRecordDaoTest {
             void pushRecord() {
                 runnerRecordDao.pushNewRecords(battleId, runnerId, records);
 
-                Query query = Query.query(where("battleId").is(battleId).and("runnerId").is(runnerId));
+                Query query =
+                        Query.query(where("battleId").is(battleId).and("runnerId").is(runnerId));
                 final RunnerRecord result = mongoTemplate.findOne(query, RunnerRecord.class);
 
                 assertThat(result.getRecords()).hasSize(3);
@@ -150,7 +153,8 @@ class RunnerRecordDaoTest {
             @MethodSource("invalidParameters")
             @DisplayName("잘못된 파라미터가 들어오면 예외를 던진다.")
             void throwException(String battleId, String runnerId, List<Record> records) {
-                Assertions.assertThatThrownBy(() -> runnerRecordDao.pushNewRecords(battleId, runnerId, records))
+                Assertions.assertThatThrownBy(
+                                () -> runnerRecordDao.pushNewRecords(battleId, runnerId, records))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
@@ -159,8 +163,7 @@ class RunnerRecordDaoTest {
                         Arguments.of(null, "runnerId", List.of(RECORD_1)),
                         Arguments.of("battleId", null, List.of(RECORD_1)),
                         Arguments.of("battleId", "runnerId", null),
-                        Arguments.of("battleId", "runnerId", List.of())
-                );
+                        Arguments.of("battleId", "runnerId", List.of()));
             }
         }
 
@@ -171,7 +174,8 @@ class RunnerRecordDaoTest {
             @Test
             @DisplayName("가장 최근의 기록을 조회한다.")
             void findLatestRecord() {
-                runnerRecordDao.pushNewRecords(battleId, runnerId, List.of(RECORD_2, RECORD_3, RECORD_1));
+                runnerRecordDao.pushNewRecords(
+                        battleId, runnerId, List.of(RECORD_2, RECORD_3, RECORD_1));
 
                 Record record = runnerRecordDao.findLatestRecord(battleId, runnerId).orElseThrow();
 
@@ -182,7 +186,8 @@ class RunnerRecordDaoTest {
             @Test
             @DisplayName("가장 최근의 기록이 없다면 empty를 반환한다.")
             void returnEmpty() {
-                final Optional<Record> latestRecord = runnerRecordDao.findLatestRecord(battleId, runnerId);
+                final Optional<Record> latestRecord =
+                        runnerRecordDao.findLatestRecord(battleId, runnerId);
                 assertThat(latestRecord).isEmpty();
             }
 
@@ -190,15 +195,13 @@ class RunnerRecordDaoTest {
             @MethodSource("invalidParameters")
             @DisplayName("잘못된 파라미터가 입력되면 예외를 던진다.")
             void throwException(String battleId, String runnerId) {
-                Assertions.assertThatThrownBy(() -> runnerRecordDao.findLatestRecord(battleId, runnerId))
+                Assertions.assertThatThrownBy(
+                                () -> runnerRecordDao.findLatestRecord(battleId, runnerId))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             public static Stream<Arguments> invalidParameters() {
-                return Stream.of(
-                        Arguments.of(null, "runnerId"),
-                        Arguments.of("battleId", null)
-                );
+                return Stream.of(Arguments.of(null, "runnerId"), Arguments.of("battleId", null));
             }
         }
     }

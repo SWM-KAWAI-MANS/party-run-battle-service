@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.record.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.GpsDatasEmptyException;
 
 import java.util.ArrayList;

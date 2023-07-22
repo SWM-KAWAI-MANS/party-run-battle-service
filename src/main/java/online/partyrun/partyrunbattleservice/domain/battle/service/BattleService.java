@@ -102,9 +102,10 @@ public class BattleService {
     }
 
     public Battle findRunningBattle(String battleId, String runnerId) {
-        final Battle battle = battleRepository
-                .findByIdAndRunnersId(battleId, runnerId)
-                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
+        final Battle battle =
+                battleRepository
+                        .findByIdAndRunnersId(battleId, runnerId)
+                        .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
 
         validateRunning(battle, runnerId);
         return battle;

@@ -2,6 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.record.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,12 @@ public class GpsData implements Comparable<GpsData> {
     Location location;
     LocalDateTime time;
 
-    public static GpsData of(double longitude, double latitude, double altitude, LocalDateTime time, LocalDateTime minTime) {
+    public static GpsData of(
+            double longitude,
+            double latitude,
+            double altitude,
+            LocalDateTime time,
+            LocalDateTime minTime) {
         validateMinTime(time, minTime);
 
         return new GpsData(Location.of(longitude, latitude, altitude), time);

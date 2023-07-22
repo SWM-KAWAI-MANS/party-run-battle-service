@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.DistanceCalculatorEmptyException;
 import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalLocationException;
 import online.partyrun.partyrunbattleservice.domain.record.exception.LocationEmptyException;
+
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import java.util.Objects;
@@ -41,14 +43,13 @@ public class Location {
         }
     }
 
-    public double calculateDistance(Location other, DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
+    public double calculateDistance(
+            Location other, DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
         validateLocation(other);
         validateCalculator(distanceCalculator);
 
         return distanceCalculator.calculate(this.point, other.point);
     }
-
-
 
     private void validateLocation(Location other) {
         if (Objects.isNull(other)) {

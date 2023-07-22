@@ -1,16 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.GpsDatasEmptyException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("GpsDatas")
 class GpsDatasTest {
@@ -37,7 +39,9 @@ class GpsDatasTest {
 
             final GpsDatas gpsDatas = new GpsDatas(List.of(gpsData1, gpsData2, gpsData3));
 
-            assertThat(gpsDatas.getGpsDatas()).usingRecursiveComparison().isEqualTo(List.of(gpsData3, gpsData2, gpsData1));
+            assertThat(gpsDatas.getGpsDatas())
+                    .usingRecursiveComparison()
+                    .isEqualTo(List.of(gpsData3, gpsData2, gpsData1));
         }
     }
 
@@ -56,9 +60,13 @@ class GpsDatasTest {
 
             Assertions.assertAll(
                     () -> assertThat(actual).hasSize(3),
-                    () -> assertThat(actual.get(actual.size() - 1).getDistance())
-                            .isEqualTo(RECORD_4.getDistance() + distance1 + distance2 + distance3)
-            );
+                    () ->
+                            assertThat(actual.get(actual.size() - 1).getDistance())
+                                    .isEqualTo(
+                                            RECORD_4.getDistance()
+                                                    + distance1
+                                                    + distance2
+                                                    + distance3));
         }
 
         @Test
@@ -71,9 +79,9 @@ class GpsDatasTest {
 
             Assertions.assertAll(
                     () -> assertThat(actual).hasSize(3),
-                    () -> assertThat(actual.get(actual.size() - 1).getDistance())
-                            .isEqualTo(distance1 + distance2)
-            );
+                    () ->
+                            assertThat(actual.get(actual.size() - 1).getDistance())
+                                    .isEqualTo(distance1 + distance2));
         }
     }
 }

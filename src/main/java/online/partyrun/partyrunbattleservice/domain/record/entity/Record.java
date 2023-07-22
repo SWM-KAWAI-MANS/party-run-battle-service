@@ -2,6 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.record.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalRecordDistanceException;
 
 import java.util.Objects;
