@@ -1,18 +1,16 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_1;
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.GPSDATA_2;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
-
+import online.partyrun.partyrunbattleservice.domain.record.exception.PastGpsDataException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
+
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("GpsData")
 class GpsDataTest {
@@ -48,15 +46,22 @@ class GpsDataTest {
 
         @Test
         @DisplayName("GpsData가 null이면 예외를 던진다.")
-        void throwException() {
+        void throwNullException() {
             assertThatThrownBy(() -> GPSDATA_1.calculateDistance(null))
                     .isInstanceOf(InvalidGpsDataException.class);
         }
 
         @Test
+        @DisplayName("측정할 GpsData가 과거 데이터면 예외를 던진다.")
+        void throwPastDataException() {
+            assertThatThrownBy(() -> GPSDATA_1.calculateDistance(GPSDATA_0))
+                    .isInstanceOf(PastGpsDataException.class);
+        }
+
+        @Test
         @DisplayName("GpsData를 받으면 거리를 계산한다.")
         void calculate() {
-            assertThat(GPSDATA_1.calculateDistance(GPSDATA_1)).isEqualTo(0);
+            assertThat(GPSDATA_1.calculateDistance(GPSDATA_1)).isZero();
         }
     }
 

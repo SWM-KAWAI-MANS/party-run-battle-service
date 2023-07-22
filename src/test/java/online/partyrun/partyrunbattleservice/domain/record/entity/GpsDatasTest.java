@@ -1,18 +1,16 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import online.partyrun.partyrunbattleservice.domain.record.exception.GpsDatasEmptyException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("GpsDatas")
 class GpsDatasTest {
@@ -53,8 +51,8 @@ class GpsDatasTest {
         @DisplayName("기존에 존재하던 기록을 통해 새로운 기록을 만든다.")
         void createRecords() {
 
-            List<Record> actual = GPSDATAS_1.createRecords(RECORD_4);
-            double distance1 = GPSDATA_4.calculateDistance(GPSDATA_1);
+            List<Record> actual = GPSDATAS_1.createRecords(RECORD_0);
+            double distance1 = GPSDATA_0.calculateDistance(GPSDATA_1);
             double distance2 = GPSDATA_1.calculateDistance(GPSDATA_2);
             double distance3 = GPSDATA_2.calculateDistance(GPSDATA_3);
 
@@ -63,7 +61,7 @@ class GpsDatasTest {
                     () ->
                             assertThat(actual.get(actual.size() - 1).getDistance())
                                     .isEqualTo(
-                                            RECORD_4.getDistance()
+                                            RECORD_0.getDistance()
                                                     + distance1
                                                     + distance2
                                                     + distance3));
