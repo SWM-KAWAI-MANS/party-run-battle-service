@@ -26,12 +26,13 @@ public class GpsData implements Comparable<GpsData> {
         }
     }
 
+    public double calculateDistance(GpsData other) {
+        // TODO: 2023/07/22 null check
+        return this.location.calculateDistance(other.location, new HaversineDistanceCalculator());
+    }
+
     @Override
     public int compareTo(GpsData o) {
         return this.time.compareTo(o.time);
-    }
-
-    public double calculateDistance(GpsData gpsData) {
-        return this.location.calculateDistance(gpsData.location);
     }
 }

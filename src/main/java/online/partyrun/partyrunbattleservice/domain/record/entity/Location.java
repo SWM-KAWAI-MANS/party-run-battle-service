@@ -5,39 +5,60 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import online.partyrun.partyrunbattleservice.domain.record.exception.DistanceCalculatorEmptyException;
+import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalLocationException;
+import online.partyrun.partyrunbattleservice.domain.record.exception.LocationEmptyException;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Location {
-    private static final double EARTH_RADIUS = 6371;
+    private static final double MAX_LONGITUDE = 180;
+    private static final double MIN_LONGITUDE = -180;
+    private static final double MAX_LATITUDE = 90;
+    private static final double MIN_LATITUDE = -90;
+    private static final double MAX_ALTITUDE = 50000;
+    private static final double MIN_ALTITUDE = 0;
 
     GeoJsonPoint point;
     double altitude;
 
     public static Location of(double longitude, double latitude, double altitude) {
+        validateValue(longitude, MAX_LONGITUDE, MIN_LONGITUDE);
+        validateValue(latitude, MAX_LATITUDE, MIN_LATITUDE);
+        validateValue(altitude, MAX_ALTITUDE, MIN_ALTITUDE);
+
         return new Location(new GeoJsonPoint(longitude, latitude), altitude);
     }
 
-    public double calculateDistance(Location other) {
-        final double lon1 = this.point.getX();
-        final double lat1 = this.point.getY();
-        final double lon2 = other.point.getX();
-        final double lat2 = other.point.getY();
+    private static void validateValue(double value, double maxValue, double minValue) {
+        if (value < minValue || value > maxValue) {
+            throw new IllegalLocationException(value, maxValue, minValue);
+        }
+    }
 
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
+    public double calculateDistance(Location other, DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
+        validateLocation(other);
+        validateCalculator(distanceCalculator);
 
-        double a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                        + Math.cos(Math.toRadians(lat1))
-                        * Math.cos(Math.toRadians(lat2))
-                        * Math.sin(dLon / 2)
-                        * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return EARTH_RADIUS * c * 1000;
+        return distanceCalculator.calculate(this.point, other.point);
+    }
+
+
+
+    private void validateLocation(Location other) {
+        if (Objects.isNull(other)) {
+            throw new LocationEmptyException();
+        }
+    }
+
+    private void validateCalculator(DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
+        if (Objects.isNull(distanceCalculator)) {
+            throw new DistanceCalculatorEmptyException();
+        }
     }
 }
