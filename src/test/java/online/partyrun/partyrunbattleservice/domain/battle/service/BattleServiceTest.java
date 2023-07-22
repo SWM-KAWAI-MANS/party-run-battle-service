@@ -24,7 +24,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static online.partyrun.partyrunbattleservice.fixture.member.MemberFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;

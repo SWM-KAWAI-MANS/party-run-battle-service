@@ -1,4 +1,4 @@
-package online.partyrun.partyrunbattleservice.fixture;
+package online.partyrun.partyrunbattleservice.fixture.member;
 
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 
