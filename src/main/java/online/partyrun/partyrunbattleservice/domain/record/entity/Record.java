@@ -2,6 +2,9 @@ package online.partyrun.partyrunbattleservice.domain.record.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import online.partyrun.partyrunbattleservice.domain.record.exception.IllegalRecordDistanceException;
+
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -13,15 +16,21 @@ public class Record {
     double distance;
 
     public Record(GpsData gpsData, double distance) {
+        validateGpsData(gpsData);
         validateDistance(distance);
         this.gpsData = gpsData;
         this.distance = distance;
     }
 
+    private void validateGpsData(GpsData gpsData) {
+        if (Objects.isNull(gpsData)) {
+            throw new InvalidGpsDataException();
+        }
+    }
+
     private void validateDistance(double distance) {
         if (distance < MIN_DISTANCE) {
-            // TODO: 2023/07/21 예외 변경
-            throw new IllegalArgumentException();
+            throw new IllegalRecordDistanceException(distance);
         }
     }
 
