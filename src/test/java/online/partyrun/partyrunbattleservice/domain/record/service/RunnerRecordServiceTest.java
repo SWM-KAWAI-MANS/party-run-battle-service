@@ -1,18 +1,17 @@
 package online.partyrun.partyrunbattleservice.domain.record.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.record.entity.RunnerRecord;
-import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.Battle.BattleFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class RunnerRecordServiceTest {
@@ -25,10 +24,7 @@ class RunnerRecordServiceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀_기록들을_생성할_때 {
 
-        Runner 박성우 = new Runner("박성우");
-        Runner 박현준 = new Runner("박현준");
-        Runner 노준혁 = new Runner("노준혁");
-        Battle 배틀 = mongoTemplate.save(new Battle(1000, List.of(박성우, 박현준, 노준혁)));
+        Battle 배틀 = mongoTemplate.save(배틀1);
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
