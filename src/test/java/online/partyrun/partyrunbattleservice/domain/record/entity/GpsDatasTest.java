@@ -1,16 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.record.entity;
 
+import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.GpsDatasEmptyException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static online.partyrun.partyrunbattleservice.fixture.record.RecordFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("GpsDatas")
 class GpsDatasTest {

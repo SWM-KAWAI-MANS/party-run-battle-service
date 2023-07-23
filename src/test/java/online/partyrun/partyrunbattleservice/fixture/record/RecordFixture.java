@@ -10,8 +10,7 @@ public class RecordFixture {
     private static final LocalDateTime startTime = LocalDateTime.now();
     public static final Location LOCATION1 = Location.of(1, 1, 1);
     public static final Location LOCATION2 = Location.of(2, 2, 2);
-    public static final GpsData GPSDATA_0 =
-            GpsData.of(1, 1, 1, startTime, startTime);
+    public static final GpsData GPSDATA_0 = GpsData.of(1, 1, 1, startTime, startTime);
     public static final GpsData GPSDATA_1 =
             GpsData.of(1, 1, 1, startTime.plusSeconds(1), startTime);
     public static final GpsData GPSDATA_2 =

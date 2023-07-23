@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.record.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.record.exception.PastGpsDataException;
 
