@@ -22,20 +22,4 @@ public class RunnerDistanceResponse {
         this.isFinished = isFinished;
         this.distance = distance;
     }
-
-    @Override
-    public String toString() {
-        return "RunnerDistanceResponse{"
-                + "type='"
-                + type
-                + '\''
-                + ", runnerId='"
-                + runnerId
-                + '\''
-                + ", isFinished="
-                + isFinished
-                + ", distance="
-                + distance
-                + '}';
-    }
 }
