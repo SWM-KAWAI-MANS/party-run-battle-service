@@ -6,6 +6,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.StompF
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.record.dto.RunnerDistanceResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
@@ -28,7 +29,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import static online.partyrun.partyrunbattleservice.fixture.member.MemberFixture.*;
 import static online.partyrun.partyrunbattleservice.fixture.record.RequestFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,9 +63,9 @@ public class RunnerRecordWebsocketAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     void setUpData() throws InterruptedException {
         // 러너 저장
-        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
+        Runner 박성우 = new Runner(memberRepository.save(new Member("박성우")).getId());
+        Runner 노준혁 = new Runner(memberRepository.save(new Member("노준혁")).getId());
+        Runner 박현준 = new Runner(memberRepository.save(new Member("박현준")).getId());
         String 박성우_accessToken = jwtGenerator.generate(박성우.getId(), Set.of("ROLE_USER")).accessToken();
         String 노준혁_accessToken = jwtGenerator.generate(노준혁.getId(), Set.of("ROLE_USER")).accessToken();
         String 박현준_accessToken = jwtGenerator.generate(박현준.getId(), Set.of("ROLE_USER")).accessToken();
@@ -172,7 +172,6 @@ public class RunnerRecordWebsocketAcceptanceTest extends AcceptanceTest {
         }
 
         @Nested
-        @Disabled
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 좌표를_여러번_받으면 {
 
@@ -192,9 +191,7 @@ public class RunnerRecordWebsocketAcceptanceTest extends AcceptanceTest {
 
                 RunnerDistanceResponse response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
                 RunnerDistanceResponse response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                RunnerDistanceResponse response3 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
 
-                System.out.println(response1.getDistance() +  " " + response2.getDistance() + " " + response3.getDistance() + "@@@@@@@@");
                 assertThat(response2.getDistance()).isGreaterThan(response1.getDistance());
             }
         }
