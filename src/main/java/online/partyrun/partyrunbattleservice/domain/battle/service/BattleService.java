@@ -100,10 +100,7 @@ public class BattleService {
 
     public RunnerDistanceResponse calculateDistance(
             String battleId, String runnerId, RecordRequest request) {
-        final Battle battle =
-                battleRepository
-                        .findBattleExceptRunnerRecords(battleId, runnerId)
-                        .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
+        final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
 
         final List<GpsData> gpsData = createNewGpsData(request);
         battle.createNewRecords(gpsData);
@@ -111,6 +108,12 @@ public class BattleService {
 
         // TODO: 2023/07/21 현재는 종료 로직이 들어가지 않았으므로 무조건 isFinished에 false 적용
         return new RunnerDistanceResponse(runnerId, false, battle.getRunnerDistance(runnerId));
+    }
+
+    private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {
+        return battleRepository
+                .findBattleExceptRunnerRecords(battleId, runnerId)
+                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
     }
 
     private List<GpsData> createNewGpsData(RecordRequest request) {
