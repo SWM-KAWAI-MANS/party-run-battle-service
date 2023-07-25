@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.IllegalLocationException;
-
+import online.partyrun.partyrunbattleservice.domain.runner.exception.DistanceCalculatorEmptyException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.LocationEmptyException;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,6 +38,25 @@ public class Location {
     private static void validateValue(double value, double maxValue, double minValue) {
         if (value < minValue || value > maxValue) {
             throw new IllegalLocationException(value, maxValue, minValue);
+        }
+    }
+
+    public double calculateDistance(Location other, DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
+        validateLocation(other);
+        validateCalculator(distanceCalculator);
+
+        return distanceCalculator.calculate(this.point, other.point);
+    }
+
+    private void validateLocation(Location other) {
+        if (Objects.isNull(other)) {
+            throw new LocationEmptyException();
+        }
+    }
+
+    private void validateCalculator(DistanceCalculator<GeoJsonPoint, Double> distanceCalculator) {
+        if (Objects.isNull(distanceCalculator)) {
+            throw new DistanceCalculatorEmptyException();
         }
     }
 }

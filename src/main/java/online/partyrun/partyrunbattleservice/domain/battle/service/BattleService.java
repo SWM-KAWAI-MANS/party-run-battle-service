@@ -103,7 +103,7 @@ public class BattleService {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
 
         final List<GpsData> gpsData = createNewGpsData(request);
-        battle.createNewRecords(gpsData);
+        battle.createNewRecords(runnerId, gpsData);
         battleDao.pushNewRecords(battle);
 
         // TODO: 2023/07/21 현재는 종료 로직이 들어가지 않았으므로 무조건 isFinished에 false 적용

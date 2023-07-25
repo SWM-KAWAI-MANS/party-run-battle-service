@@ -4,14 +4,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,6 +17,7 @@ import java.util.Objects;
 public class Runner {
     String id;
     RunnerStatus status;
+    RunnerRecord recentRunnerRecord;
     List<RunnerRecord> runnerRecords;
 
     public Runner(String id) {
@@ -52,5 +51,36 @@ public class Runner {
 
     public boolean isRunning() {
         return this.status.isRunning();
+    }
+
+    public void createNewRecords(List<GpsData> gpsData) {
+        final List<RunnerRecord> newRecords = createRecords(gpsData);
+
+        this.runnerRecords.addAll(newRecords);
+        this.recentRunnerRecord = Collections.max(newRecords);
+    }
+
+    private List<RunnerRecord> createRecords(List<GpsData> gpsData) {
+        final List<GpsData> copiedGpsData = new ArrayList<>(gpsData);
+        Collections.sort(copiedGpsData);
+
+        if (Objects.isNull(this.recentRunnerRecord)) {
+            final GpsData firstGpsData = copiedGpsData.get(0);
+            final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, 0);
+
+            return createRecords(firstRecord, copiedGpsData);
+        }
+
+        return createRecords(this.recentRunnerRecord, copiedGpsData);
+    }
+
+    private List<RunnerRecord> createRecords(RunnerRecord record, List<GpsData> gpsData) {
+        List<RunnerRecord> records = new ArrayList<>();
+        for (GpsData newGpsData : gpsData) {
+            record = record.createNewRecord(newGpsData);
+            records.add(record);
+        }
+
+        return records;
     }
 }

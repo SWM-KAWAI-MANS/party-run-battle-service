@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 
@@ -103,8 +103,21 @@ public class Battle {
         return this.runners.stream().allMatch(Runner::isRunning);
     }
 
-    public void createNewRecords(List<GpsData> gpsDatas) {
-        throw new UnsupportedOperationException();
+    public void createNewRecords(String runnerId, List<GpsData> gpsData) {
+        validateGpsData(gpsData);
+
+        final Runner runner = findRunner(runnerId);
+        runner.createNewRecords(gpsData);
+    }
+
+    private void validateGpsData(List<GpsData> gpsData) {
+        if (Objects.isNull(gpsData) || gpsData.isEmpty()) {
+            throw new InvalidGpsDataException();
+        }
+
+        if (gpsData.stream().anyMatch(data -> data.isBefore(this.startTime))) {
+            throw new InvalidGpsDataTimeException(this.startTime);
+        }
     }
 
     public double getRunnerDistance(String runnerId) {
