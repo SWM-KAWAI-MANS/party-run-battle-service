@@ -1,19 +1,19 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -21,6 +21,9 @@ class BattleRepositoryTest {
 
     @Autowired MongoTemplate mongoTemplate;
     @Autowired private BattleRepository battleRepository;
+    Runner 박성우 = new Runner("박성우");
+    Runner 박현준 = new Runner("박현준");
+    Runner 노준혁 = new Runner("노준혁");
 
     @AfterEach
     void tearDown() {
@@ -31,9 +34,6 @@ class BattleRepositoryTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들이_존재할_때 {
 
-        Runner 박성우 = new Runner("박성우");
-        Runner 박현준 = new Runner("박현준");
-        Runner 노준혁 = new Runner("노준혁");
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -123,6 +123,25 @@ class BattleRepositoryTest {
                                 배틀.getId(), 노준혁.getId(), BattleStatus.RUNNING);
 
                 assertAll(() -> assertThat(result1).isFalse(), () -> assertThat(result2).isFalse());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀_조회_시 {
+
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class findBattleExceptRunnerRecords는 {
+
+            @Test
+            @DisplayName("현재까지의 기록들을 반환하지 않는다.")
+            void returnNullRecords() {
+                Battle result = battleRepository.findBattleExceptRunnerRecords(배틀.getId(), 박성우.getId()).orElseThrow();
+                assertThat(result.getRunners().stream().allMatch(r -> Objects.isNull(r.getRunnerRecords()))).isTrue();
             }
         }
     }

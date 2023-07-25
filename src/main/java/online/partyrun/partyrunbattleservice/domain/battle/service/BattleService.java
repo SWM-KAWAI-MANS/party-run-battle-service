@@ -101,8 +101,8 @@ public class BattleService {
     public RunnerDistanceResponse calculateDistance(
             String battleId, String runnerId, RecordRequest request) {
         final Battle battle =
-                battleDao
-                        .findBattleWithRecentRecord(battleId, runnerId)
+                battleRepository
+                        .findBattleExceptRunnerRecords(battleId, runnerId)
                         .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
 
         final List<GpsData> gpsData = createNewGpsData(request);
