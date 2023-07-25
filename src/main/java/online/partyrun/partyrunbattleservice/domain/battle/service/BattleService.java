@@ -3,11 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleMapper;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -16,10 +12,10 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattle
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -98,5 +94,24 @@ public class BattleService {
         battleRepository.save(battle);
 
         return new BattleStartTimeResponse(startTime);
+    }
+
+    public RunnerDistanceResponse calculateDistance(String battleId, String runnerId, RecordRequest request) {
+        final Battle battle = battleDao.findBattleWithRecentRecord(battleId, runnerId)
+                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
+
+        final List<GpsData> gpsData = createNewGpsData(request);
+        battle.createNewRecords(gpsData);
+        battleDao.pushNewRecords(battle);
+
+        // TODO: 2023/07/21 현재는 종료 로직이 들어가지 않았으므로 무조건 isFinished에 false 적용
+        return new RunnerDistanceResponse(runnerId, false, battle.getRunnerDistance(runnerId));
+    }
+
+    private List<GpsData> createNewGpsData(RecordRequest request) {
+        return request.getRecord()
+                .stream()
+                .map(GpsRequest::toEntity)
+                .toList();
     }
 }

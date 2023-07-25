@@ -1,4 +1,4 @@
-package online.partyrun.partyrunbattleservice.domain.record.entity;
+package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Record {
+public class RunnerRecord {
     GpsData gpsData;
     double distance;
 }

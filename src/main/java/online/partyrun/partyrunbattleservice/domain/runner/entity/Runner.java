@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.record.entity.Record;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 
@@ -19,12 +19,12 @@ import java.util.Objects;
 public class Runner {
     String id;
     RunnerStatus status;
-    List<Record> records;
+    List<RunnerRecord> runnerRecords;
 
     public Runner(String id) {
         this.id = id;
         this.status = RunnerStatus.READY;
-        this.records = new ArrayList<>();
+        this.runnerRecords = new ArrayList<>();
     }
 
     public boolean hasId(String id) {
