@@ -13,7 +13,8 @@ public class GpsData {
     Location location;
     LocalDateTime time;
 
-    public static GpsData of(double longitude, double latitude, double altitude, LocalDateTime time) {
+    public static GpsData of(
+            double longitude, double latitude, double altitude, LocalDateTime time) {
         return new GpsData(Location.of(longitude, latitude, altitude), time);
     }
 }

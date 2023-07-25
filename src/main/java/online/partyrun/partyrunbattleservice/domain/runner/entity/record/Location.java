@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.IllegalLocationException;
+
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 @Getter

@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
@@ -12,10 +13,11 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattle
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -96,9 +98,12 @@ public class BattleService {
         return new BattleStartTimeResponse(startTime);
     }
 
-    public RunnerDistanceResponse calculateDistance(String battleId, String runnerId, RecordRequest request) {
-        final Battle battle = battleDao.findBattleWithRecentRecord(battleId, runnerId)
-                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
+    public RunnerDistanceResponse calculateDistance(
+            String battleId, String runnerId, RecordRequest request) {
+        final Battle battle =
+                battleDao
+                        .findBattleWithRecentRecord(battleId, runnerId)
+                        .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
 
         final List<GpsData> gpsData = createNewGpsData(request);
         battle.createNewRecords(gpsData);
@@ -109,9 +114,6 @@ public class BattleService {
     }
 
     private List<GpsData> createNewGpsData(RecordRequest request) {
-        return request.getRecord()
-                .stream()
-                .map(GpsRequest::toEntity)
-                .toList();
+        return request.getRecord().stream().map(GpsRequest::toEntity).toList();
     }
 }
