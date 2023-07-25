@@ -31,13 +31,13 @@ public class Runner {
     }
 
     public void changeStatus(RunnerStatus status) {
-        validateCurrentStatus();
+        validateIsFinishedStatus();
         validateRunnerStatus(status);
 
         this.status = status;
     }
 
-    private void validateCurrentStatus() {
+    private void validateIsFinishedStatus() {
         if (this.status.isFinished()) {
             throw new RunnerAlreadyFinishedException(this.id);
         }
@@ -54,6 +54,8 @@ public class Runner {
     }
 
     public void createNewRecords(List<GpsData> gpsData) {
+        validateIsFinishedStatus();
+
         final List<RunnerRecord> newRecords = createRecords(gpsData);
 
         this.runnerRecords.addAll(newRecords);

@@ -104,6 +104,7 @@ public class Battle {
     }
 
     public void createNewRecords(String runnerId, List<GpsData> gpsData) {
+        validateIsFinishedStatus();
         validateGpsData(gpsData);
 
         final Runner runner = findRunner(runnerId);
@@ -115,9 +116,13 @@ public class Battle {
             throw new InvalidGpsDataException();
         }
 
-        if (gpsData.stream().anyMatch(data -> data.isBefore(this.startTime))) {
+        if (hasBeforeStartTime(gpsData)) {
             throw new InvalidGpsDataTimeException(this.startTime);
         }
+    }
+
+    private boolean hasBeforeStartTime(List<GpsData> gpsData) {
+        return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
     }
 
     public double getRunnerDistance(String runnerId) {
