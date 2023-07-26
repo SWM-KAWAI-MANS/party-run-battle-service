@@ -12,9 +12,7 @@ import static org.mockito.Mockito.times;
 
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -270,6 +268,55 @@ class BattleServiceTest {
                 assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 거리를_계산할_때 {
+        LocalDateTime now = LocalDateTime.now().plusMinutes(1);
+        GpsRequest GPS_REQUEST1 = new GpsRequest(1, 1, 1, now);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(2, 2, 2, now.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(3, 3, 3, now.plusSeconds(2));
+        RunnerRecordRequest RECORD_REQUEST1 =
+                new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+        Runner 박성우 = new Runner("박성우");
+        Battle 진행중인_배틀;
+
+        @BeforeEach
+        void setUp() {
+            Battle 배틀 = new Battle(1000, List.of(박성우));
+            배틀.changeRunnerStatus(박성우.getId(), RunnerStatus.RUNNING);
+            배틀.changeBattleStatus(BattleStatus.RUNNING);
+            배틀.setStartTime(now.minusSeconds(2), now.minusSeconds(1));
+
+            진행중인_배틀 = mongoTemplate.save(배틀);
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 기존에_기록이_존재하지_않으면 {
+
+            @Test
+            @DisplayName("새로운 기록을 저장한다")
+            void createNewRecord() {
+                RunnerDistanceResponse response =
+                        battleService.calculateDistance(
+                                진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+                assertAll(
+                        () -> assertThat(response.runnerId()).isEqualTo(박성우.getId()),
+                        () -> assertThat(response.distance()).isPositive());
+            }
+        }
+
+        @Test
+        @DisplayName("배틀을 조회하지 못하면 예외를 던진다.")
+        void throwException() {
+            assertThatThrownBy(
+                            () ->
+                                    battleService.calculateDistance(
+                                            "invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
+                    .isInstanceOf(BattleNotFoundException.class);
         }
     }
 }

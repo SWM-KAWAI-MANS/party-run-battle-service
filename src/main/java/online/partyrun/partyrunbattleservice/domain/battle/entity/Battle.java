@@ -8,6 +8,10 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -26,7 +30,7 @@ public class Battle {
     @Id String id;
     int distance;
     List<Runner> runners;
-    BattleStatus status;
+    BattleStatus status = BattleStatus.READY;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
@@ -35,7 +39,6 @@ public class Battle {
         validateRunners(runners);
         this.distance = distance;
         this.runners = runners;
-        this.status = BattleStatus.READY;
     }
 
     private void validateDistance(int distance) {
@@ -100,5 +103,39 @@ public class Battle {
 
     public boolean isAllRunnersRunningStatus() {
         return this.runners.stream().allMatch(Runner::isRunning);
+    }
+
+    public void addRecords(String runnerId, List<GpsData> gpsData) {
+        validateIsFinishedStatus();
+        validateGpsData(gpsData);
+
+        final Runner runner = findRunner(runnerId);
+        runner.addRecords(gpsData);
+    }
+
+    private void validateGpsData(List<GpsData> gpsData) {
+        if (Objects.isNull(gpsData) || gpsData.isEmpty()) {
+            throw new InvalidGpsDataException();
+        }
+
+        if (hasBeforeStartTime(gpsData)) {
+            throw new InvalidGpsDataTimeException(this.startTime);
+        }
+    }
+
+    private boolean hasBeforeStartTime(List<GpsData> gpsData) {
+        return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
+    }
+
+    public List<RunnerRecord> getRunnerRecords(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.getRunnerRecords();
+    }
+
+    public double getRunnerRecentDistance(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.getRecentDistance();
     }
 }
