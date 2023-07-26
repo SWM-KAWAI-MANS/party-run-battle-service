@@ -22,13 +22,12 @@ public class Runner {
     private static final int FIRST_GPSDATA = 0;
 
     String id;
-    RunnerStatus status;
+    RunnerStatus status = RunnerStatus.READY;
     RunnerRecord recentRunnerRecord;
     List<RunnerRecord> runnerRecords = new ArrayList<>();
 
     public Runner(String id) {
         this.id = id;
-        this.status = RunnerStatus.READY;
     }
 
     public boolean hasId(String id) {

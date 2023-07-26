@@ -30,7 +30,7 @@ public class Battle {
     @Id String id;
     int distance;
     List<Runner> runners;
-    BattleStatus status;
+    BattleStatus status = BattleStatus.READY;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
@@ -39,7 +39,6 @@ public class Battle {
         validateRunners(runners);
         this.distance = distance;
         this.runners = runners;
-        this.status = BattleStatus.READY;
     }
 
     private void validateDistance(int distance) {
