@@ -51,7 +51,7 @@ class RunnerRecordTest {
         @Test
         @DisplayName("거리 차이를 통해 새로운 기록을 생성한다.")
         void createNewRecord() {
-            RunnerRecord newRecord = runnerRecord.createNewRecord(GPSDATA_2);
+            RunnerRecord newRecord = runnerRecord.createNextRecord(GPSDATA_2);
 
             assertThat(newRecord.getDistance()).isGreaterThan(runnerRecord.getDistance());
         }

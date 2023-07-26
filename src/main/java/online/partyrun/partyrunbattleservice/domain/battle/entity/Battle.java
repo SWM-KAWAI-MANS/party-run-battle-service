@@ -106,12 +106,12 @@ public class Battle {
         return this.runners.stream().allMatch(Runner::isRunning);
     }
 
-    public void createNewRecords(String runnerId, List<GpsData> gpsData) {
+    public void addRecords(String runnerId, List<GpsData> gpsData) {
         validateIsFinishedStatus();
         validateGpsData(gpsData);
 
         final Runner runner = findRunner(runnerId);
-        runner.createNewRecords(gpsData);
+        runner.addRecords(gpsData);
     }
 
     private void validateGpsData(List<GpsData> gpsData) {

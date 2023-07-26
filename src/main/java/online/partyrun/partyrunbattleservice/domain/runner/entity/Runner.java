@@ -18,6 +18,9 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Runner {
+    private static final int DEFAULT_DISTANCE = 0;
+    private static final int FIRST_GPSDATA = 0;
+
     String id;
     RunnerStatus status;
     RunnerRecord recentRunnerRecord;
@@ -55,7 +58,7 @@ public class Runner {
         return this.status.isRunning();
     }
 
-    public void createNewRecords(List<GpsData> gpsData) {
+    public void addRecords(List<GpsData> gpsData) {
         validateIsRunningStatus();
 
         final List<RunnerRecord> newRecords = createRecords(gpsData);
@@ -75,8 +78,8 @@ public class Runner {
         Collections.sort(copiedGpsData);
 
         if (Objects.isNull(this.recentRunnerRecord)) {
-            final GpsData firstGpsData = copiedGpsData.get(0);
-            final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, 0);
+            final GpsData firstGpsData = copiedGpsData.get(FIRST_GPSDATA);
+            final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, DEFAULT_DISTANCE);
 
             return createRecords(firstRecord, copiedGpsData);
         }
@@ -87,7 +90,7 @@ public class Runner {
     private List<RunnerRecord> createRecords(RunnerRecord record, List<GpsData> gpsData) {
         List<RunnerRecord> records = new ArrayList<>();
         for (GpsData newGpsData : gpsData) {
-            record = record.createNewRecord(newGpsData);
+            record = record.createNextRecord(newGpsData);
             records.add(record);
         }
 

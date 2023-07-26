@@ -170,7 +170,7 @@ class RunnerTest {
         @DisplayName("러너가 RUNNING 상태가 아니면 예외를 던진다.")
         void throwException() {
             List<GpsData> gpsData = List.of(GPSDATA_1, GPSDATA_2, GPSDATA_3);
-            assertThatThrownBy(() -> 박성우.createNewRecords(gpsData))
+            assertThatThrownBy(() -> 박성우.addRecords(gpsData))
                     .isInstanceOf(RunnerIsNotRunningException.class);
         }
 
@@ -180,7 +180,7 @@ class RunnerTest {
             박성우.changeStatus(RunnerStatus.RUNNING);
 
             List<GpsData> gpsData = List.of(GPSDATA_1, GPSDATA_2, GPSDATA_3);
-            박성우.createNewRecords(gpsData);
+            박성우.addRecords(gpsData);
 
             assertAll(
                     () -> assertThat(박성우.getRecentRunnerRecord().getGpsData()).isEqualTo(GPSDATA_3),
@@ -199,10 +199,10 @@ class RunnerTest {
             박성우.changeStatus(RunnerStatus.RUNNING);
 
             List<GpsData> recentGpsData = List.of(GPSDATA_1);
-            박성우.createNewRecords(recentGpsData);
+            박성우.addRecords(recentGpsData);
 
             List<GpsData> newGpsData = List.of(GPSDATA_2, GPSDATA_3);
-            박성우.createNewRecords(newGpsData);
+            박성우.addRecords(newGpsData);
 
             assertAll(
                     () -> assertThat(박성우.getRecentRunnerRecord().getGpsData()).isEqualTo(GPSDATA_3),
@@ -237,7 +237,7 @@ class RunnerTest {
 
             List<GpsData> recentGpsData = List.of(GPSDATA_1, GPSDATA_2);
 
-            박성우.createNewRecords(recentGpsData);
+            박성우.addRecords(recentGpsData);
 
             assertThat(박성우.getRecentDistance()).isPositive();
         }

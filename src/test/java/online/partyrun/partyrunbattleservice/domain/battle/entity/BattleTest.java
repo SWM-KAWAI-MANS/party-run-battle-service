@@ -1,7 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import static org.assertj.core.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -9,7 +7,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -17,6 +14,8 @@ import org.junit.jupiter.params.provider.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -316,7 +315,7 @@ class BattleTest {
         @NullAndEmptySource
         @DisplayName("GpsData가 빈 값이면 예외를 던진다.")
         void throwNullException(List<GpsData> invalidGpsData) {
-            assertThatThrownBy(() -> 배틀.createNewRecords(박성우.getId(), invalidGpsData))
+            assertThatThrownBy(() -> 배틀.addRecords(박성우.getId(), invalidGpsData))
                     .isInstanceOf(InvalidGpsDataException.class);
         }
 
@@ -328,7 +327,7 @@ class BattleTest {
             GpsData validGpsData = GpsData.of(1, 1, 1, battleStartTime.plusSeconds(1));
             List<GpsData> gpsData = List.of(validGpsData);
 
-            assertThatThrownBy(() -> 배틀.createNewRecords(박성우.getId(), gpsData))
+            assertThatThrownBy(() -> 배틀.addRecords(박성우.getId(), gpsData))
                     .isInstanceOf(BattleAlreadyFinishedException.class);
         }
 
@@ -339,7 +338,7 @@ class BattleTest {
             GpsData invalidGpsData = GpsData.of(1, 1, 1, battleStartTime.minusSeconds(1));
             List<GpsData> gpsData = List.of(validGpsData, invalidGpsData);
 
-            assertThatThrownBy(() -> 배틀.createNewRecords(박성우.getId(), gpsData))
+            assertThatThrownBy(() -> 배틀.addRecords(박성우.getId(), gpsData))
                     .isInstanceOf(InvalidGpsDataTimeException.class);
         }
 
@@ -351,7 +350,7 @@ class BattleTest {
             GpsData gpsData2 = GpsData.of(2, 2, 2, battleStartTime.plusSeconds(2));
             List<GpsData> gpsData = List.of(gpsData1, gpsData2);
 
-            배틀.createNewRecords(박성우.getId(), gpsData);
+            배틀.addRecords(박성우.getId(), gpsData);
 
             assertThat(박성우.getRunnerRecords()).hasSize(2);
         }
@@ -373,13 +372,14 @@ class BattleTest {
             GpsData gpsData2 = GpsData.of(2, 2, 2, battleStartTime.plusSeconds(2));
             List<GpsData> gpsData = List.of(gpsData1, gpsData2);
             박성우.changeStatus(RunnerStatus.RUNNING);
-            배틀.createNewRecords(박성우.getId(), gpsData);
+            배틀.addRecords(박성우.getId(), gpsData);
+
         }
 
         @Test
         @DisplayName("최신 기록으로부터 거리를 가져온다.")
         void getDistance() {
-            double runnerRecentDistance = 배틀.getRunnerRecentDistance(박성우.getId());
+             double runnerRecentDistance = 배틀.getRunnerRecentDistance(박성우.getId());
             assertThat(runnerRecentDistance).isPositive();
         }
     }

@@ -38,7 +38,7 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
         }
     }
 
-    public RunnerRecord createNewRecord(GpsData gpsData) {
+    public RunnerRecord createNextRecord(GpsData gpsData) {
         double distance = this.gpsData.calculateDistance(gpsData);
 
         return new RunnerRecord(gpsData, this.distance + distance);

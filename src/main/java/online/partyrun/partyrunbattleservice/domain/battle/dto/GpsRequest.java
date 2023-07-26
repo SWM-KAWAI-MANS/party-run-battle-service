@@ -27,9 +27,9 @@ public class GpsRequest {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    LocalDateTime gpsTime;
+    LocalDateTime time;
 
     public GpsData toEntity() {
-        return GpsData.of(longitude, latitude, altitude, gpsTime);
+        return GpsData.of(longitude, latitude, altitude, time);
     }
 }

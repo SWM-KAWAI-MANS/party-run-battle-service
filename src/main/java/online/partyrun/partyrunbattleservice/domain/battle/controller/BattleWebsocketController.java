@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.battle.dto.RecordRequest;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerDistanceResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
@@ -33,7 +33,7 @@ public class BattleWebsocketController {
     public void calculateDistance(
             @DestinationVariable String battleId,
             Authentication auth,
-            @Valid RecordRequest request) {
+            @Valid RunnerRecordRequest request) {
         final String runnerId = auth.getName();
         final RunnerDistanceResponse response =
                 battleService.calculateDistance(battleId, runnerId, request);

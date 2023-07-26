@@ -1,26 +1,19 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import lombok.extern.slf4j.Slf4j;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.GpsRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.RecordRequest;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerDistanceResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -41,6 +34,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 @Slf4j
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
@@ -48,12 +45,18 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     private static final String TOPIC_BATTLE_PREFIX = "/topic/battle";
     private static final String PUB_BATTLE_PREFIX = "/pub/battle";
 
-    @Autowired WebSocketStompClient webSocketStompClient;
-    @Autowired BattleRepository battleRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired MongoTemplate mongoTemplate;
-    @Autowired JwtGenerator jwtGenerator;
-    @Autowired Clock clock;
+    @Autowired
+    WebSocketStompClient webSocketStompClient;
+    @Autowired
+    BattleRepository battleRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    MongoTemplate mongoTemplate;
+    @Autowired
+    JwtGenerator jwtGenerator;
+    @Autowired
+    Clock clock;
 
     private StompSession 웹소켓_연결(String accessToken) {
         try {
@@ -64,7 +67,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                     .connectAsync(
                             "ws://localhost:" + port + "/api/battle/ws",
                             headers,
-                            new StompSessionHandlerAdapter() {})
+                            new StompSessionHandlerAdapter() {
+                            })
                     .get(1, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException();
@@ -262,8 +266,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
             // 배틀 시간 변경
             Query query = Query.query(Criteria.where("id").is(배틀.getId()));
-            mongoTemplate.updateFirst(
-                    query, Update.update("startTime", LocalDateTime.now()), Battle.class);
+            mongoTemplate.updateFirst(query, Update.update("startTime", LocalDateTime.now()), Battle.class);
         }
 
         LocalDateTime now = LocalDateTime.now().plusMinutes(1);
@@ -276,13 +279,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         GpsRequest GPS_REQUEST7 = new GpsRequest(4, 4, 4, now.plusSeconds(6));
         GpsRequest GPS_REQUEST8 = new GpsRequest(5, 5, 5, now.plusSeconds(7));
         GpsRequest GPS_REQUEST9 = new GpsRequest(6, 6, 6, now.plusSeconds(8));
-        RecordRequest RECORD_REQUEST1 =
-                new RecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
-        RecordRequest RECORD_REQUEST2 =
-                new RecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6));
-        RecordRequest RECORD_REQUEST3 =
-                new RecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
-
+        RunnerRecordRequest RECORD_REQUEST1 = new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+        RunnerRecordRequest RECORD_REQUEST2 = new RunnerRecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6));
+        RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 좌표를_받으면 {
