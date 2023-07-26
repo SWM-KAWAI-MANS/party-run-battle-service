@@ -1,10 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -14,17 +18,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 @DataMongoTest
 @DisplayName("BattleRepository")
 class BattleRepositoryTest {
 
-    @Autowired
-    MongoTemplate mongoTemplate;
-    @Autowired
-    private BattleRepository battleRepository;
+    @Autowired MongoTemplate mongoTemplate;
+    @Autowired private BattleRepository battleRepository;
     Runner 박성우 = new Runner("박성우");
     Runner 박현준 = new Runner("박현준");
     Runner 노준혁 = new Runner("노준혁");
@@ -33,7 +32,6 @@ class BattleRepositoryTest {
     void tearDown() {
         mongoTemplate.getDb().drop();
     }
-
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -81,18 +79,14 @@ class BattleRepositoryTest {
                             .findByStatusAndRunnersId(BattleStatus.READY, 박현준.getId())
                             .orElseThrow();
 
-            assertThat(박성우_진행중_배틀)
-                    .usingRecursiveComparison()
-                    .isEqualTo(박현준_진행중_배틀)
-                    .isEqualTo(배틀);
+            assertThat(박성우_진행중_배틀).usingRecursiveComparison().isEqualTo(박현준_진행중_배틀).isEqualTo(배틀);
         }
 
         @Test
         @DisplayName("현재 진행중인 상태의 배틀이 존재하지않으면 빈 값을 반환한다.")
         void returnEmpty() {
             final Optional<Battle> 노준혁_진행중_배틀 =
-                    battleRepository.findByStatusAndRunnersId(
-                            BattleStatus.RUNNING, 노준혁.getId());
+                    battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, 노준혁.getId());
 
             assertThat(노준혁_진행중_배틀).isEmpty();
         }
@@ -139,8 +133,14 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("현재까지의 기록들을 반환하지 않는다.")
             void returnNullRecords() {
-                Battle result = battleRepository.findBattleExceptRunnerRecords(배틀.getId(), 박성우.getId()).orElseThrow();
-                assertThat(result.getRunners().stream().allMatch(r -> r.getRunnerRecords().isEmpty())).isTrue();
+                Battle result =
+                        battleRepository
+                                .findBattleExceptRunnerRecords(배틀.getId(), 박성우.getId())
+                                .orElseThrow();
+                assertThat(
+                                result.getRunners().stream()
+                                        .allMatch(r -> r.getRunnerRecords().isEmpty()))
+                        .isTrue();
             }
         }
     }
@@ -175,8 +175,7 @@ class BattleRepositoryTest {
 
             Assertions.assertAll(
                     () -> assertThat(battle.getRunnerRecords(박성우.getId())).hasSize(4),
-                    () -> assertThat(battle.getRunnerRecords(박현준.getId())).hasSize(2)
-            );
+                    () -> assertThat(battle.getRunnerRecords(박현준.getId())).hasSize(2));
         }
     }
 }

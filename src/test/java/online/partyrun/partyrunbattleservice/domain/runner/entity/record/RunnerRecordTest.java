@@ -1,13 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.runner.exception.IllegalRecordDistanceException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("RunnerRecord")
 class RunnerRecordTest {
@@ -37,8 +38,7 @@ class RunnerRecordTest {
         @Test
         @DisplayName("parameter가 정상적이라면 생성한다.")
         void create() {
-            assertThatCode(() -> new RunnerRecord(GPSDATA_1, 1))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> new RunnerRecord(GPSDATA_1, 1)).doesNotThrowAnyException();
         }
     }
 
@@ -47,6 +47,7 @@ class RunnerRecordTest {
     class 현재_기록으로부터_새로운_기록_생성_시 {
 
         RunnerRecord runnerRecord = new RunnerRecord(GPSDATA_1, 1);
+
         @Test
         @DisplayName("거리 차이를 통해 새로운 기록을 생성한다.")
         void createNewRecord() {
@@ -70,8 +71,7 @@ class RunnerRecordTest {
             assertAll(
                     () -> assertThat(record1.compareTo(record2)).isNegative(),
                     () -> assertThat(record1.compareTo(record1)).isZero(),
-                    () -> assertThat(record2.compareTo(record1)).isPositive()
-            );
+                    () -> assertThat(record2.compareTo(record1)).isPositive());
         }
     }
 }

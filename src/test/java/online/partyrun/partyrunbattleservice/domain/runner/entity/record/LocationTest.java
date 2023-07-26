@@ -1,13 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
+import static org.assertj.core.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.IllegalLocationException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.DistanceCalculatorEmptyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.LocationEmptyException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.assertj.core.api.Assertions.*;
 
 class LocationTest {
     Location LOCATION1 = Location.of(1, 1, 1);
