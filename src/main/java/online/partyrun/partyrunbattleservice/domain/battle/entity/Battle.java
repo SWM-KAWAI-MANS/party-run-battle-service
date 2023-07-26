@@ -132,7 +132,9 @@ public class Battle {
         return runner.getRunnerRecords();
     }
 
-    public double getRunnerDistance(String runnerId) {
-        throw new UnsupportedOperationException();
+    public double getRunnerRecentDistance(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.getRecentDistance();
     }
 }

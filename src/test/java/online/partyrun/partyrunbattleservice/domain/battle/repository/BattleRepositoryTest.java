@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -141,7 +140,7 @@ class BattleRepositoryTest {
             @DisplayName("현재까지의 기록들을 반환하지 않는다.")
             void returnNullRecords() {
                 Battle result = battleRepository.findBattleExceptRunnerRecords(배틀.getId(), 박성우.getId()).orElseThrow();
-                assertThat(result.getRunners().stream().allMatch(r -> Objects.isNull(r.getRunnerRecords()))).isTrue();
+                assertThat(result.getRunners().stream().allMatch(r -> r.getRunnerRecords().isEmpty())).isTrue();
             }
         }
     }

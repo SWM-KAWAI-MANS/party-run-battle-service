@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
@@ -19,12 +20,11 @@ public class Runner {
     String id;
     RunnerStatus status;
     RunnerRecord recentRunnerRecord;
-    List<RunnerRecord> runnerRecords;
+    List<RunnerRecord> runnerRecords = new ArrayList<>();
 
     public Runner(String id) {
         this.id = id;
         this.status = RunnerStatus.READY;
-        this.runnerRecords = new ArrayList<>();
     }
 
     public boolean hasId(String id) {
@@ -91,5 +91,16 @@ public class Runner {
         }
 
         return records;
+    }
+
+    public double getRecentDistance() {
+        validateRecentRunnerRecords();
+        return this.recentRunnerRecord.getDistance();
+    }
+
+    private void validateRecentRunnerRecords() {
+        if (Objects.isNull(this.recentRunnerRecord)) {
+            throw new InvalidRecentRunnerRecordException(this.id);
+        }
     }
 }

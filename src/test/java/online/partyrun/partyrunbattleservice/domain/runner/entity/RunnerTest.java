@@ -2,6 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
@@ -203,6 +204,32 @@ class RunnerTest {
                     () -> assertThat(박성우.getRunnerRecords().stream().map(RunnerRecord::getGpsData).skip(1).toList()).isEqualTo(newGpsData),
                     () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotEqualTo(0)
             );
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_최근_거리를_가져올_때 {
+
+        @Test
+        @DisplayName("최신 기록이 없으면 예외를 던진다.")
+        void throwException() {
+            assertThatThrownBy(() -> 박성우.getRecentDistance())
+                    .isInstanceOf(InvalidRecentRunnerRecordException.class);
+        }
+
+        @Test
+        @DisplayName("최신 기록이 있으면 최신 거리를 조회한다.")
+        void returnDistance() {
+            박성우.changeStatus(RunnerStatus.RUNNING);
+            GpsData GPSDATA_1 = GpsData.of(1, 1, 1, LocalDateTime.now());
+            GpsData GPSDATA_2 = GpsData.of(2, 2, 2, LocalDateTime.now().plusSeconds(1));
+
+            List<GpsData> recentGpsData = List.of(GPSDATA_1, GPSDATA_2);
+
+            박성우.createNewRecords(recentGpsData);
+
+            assertThat(박성우.getRecentDistance()).isPositive();
         }
     }
 }

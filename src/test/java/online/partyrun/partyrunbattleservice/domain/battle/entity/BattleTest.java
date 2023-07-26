@@ -354,6 +354,33 @@ class BattleTest {
 
             assertThat(박성우.getRunnerRecords()).hasSize(2);
         }
+    }
 
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_최신_거리를_가져올_때 {
+        Battle 배틀;
+        LocalDateTime battleStartTime;
+
+        @BeforeEach
+        void setUp() {
+            battleStartTime = LocalDateTime.now();
+            배틀 = new Battle(1000, List.of(박성우, 박현준, 노준혁));
+            배틀.setStartTime(battleStartTime.minusSeconds(1), battleStartTime);
+
+            GpsData gpsData1 = GpsData.of(1, 1, 1, battleStartTime.plusSeconds(1));
+            GpsData gpsData2 = GpsData.of(2, 2, 2, battleStartTime.plusSeconds(2));
+            List<GpsData> gpsData = List.of(gpsData1, gpsData2);
+            박성우.changeStatus(RunnerStatus.RUNNING);
+            배틀.createNewRecords(박성우.getId(), gpsData);
+
+        }
+
+        @Test
+        @DisplayName("최신 기록으로부터 거리를 가져온다.")
+        void getDistance() {
+             double runnerRecentDistance = 배틀.getRunnerRecentDistance(박성우.getId());
+            assertThat(runnerRecentDistance).isPositive();
+        }
     }
 }
