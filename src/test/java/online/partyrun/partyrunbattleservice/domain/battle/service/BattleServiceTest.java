@@ -1,20 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -26,7 +14,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,17 +25,32 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
 class BattleServiceTest {
 
-    @Autowired BattleService battleService;
-    @Autowired BattleRepository battleRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired MongoTemplate mongoTemplate;
-    @Autowired ApplicationEventPublisher publisher;
-    @Autowired Clock clock;
+    @Autowired
+    BattleService battleService;
+    @Autowired
+    BattleRepository battleRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    MongoTemplate mongoTemplate;
+    @Autowired
+    ApplicationEventPublisher publisher;
+    @Autowired
+    Clock clock;
 
     @AfterEach
     void setUp() {
@@ -103,14 +105,14 @@ class BattleServiceTest {
                 battleService.createBattle(request);
 
                 assertThatThrownBy(
-                                () ->
-                                        battleService.createBattle(
-                                                new BattleCreateRequest(
-                                                        1000,
-                                                        List.of(
-                                                                박성우.getId(),
-                                                                장세연.getId(),
-                                                                이승열.getId()))))
+                        () ->
+                                battleService.createBattle(
+                                        new BattleCreateRequest(
+                                                1000,
+                                                List.of(
+                                                        박성우.getId(),
+                                                        장세연.getId(),
+                                                        이승열.getId()))))
                         .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
             }
         }
@@ -168,12 +170,12 @@ class BattleServiceTest {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
 
                 assertThat(
-                                battleRepository
-                                        .findById(배틀.getId())
-                                        .orElseThrow()
-                                        .getRunners()
-                                        .get(0)
-                                        .getStatus())
+                        battleRepository
+                                .findById(배틀.getId())
+                                .orElseThrow()
+                                .getRunners()
+                                .get(0)
+                                .getStatus())
                         .isEqualTo(RunnerStatus.RUNNING);
             }
         }
@@ -188,7 +190,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(
-                                () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                        () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
@@ -270,6 +272,58 @@ class BattleServiceTest {
                 assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 거리를_계산할_때 {
+        LocalDateTime now = LocalDateTime.now().plusMinutes(1);
+        GpsRequest GPS_REQUEST1 = new GpsRequest(1, 1, 1, now);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(2, 2, 2, now.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(3, 3, 3, now.plusSeconds(2));
+        GpsRequest GPS_REQUEST4 = new GpsRequest(1, 1, 1, now.plusSeconds(3));
+        GpsRequest GPS_REQUEST5 = new GpsRequest(2, 2, 2, now.plusSeconds(4));
+        GpsRequest GPS_REQUEST6 = new GpsRequest(3, 3, 3, now.plusSeconds(5));
+        GpsRequest GPS_REQUEST7 = new GpsRequest(4, 4, 4, now.plusSeconds(6));
+        GpsRequest GPS_REQUEST8 = new GpsRequest(5, 5, 5, now.plusSeconds(7));
+        GpsRequest GPS_REQUEST9 = new GpsRequest(6, 6, 6, now.plusSeconds(8));
+        RecordRequest RECORD_REQUEST1 = new RecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+        RecordRequest RECORD_REQUEST2 = new RecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6));
+        RecordRequest RECORD_REQUEST3 = new RecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
+        Runner 박성우 = new Runner("박성우");
+        Battle 진행중인_배틀;
+
+        @BeforeEach
+        void setUp() {
+            Battle 배틀 = new Battle(1000, List.of(박성우));
+            배틀.changeRunnerStatus(박성우.getId(), RunnerStatus.RUNNING);
+            배틀.changeBattleStatus(BattleStatus.RUNNING);
+            배틀.setStartTime(now.minusSeconds(2), now.minusSeconds(1));
+
+            진행중인_배틀 = mongoTemplate.save(배틀);
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 기존에_기록이_존재하지_않으면 {
+
+            @Test
+            @DisplayName("새로운 기록을 저장한다")
+            void createNewRecord() {
+                RunnerDistanceResponse response = battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+                assertAll(
+                        () -> assertThat(response.getRunnerId()).isEqualTo(박성우.getId()),
+                        () -> assertThat(response.getDistance()).isPositive()
+                );
+            }
+        }
+
+        @Test
+        @DisplayName("배틀을 조회하지 못하면 예외를 던진다.")
+        void throwException() {
+            assertThatThrownBy(() -> battleService.calculateDistance("invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
+                    .isInstanceOf(BattleNotFoundException.class);
         }
     }
 }
