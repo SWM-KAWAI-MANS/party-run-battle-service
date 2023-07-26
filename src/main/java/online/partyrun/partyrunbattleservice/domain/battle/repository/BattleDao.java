@@ -27,8 +27,4 @@ public class BattleDao {
 
         return mongoTemplate.findAndModify(query, update, options, Battle.class);
     }
-
-    public void pushNewRecords(Battle battle) {
-        throw new UnsupportedOperationException();
-    }
 }

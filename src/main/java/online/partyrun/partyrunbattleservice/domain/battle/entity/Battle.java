@@ -8,6 +8,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
@@ -123,6 +124,12 @@ public class Battle {
 
     private boolean hasBeforeStartTime(List<GpsData> gpsData) {
         return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
+    }
+
+    public List<RunnerRecord> getRunnerRecords(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.getRunnerRecords();
     }
 
     public double getRunnerDistance(String runnerId) {
