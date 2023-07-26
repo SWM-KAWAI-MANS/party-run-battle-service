@@ -1,18 +1,17 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.IllegalLocationException;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Nested;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.DistanceCalculatorEmptyException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.LocationEmptyException;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static org.assertj.core.api.Assertions.*;
+
 class LocationTest {
+    Location LOCATION1 = Location.of(1, 1, 1);
+    Location LOCATION2 = Location.of(2, 2, 2);
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -32,6 +31,35 @@ class LocationTest {
         void creatLocation(double longitude, double latitude, double altitude) {
             assertThatCode(() -> Location.of(longitude, latitude, altitude))
                     .doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 다른_위치와의_거리를_구할_때 {
+
+        @Test
+        @DisplayName("잘못된 위치가 들어오면 예외를 던진다.")
+        void throwLocationException() {
+            assertThatThrownBy(() -> LOCATION1.calculateDistance(null, (point1, point2) -> 1d))
+                    .isInstanceOf(LocationEmptyException.class);
+        }
+
+        @Test
+        @DisplayName("잘못된 계산 구현체가 들어오면 예외를 던진다.")
+        void throwCalculatorException() {
+            assertThatThrownBy(() -> LOCATION1.calculateDistance(LOCATION2, null))
+                    .isInstanceOf(DistanceCalculatorEmptyException.class);
+        }
+
+        @Test
+        @DisplayName("계산 구현체에 맞게 계산한다.")
+        void calculateDistance() {
+            double expected = 1;
+            final double actual =
+                    LOCATION1.calculateDistance(LOCATION2, (point1, point2) -> expected);
+
+            assertThat(actual).isEqualTo(expected);
         }
     }
 }

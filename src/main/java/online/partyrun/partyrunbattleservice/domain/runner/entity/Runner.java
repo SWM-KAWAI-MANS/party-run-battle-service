@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 
 import java.util.*;
@@ -54,12 +55,18 @@ public class Runner {
     }
 
     public void createNewRecords(List<GpsData> gpsData) {
-        validateIsFinishedStatus();
+        validateIsRunningStatus();
 
         final List<RunnerRecord> newRecords = createRecords(gpsData);
 
         this.runnerRecords.addAll(newRecords);
         this.recentRunnerRecord = Collections.max(newRecords);
+    }
+
+    private void validateIsRunningStatus() {
+        if (!status.isRunning()) {
+            throw new RunnerIsNotRunningException(this.id);
+        }
     }
 
     private List<RunnerRecord> createRecords(List<GpsData> gpsData) {
