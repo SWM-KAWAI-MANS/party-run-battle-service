@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import static org.assertj.core.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -7,6 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -14,8 +17,6 @@ import org.junit.jupiter.params.provider.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -373,13 +374,12 @@ class BattleTest {
             List<GpsData> gpsData = List.of(gpsData1, gpsData2);
             박성우.changeStatus(RunnerStatus.RUNNING);
             배틀.addRecords(박성우.getId(), gpsData);
-
         }
 
         @Test
         @DisplayName("최신 기록으로부터 거리를 가져온다.")
         void getDistance() {
-             double runnerRecentDistance = 배틀.getRunnerRecentDistance(박성우.getId());
+            double runnerRecentDistance = 배틀.getRunnerRecentDistance(박성우.getId());
             assertThat(runnerRecentDistance).isPositive();
         }
     }

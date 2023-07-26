@@ -6,8 +6,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerDistanceResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
