@@ -28,16 +28,16 @@ public class Battle {
     private static final int MIN_DISTANCE = 1;
 
     @Id String id;
-    int distance;
+    int targetDistance;
     List<Runner> runners;
     BattleStatus status = BattleStatus.READY;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
-    public Battle(int distance, List<Runner> runners) {
-        validateDistance(distance);
+    public Battle(int targetDistance, List<Runner> runners) {
+        validateDistance(targetDistance);
         validateRunners(runners);
-        this.distance = distance;
+        this.targetDistance = targetDistance;
         this.runners = runners;
     }
 
