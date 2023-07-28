@@ -1,0 +1,32 @@
+name : cd - dev
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-back-docker-img:
+    uses: ./.github/workflows/build-docker-image-dev.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      DOCKER_BATTLE_IMAGE_NAME: ${{ secrets.DOCKER_BATTLE_IMAGE_NAME }}
+
+  deploy:
+    needs: build-back-docker-img
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_HOST_USER_NAME }}
+          key: ${{ secrets.DEV_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.DEV_DEPLOY_DIRECTORY }}
+            docker compose stop ${{ secrets.DOCKER_BATTLE_CONTAINER_NAME }}
+            docker compose rm -f ${{ secrets.DOCKER_BATTLE_CONTAINER_NAME }}
+            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_BATTLE_IMAGE_NAME }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_BATTLE_IMAGE_NAME }}
+            docker compose up -d
