@@ -53,10 +53,18 @@ public class Battle {
         }
     }
 
-    public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
+    public void changeRunnerRunningStatus(String runnerId) {
+        validateIsRunningStatus();
         validateIsFinishedStatus();
+
         final Runner runner = findRunner(runnerId);
-        runner.changeStatus(runnerStatus);
+        runner.changeRunningStatus();
+    }
+
+    private void validateIsRunningStatus() {
+        if (this.status.isRunning()) {
+            throw new BattleAlreadyRunningException(this.id);
+        }
     }
 
     private void validateIsFinishedStatus() {

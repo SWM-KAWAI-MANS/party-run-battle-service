@@ -1,15 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -24,7 +14,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +24,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -286,7 +284,7 @@ class BattleServiceTest {
         @BeforeEach
         void setUp() {
             Battle 배틀 = new Battle(1000, List.of(박성우));
-            배틀.changeRunnerStatus(박성우.getId(), RunnerStatus.RUNNING);
+            배틀.changeRunnerRunningStatus(박성우.getId());
             배틀.changeBattleStatus(BattleStatus.RUNNING);
             배틀.setStartTime(now.minusSeconds(2), now.minusSeconds(1));
 

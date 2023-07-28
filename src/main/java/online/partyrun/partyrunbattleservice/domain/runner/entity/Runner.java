@@ -4,15 +4,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -34,11 +36,17 @@ public class Runner {
         return this.id.equals(id);
     }
 
-    public void changeStatus(RunnerStatus status) {
+    public void changeRunningStatus() {
+        validateIsRunningStatus();
         validateIsFinishedStatus();
-        validateRunnerStatus(status);
 
-        this.status = status;
+        this.status = RunnerStatus.RUNNING;
+    }
+
+    private void validateIsRunningStatus() {
+        if (status.isRunning()) {
+            throw new RunnerAlreadyRunningException(this.id);
+        }
     }
 
     private void validateIsFinishedStatus() {
@@ -47,18 +55,12 @@ public class Runner {
         }
     }
 
-    private void validateRunnerStatus(RunnerStatus status) {
-        if (Objects.isNull(status) || status.isReady() || this.status.equals(status)) {
-            throw new RunnerStatusCannotBeChangedException(status);
-        }
-    }
-
     public boolean isRunning() {
         return this.status.isRunning();
     }
 
     public void addRecords(List<GpsData> gpsData) {
-        validateIsRunningStatus();
+        validateIsNotRunningStatus();
 
         final List<RunnerRecord> newRecords = createRecords(gpsData);
 
@@ -66,7 +68,7 @@ public class Runner {
         this.recentRunnerRecord = Collections.max(newRecords);
     }
 
-    private void validateIsRunningStatus() {
+    private void validateIsNotRunningStatus() {
         if (!status.isRunning()) {
             throw new RunnerIsNotRunningException(this.id);
         }
