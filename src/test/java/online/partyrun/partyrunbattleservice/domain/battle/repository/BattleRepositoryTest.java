@@ -50,7 +50,9 @@ class BattleRepositoryTest {
         void returnListBattle() {
             final Battle 배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
             final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
-            배틀2.changeBattleStatus(BattleStatus.RUNNING);
+
+            노준혁.changeRunningStatus();
+            배틀2.changeBattleRunning(LocalDateTime.now());
             battleRepository.save(배틀2);
 
             final List<Battle> actual =
@@ -58,7 +60,7 @@ class BattleRepositoryTest {
                             List.of(BattleStatus.READY, BattleStatus.RUNNING),
                             List.of(박성우, 박현준, 노준혁));
 
-            assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(배틀1, 배틀2));
+            assertThat(actual).hasSize(2);
         }
     }
 

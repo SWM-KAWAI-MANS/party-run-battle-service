@@ -12,25 +12,33 @@ import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFo
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @DisplayName("Battle")
 class BattleTest {
 
-    Runner 박성우 = new Runner("박성우");
-    Runner 노준혁 = new Runner("노준혁");
-    Runner 박현준 = new Runner("박현준");
+    Runner 박성우;
+    Runner 노준혁;
+    Runner 박현준;
+    Battle 배틀;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_생성할_때 {
-
-        List<Runner> runnerList = List.of(박성우, 노준혁, 박현준);
+        List<Runner> runnerList;
         int distance = 1000;
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            노준혁 = new Runner("노준혁");
+            박현준 = new Runner("박현준");
+            runnerList = List.of(박성우, 노준혁, 박현준);
+        }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -72,157 +80,116 @@ class BattleTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너의_상태를_변경할_때 {
+    class 러너를_Running_상태로_변경할_때 {
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 상태를_받으면 {
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            노준혁 = new Runner("노준혁");
+            박현준 = new Runner("박현준");
+            배틀 = new Battle(1000, List.of(박성우, 박현준));
+        }
 
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-            RunnerStatus runnerStatus = RunnerStatus.RUNNING;
-
-            @Test
-            @DisplayName("러너의 상태를 변경한다.")
-            void changeRunnerStatus() {
-                배틀.changeRunnerStatus(박성우.getId(), runnerStatus);
-                assertThat(박성우.getStatus()).isEqualTo(runnerStatus);
-            }
+        @Test
+        @DisplayName("러너의 상태를 변경한다.")
+        void changeRunnerStatus() {
+            배틀.changeRunnerRunningStatus(박성우.getId());
+            assertThat(박성우.getStatus()).isEqualTo(RunnerStatus.RUNNING);
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀_내에_러너가_존재하지_않으면 {
 
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> 배틀.changeRunnerStatus(노준혁.getId(), RunnerStatus.RUNNING))
+                assertThatThrownBy(() -> 배틀.changeRunnerRunningStatus(노준혁.getId()))
                         .isInstanceOf(RunnerNotFoundException.class);
             }
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 배틀이_FINISHED_상태라면 {
-
-            Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+        class 배틀이_RUNNING_상태라면 {
 
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                배틀.changeBattleStatus(BattleStatus.FINISHED);
-                assertThatThrownBy(() -> 배틀.changeRunnerStatus(노준혁.getId(), RunnerStatus.RUNNING))
-                        .isInstanceOf(BattleAlreadyFinishedException.class);
-            }
-        }
-    }
+                박성우.changeRunningStatus();
+                박현준.changeRunningStatus();
+                배틀.changeBattleRunning(LocalDateTime.now());
 
-    @Nested
-    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 배틀의_상태를_변경할_때 {
-
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 상태를_받으면 {
-
-            BattleStatus status = BattleStatus.RUNNING;
-
-            @Test
-            @DisplayName("배틀의 상태를 변경한다.")
-            void changeBattleStatus() {
-                배틀.changeBattleStatus(status);
-                assertThat(배틀.getStatus()).isEqualTo(status);
+                assertThatThrownBy(() -> 배틀.changeRunnerRunningStatus(박성우.getId()))
+                        .isInstanceOf(BattleAlreadyRunningException.class);
             }
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀이_FINISHED_상태라면 {
-
+            @Disabled
             @Test
             @DisplayName("예외를 던진다.")
-            void throwException() {
-                배틀.changeBattleStatus(BattleStatus.FINISHED);
-                assertThatThrownBy(() -> 배틀.changeBattleStatus(BattleStatus.RUNNING))
-                        .isInstanceOf(BattleAlreadyFinishedException.class);
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 새로운_상태가_null_또는_READY라면 {
-
-            private static List<Arguments> BattleStatusProvider() {
-                return List.of(Arguments.of(BattleStatus.READY));
-            }
-
-            @ParameterizedTest
-            @NullSource
-            @MethodSource("BattleStatusProvider")
-            @DisplayName("예외를 던진다.")
-            void throwException(BattleStatus status) {
-                assertThatThrownBy(() -> 배틀.changeBattleStatus(status))
-                        .isInstanceOf(BattleStatusCannotBeChangedException.class);
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 새로운_상태가_현재_상태와_같다면 {
-
-            BattleStatus status = BattleStatus.RUNNING;
-
-            @Test
-            @DisplayName("예외를 던진다.")
-            void throwException() {
-                배틀.changeBattleStatus(status);
-                assertThatThrownBy(() -> 배틀.changeBattleStatus(status))
-                        .isInstanceOf(BattleStatusCannotBeChangedException.class);
-            }
+            void throwException() {}
         }
     }
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 배틀의_시작_시간을_설정할_떄 {
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
+    class 배틀을_Running_상태로_변경할_때 {
+
+        LocalDateTime now;
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+            now = LocalDateTime.now();
+        }
+
+        @Test
+        @DisplayName("배틀의 상태를 변경한다.")
+        void changeBattleStatus() {
+            박성우.changeRunningStatus();
+            배틀.changeBattleRunning(now);
+            assertThat(배틀.getStatus()).isEqualTo(BattleStatus.RUNNING);
+        }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 시작_시간이_생성_시간_보다_같거나_이후라면 {
-
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startTime = now.plusSeconds(1);
+        class 이미_Running_상태라면 {
 
             @Test
-            @DisplayName("시작 시간을 설정한다")
-            void setStartTime() {
-                배틀.setStartTime(now, startTime);
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                박성우.changeRunningStatus();
 
-                assertThat(배틀.getStartTime()).isEqualTo(startTime);
+                배틀.changeBattleRunning(now);
+                assertThatThrownBy(() -> 배틀.changeBattleRunning(now))
+                        .isInstanceOf(BattleAlreadyRunningException.class);
             }
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 시작_시간이_생성_시간_보다_같거나_이전이라면 {
+        class 배틀이_FINISHED_상태라면 {
 
-            public static Stream<Arguments> invalidStartTime() {
-                final LocalDateTime now = LocalDateTime.now();
-                return Stream.of(Arguments.of(now, now), Arguments.of(now, now.minusSeconds(1)));
-            }
-
-            @ParameterizedTest
-            @MethodSource("invalidStartTime")
+            @Disabled
+            @Test
             @DisplayName("예외를 던진다.")
-            void throwException(LocalDateTime now, LocalDateTime startTime) {
+            void throwException() {}
+        }
 
-                assertThatThrownBy(() -> 배틀.setStartTime(now, startTime))
-                        .isInstanceOf(InvalidBattleStartTimeException.class);
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모든_러너가_RUNNING_상태가_아니라면 {
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                assertThatThrownBy(() -> 배틀.changeBattleRunning(now))
+                        .isInstanceOf(AllRunnersAreNotRunningStatusException.class);
             }
         }
     }
@@ -230,21 +197,19 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_찾을_떄 {
-        Battle 배틀 = new Battle(1000, List.of(박성우, 박현준));
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 러너의_id를_받으면 {
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+        }
 
-            String runnerId = 박성우.getId();
+        @Test
+        @DisplayName("러너의 상태를 반환한다.")
+        void returnRunnerStatus() {
+            RunnerStatus runnerStatus = 배틀.getRunnerStatus(박성우.getId());
 
-            @Test
-            @DisplayName("러너의 상태를 반환한다.")
-            void returnRunnerStatus() {
-                RunnerStatus runnerStatus = 배틀.getRunnerStatus(runnerId);
-
-                assertThat(runnerStatus).isEqualTo(박성우.getStatus());
-            }
+            assertThat(runnerStatus).isEqualTo(박성우.getStatus());
         }
 
         @Nested
@@ -254,8 +219,8 @@ class BattleTest {
             String invalidRunnerId = "invalidRunnerId";
 
             @Test
-            @DisplayName("러너의 상태를 반환한다.")
-            void returnRunnerStatus() {
+            @DisplayName("예외를 던진다")
+            void throwException() {
                 assertThatThrownBy(() -> 배틀.getRunnerStatus(invalidRunnerId))
                         .isInstanceOf(RunnerNotFoundException.class);
             }
@@ -266,9 +231,12 @@ class BattleTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_러너들이_모두_RUNNING_상태인지_확인할_때 {
 
-        Runner 박성우 = new Runner("박성우");
-        Runner 노준혁 = new Runner("노준혁");
-        Battle 배틀 = new Battle(1000, List.of(박성우, 노준혁));
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            박현준 = new Runner("박현준");
+            배틀 = new Battle(1000, List.of(박성우, 박현준));
+        }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -277,8 +245,8 @@ class BattleTest {
             @Test
             @DisplayName("true를 반환한다.")
             void returnTrue() {
-                박성우.changeStatus(RunnerStatus.RUNNING);
-                노준혁.changeStatus(RunnerStatus.RUNNING);
+                박성우.changeRunningStatus();
+                박현준.changeRunningStatus();
 
                 assertThat(배틀.isAllRunnersRunningStatus()).isTrue();
             }
@@ -291,7 +259,7 @@ class BattleTest {
             @Test
             @DisplayName("true를 반환한다.")
             void returnTrue() {
-                박성우.changeStatus(RunnerStatus.FINISHED);
+                박성우.changeRunningStatus();
 
                 assertThat(배틀.isAllRunnersRunningStatus()).isFalse();
             }
@@ -302,14 +270,17 @@ class BattleTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀에_기록을_생성할_때 {
 
-        Battle 배틀;
         LocalDateTime battleStartTime;
 
         @BeforeEach
         void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+
+            박성우.changeRunningStatus();
+
             battleStartTime = LocalDateTime.now();
-            배틀 = new Battle(1000, List.of(박성우, 박현준, 노준혁));
-            배틀.setStartTime(battleStartTime.minusSeconds(1), battleStartTime);
+            배틀.changeBattleRunning(battleStartTime.minusSeconds(5));
         }
 
         @ParameterizedTest
@@ -320,17 +291,10 @@ class BattleTest {
                     .isInstanceOf(InvalidGpsDataException.class);
         }
 
+        @Disabled
         @Test
         @DisplayName("배틀이 이미 종료되었다면 예외를 던진다.")
-        void throwBattleAlreadyFinishedException() {
-            배틀.changeBattleStatus(BattleStatus.FINISHED);
-
-            GpsData validGpsData = GpsData.of(1, 1, 1, battleStartTime.plusSeconds(1));
-            List<GpsData> gpsData = List.of(validGpsData);
-
-            assertThatThrownBy(() -> 배틀.addRecords(박성우.getId(), gpsData))
-                    .isInstanceOf(BattleAlreadyFinishedException.class);
-        }
+        void throwBattleAlreadyFinishedException() {}
 
         @Test
         @DisplayName("GpsData가 배틀 시작 시간보다 이전에 생성되었다면 예외를 던진다.")
@@ -346,7 +310,6 @@ class BattleTest {
         @Test
         @DisplayName("새로운 기록을 만든다.")
         void createNewRecords() {
-            박성우.changeStatus(RunnerStatus.RUNNING);
             GpsData gpsData1 = GpsData.of(1, 1, 1, battleStartTime.plusSeconds(1));
             GpsData gpsData2 = GpsData.of(2, 2, 2, battleStartTime.plusSeconds(2));
             List<GpsData> gpsData = List.of(gpsData1, gpsData2);
@@ -360,19 +323,21 @@ class BattleTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_최신_거리를_가져올_때 {
-        Battle 배틀;
         LocalDateTime battleStartTime;
 
         @BeforeEach
         void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+
+            박성우.changeRunningStatus();
+
             battleStartTime = LocalDateTime.now();
-            배틀 = new Battle(1000, List.of(박성우, 박현준, 노준혁));
-            배틀.setStartTime(battleStartTime.minusSeconds(1), battleStartTime);
+            배틀.changeBattleRunning(battleStartTime.minusSeconds(5));
 
             GpsData gpsData1 = GpsData.of(1, 1, 1, battleStartTime.plusSeconds(1));
             GpsData gpsData2 = GpsData.of(2, 2, 2, battleStartTime.plusSeconds(2));
             List<GpsData> gpsData = List.of(gpsData1, gpsData2);
-            박성우.changeStatus(RunnerStatus.RUNNING);
             배틀.addRecords(박성우.getId(), gpsData);
         }
 

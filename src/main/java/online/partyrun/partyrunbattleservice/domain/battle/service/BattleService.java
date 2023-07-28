@@ -14,7 +14,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlrea
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 
@@ -67,7 +66,7 @@ public class BattleService {
 
     public void setRunnerRunning(String battleId, String runnerId) {
         final Battle battle = findBattle(battleId);
-        battle.changeRunnerStatus(runnerId, RunnerStatus.RUNNING);
+        battle.changeRunnerRunningStatus(runnerId);
         final Battle updatedBattle =
                 battleDao.updateRunnerStatus(battleId, runnerId, battle.getRunnerStatus(runnerId));
 
@@ -88,14 +87,12 @@ public class BattleService {
 
     public BattleStartTimeResponse setBattleRunning(String battleId) {
         final Battle battle = findBattle(battleId);
-        battle.changeBattleStatus(BattleStatus.RUNNING);
-
         final LocalDateTime now = LocalDateTime.now(clock);
-        final LocalDateTime startTime = now.plusSeconds(5);
-        battle.setStartTime(now, startTime);
+        battle.changeBattleRunning(now);
+
         battleRepository.save(battle);
 
-        return new BattleStartTimeResponse(startTime);
+        return new BattleStartTimeResponse(battle.getStartTime());
     }
 
     public RunnerDistanceResponse calculateDistance(

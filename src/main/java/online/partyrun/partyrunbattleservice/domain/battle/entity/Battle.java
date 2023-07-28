@@ -26,18 +26,19 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Battle {
     private static final int MIN_DISTANCE = 1;
+    private static final int ADDED_SECOND_FOR_START_TIME = 5;
 
     @Id String id;
-    int distance;
+    int targetDistance;
     List<Runner> runners;
     BattleStatus status = BattleStatus.READY;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
-    public Battle(int distance, List<Runner> runners) {
-        validateDistance(distance);
+    public Battle(int targetDistance, List<Runner> runners) {
+        validateDistance(targetDistance);
         validateRunners(runners);
-        this.distance = distance;
+        this.targetDistance = targetDistance;
         this.runners = runners;
     }
 
@@ -53,10 +54,18 @@ public class Battle {
         }
     }
 
-    public void changeRunnerStatus(String runnerId, RunnerStatus runnerStatus) {
+    public void changeRunnerRunningStatus(String runnerId) {
+        validateIsRunningStatus();
         validateIsFinishedStatus();
+
         final Runner runner = findRunner(runnerId);
-        runner.changeStatus(runnerStatus);
+        runner.changeRunningStatus();
+    }
+
+    private void validateIsRunningStatus() {
+        if (this.status.isRunning()) {
+            throw new BattleAlreadyRunningException(this.id);
+        }
     }
 
     private void validateIsFinishedStatus() {
@@ -72,37 +81,29 @@ public class Battle {
                 .orElseThrow(() -> new RunnerNotFoundException(runnerId));
     }
 
-    public void changeBattleStatus(BattleStatus status) {
+    public void changeBattleRunning(LocalDateTime now) {
+        validateIsRunningStatus();
         validateIsFinishedStatus();
-        validateStatus(status);
+        validateAllRunnersRunning();
 
-        this.status = status;
+        this.status = BattleStatus.RUNNING;
+        this.startTime = now.plusSeconds(ADDED_SECOND_FOR_START_TIME);
     }
 
-    private void validateStatus(BattleStatus status) {
-        if (Objects.isNull(status) || status.isReady() || this.status.equals(status)) {
-            throw new BattleStatusCannotBeChangedException(status);
-        }
-    }
-
-    public RunnerStatus getRunnerStatus(String runnerId) {
-        final Runner runner = findRunner(runnerId);
-        return runner.getStatus();
-    }
-
-    public void setStartTime(LocalDateTime now, LocalDateTime startTime) {
-        validateStartTime(now, startTime);
-        this.startTime = startTime;
-    }
-
-    private void validateStartTime(LocalDateTime now, LocalDateTime startTime) {
-        if (!startTime.isAfter(now)) {
-            throw new InvalidBattleStartTimeException(startTime, now);
+    private void validateAllRunnersRunning() {
+        if (!isAllRunnersRunningStatus()) {
+            throw new AllRunnersAreNotRunningStatusException(
+                    runners.stream().map(Runner::getId).toList());
         }
     }
 
     public boolean isAllRunnersRunningStatus() {
         return this.runners.stream().allMatch(Runner::isRunning);
+    }
+
+    public RunnerStatus getRunnerStatus(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+        return runner.getStatus();
     }
 
     public void addRecords(String runnerId, List<GpsData> gpsData) {

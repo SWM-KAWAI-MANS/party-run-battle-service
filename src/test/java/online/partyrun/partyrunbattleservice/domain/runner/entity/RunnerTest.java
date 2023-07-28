@@ -7,9 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerStatusCannotBeChangedException;
 
 import org.junit.jupiter.api.*;
 
@@ -28,72 +27,25 @@ class RunnerTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너의_상태를_변경할_때 {
+    class 러너를_RUNNING_상태로_변경할_때 {
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 변경할_상태가_정상적이라면 {
-            RunnerStatus status = RunnerStatus.RUNNING;
-
-            @Test
-            @DisplayName("상태를 변경한다")
-            void changeStatus() {
-                박성우.changeStatus(status);
-                assertThat(박성우.getStatus()).isEqualTo(status);
-            }
+        @Test
+        @DisplayName("상태를 변경한다")
+        void changeStatus() {
+            박성우.changeRunningStatus();
+            assertThat(박성우.getStatus()).isEqualTo(RunnerStatus.RUNNING);
         }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 현재_상태가_FINISHED라면 {
-            RunnerStatus status = RunnerStatus.RUNNING;
+        class 변경할_상태가_이미_RUNNING_상태라면 {
 
             @Test
             @DisplayName("예외를 던진다")
             void throwException() {
-                박성우.changeStatus(RunnerStatus.FINISHED);
-                assertThatThrownBy(() -> 박성우.changeStatus(status))
-                        .isInstanceOf(RunnerAlreadyFinishedException.class);
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 변경할_상태가_READY라면 {
-            RunnerStatus status = RunnerStatus.READY;
-
-            @Test
-            @DisplayName("예외를 던진다")
-            void throwException() {
-                assertThatThrownBy(() -> 박성우.changeStatus(status))
-                        .isInstanceOf(RunnerStatusCannotBeChangedException.class);
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 변경할_상태가_null라면 {
-            RunnerStatus status = null;
-
-            @Test
-            @DisplayName("예외를 던진다")
-            void throwException() {
-                assertThatThrownBy(() -> 박성우.changeStatus(status))
-                        .isInstanceOf(RunnerStatusCannotBeChangedException.class);
-            }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 변경할_상태가_이전_상태와_같다면 {
-            RunnerStatus status = RunnerStatus.RUNNING;
-
-            @Test
-            @DisplayName("예외를 던진다")
-            void throwException() {
-                박성우.changeStatus(status);
-                assertThatThrownBy(() -> 박성우.changeStatus(status))
-                        .isInstanceOf(RunnerStatusCannotBeChangedException.class);
+                박성우.changeRunningStatus();
+                assertThatThrownBy(() -> 박성우.changeRunningStatus())
+                        .isInstanceOf(RunnerAlreadyRunningException.class);
             }
         }
     }
@@ -138,7 +90,7 @@ class RunnerTest {
             @Test
             @DisplayName("true를 반환한다.")
             void returnTrue() {
-                박성우.changeStatus(RunnerStatus.RUNNING);
+                박성우.changeRunningStatus();
 
                 assertThat(박성우.isRunning()).isTrue();
             }
@@ -151,8 +103,6 @@ class RunnerTest {
             @Test
             @DisplayName("false를 반환한다.")
             void returnFalse() {
-                박성우.changeStatus(RunnerStatus.FINISHED);
-
                 assertThat(박성우.isRunning()).isFalse();
             }
         }
@@ -177,7 +127,7 @@ class RunnerTest {
         @Test
         @DisplayName("최근 기록이 없으면 새롭게 생성한다.")
         void createRecordWithoutRecentRecord() {
-            박성우.changeStatus(RunnerStatus.RUNNING);
+            박성우.changeRunningStatus();
 
             List<GpsData> gpsData = List.of(GPSDATA_1, GPSDATA_2, GPSDATA_3);
             박성우.addRecords(gpsData);
@@ -196,7 +146,7 @@ class RunnerTest {
         @Test
         @DisplayName("최근 기록이 있으면 최근 기록에 이어서 새롭게 생성한다.")
         void createRecordWithRecentRecord() {
-            박성우.changeStatus(RunnerStatus.RUNNING);
+            박성우.changeRunningStatus();
 
             List<GpsData> recentGpsData = List.of(GPSDATA_1);
             박성우.addRecords(recentGpsData);
@@ -231,7 +181,7 @@ class RunnerTest {
         @Test
         @DisplayName("최신 기록이 있으면 최신 거리를 조회한다.")
         void returnDistance() {
-            박성우.changeStatus(RunnerStatus.RUNNING);
+            박성우.changeRunningStatus();
             GpsData GPSDATA_1 = GpsData.of(1, 1, 1, LocalDateTime.now());
             GpsData GPSDATA_2 = GpsData.of(2, 2, 2, LocalDateTime.now().plusSeconds(1));
 
