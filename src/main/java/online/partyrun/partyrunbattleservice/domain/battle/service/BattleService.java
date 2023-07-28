@@ -87,14 +87,12 @@ public class BattleService {
 
     public BattleStartTimeResponse setBattleRunning(String battleId) {
         final Battle battle = findBattle(battleId);
-        battle.changeBattleStatus(BattleStatus.RUNNING);
-
         final LocalDateTime now = LocalDateTime.now(clock);
-        final LocalDateTime startTime = now.plusSeconds(5);
-        battle.setStartTime(now, startTime);
+        battle.changeBattleRunning(now);
+
         battleRepository.save(battle);
 
-        return new BattleStartTimeResponse(startTime);
+        return new BattleStartTimeResponse(battle.getStartTime());
     }
 
     public RunnerDistanceResponse calculateDistance(

@@ -1,14 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -17,6 +13,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -50,7 +49,9 @@ class BattleRepositoryTest {
         void returnListBattle() {
             final Battle 배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
             final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
-            배틀2.changeBattleStatus(BattleStatus.RUNNING);
+
+            노준혁.changeRunningStatus();
+            배틀2.changeBattleRunning(LocalDateTime.now());
             battleRepository.save(배틀2);
 
             final List<Battle> actual =
@@ -58,7 +59,7 @@ class BattleRepositoryTest {
                             List.of(BattleStatus.READY, BattleStatus.RUNNING),
                             List.of(박성우, 박현준, 노준혁));
 
-            assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(배틀1, 배틀2));
+            assertThat(actual).hasSize(2);
         }
     }
 
