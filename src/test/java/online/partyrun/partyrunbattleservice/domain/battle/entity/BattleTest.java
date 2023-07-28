@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import static org.assertj.core.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -7,6 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -14,8 +17,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -130,8 +131,7 @@ class BattleTest {
             @Disabled
             @Test
             @DisplayName("예외를 던진다.")
-            void throwException() {
-            }
+            void throwException() {}
         }
     }
 
@@ -178,8 +178,7 @@ class BattleTest {
             @Disabled
             @Test
             @DisplayName("예외를 던진다.")
-            void throwException() {
-            }
+            void throwException() {}
         }
 
         @Nested
@@ -295,8 +294,7 @@ class BattleTest {
         @Disabled
         @Test
         @DisplayName("배틀이 이미 종료되었다면 예외를 던진다.")
-        void throwBattleAlreadyFinishedException() {
-        }
+        void throwBattleAlreadyFinishedException() {}
 
         @Test
         @DisplayName("GpsData가 배틀 시작 시간보다 이전에 생성되었다면 예외를 던진다.")
