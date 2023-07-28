@@ -1,8 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import org.junit.jupiter.api.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.*;
 
 @DisplayName("BattleStatus")
 class BattleStatusTest {

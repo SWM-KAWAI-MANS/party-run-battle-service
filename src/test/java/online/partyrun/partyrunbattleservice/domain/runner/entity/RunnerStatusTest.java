@@ -1,8 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import org.junit.jupiter.api.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.*;
 
 @DisplayName("RunnerStatus")
 class RunnerStatusTest {
@@ -64,7 +64,6 @@ class RunnerStatusTest {
             }
         }
     }
-
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)

@@ -4,11 +4,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
+
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
 
 import java.util.ArrayList;

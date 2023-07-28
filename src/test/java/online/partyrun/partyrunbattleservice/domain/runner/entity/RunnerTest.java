@@ -1,18 +1,19 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
+
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -135,9 +136,9 @@ class RunnerTest {
                     () -> assertThat(박성우.getRecentRunnerRecord().getGpsData()).isEqualTo(GPSDATA_3),
                     () ->
                             assertThat(
-                                    박성우.getRunnerRecords().stream()
-                                            .map(RunnerRecord::getGpsData)
-                                            .toList())
+                                            박성우.getRunnerRecords().stream()
+                                                    .map(RunnerRecord::getGpsData)
+                                                    .toList())
                                     .isEqualTo(gpsData),
                     () -> assertThat(박성우.getRunnerRecords().get(0).getDistance()).isEqualTo(0));
         }
@@ -157,10 +158,10 @@ class RunnerTest {
                     () -> assertThat(박성우.getRecentRunnerRecord().getGpsData()).isEqualTo(GPSDATA_3),
                     () ->
                             assertThat(
-                                    박성우.getRunnerRecords().stream()
-                                            .map(RunnerRecord::getGpsData)
-                                            .skip(1)
-                                            .toList())
+                                            박성우.getRunnerRecords().stream()
+                                                    .map(RunnerRecord::getGpsData)
+                                                    .skip(1)
+                                                    .toList())
                                     .isEqualTo(newGpsData),
                     () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotEqualTo(0));
         }
