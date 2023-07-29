@@ -101,6 +101,7 @@ public class BattleService {
 
         final List<GpsData> gpsData = createGpsData(request);
         battle.addRecords(runnerId, gpsData);
+        // TODO: 2023/07/29 addRunnerRecord시 기록 + Runner의 상태 push
         battleRepository.addRunnerRecords(
                 battle.getId(), runnerId, battle.getRunnerRecords(runnerId));
 

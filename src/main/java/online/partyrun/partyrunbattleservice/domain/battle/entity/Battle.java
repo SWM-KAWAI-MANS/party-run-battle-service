@@ -104,6 +104,8 @@ public class Battle {
 
         final Runner runner = findRunner(runnerId);
         runner.addRecords(gpsData);
+
+        changeFinishStatusIfExceededTargetDistance(runner);
     }
 
     private void validateIsNotRunningStatus() {
@@ -119,6 +121,12 @@ public class Battle {
 
         if (hasBeforeStartTime(gpsData)) {
             throw new InvalidGpsDataTimeException(this.startTime);
+        }
+    }
+
+    private void changeFinishStatusIfExceededTargetDistance(Runner runner) {
+        if (runner.isRunningMoreThan(this.targetDistance)) {
+            runner.changeFinishStatus();
         }
     }
 

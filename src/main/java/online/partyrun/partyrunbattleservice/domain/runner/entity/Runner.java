@@ -99,4 +99,14 @@ public class Runner {
             throw new InvalidRecentRunnerRecordException(this.id);
         }
     }
+
+    public boolean isRunningMoreThan(int targetDistance) {
+        return this.recentRunnerRecord.hasBiggerDistanceThan(targetDistance);
+    }
+
+    public void changeFinishStatus() {
+        validateIsNotRunningStatus();
+
+        this.status = RunnerStatus.FINISHED;
+    }
 }
