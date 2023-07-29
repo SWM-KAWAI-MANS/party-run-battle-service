@@ -1,19 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotReadyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -38,14 +37,14 @@ class RunnerTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 변경할_상태가_이미_RUNNING_상태라면 {
+        class READY_상태가_아니라면 {
 
             @Test
             @DisplayName("예외를 던진다")
             void throwException() {
                 박성우.changeRunningStatus();
                 assertThatThrownBy(() -> 박성우.changeRunningStatus())
-                        .isInstanceOf(RunnerAlreadyRunningException.class);
+                        .isInstanceOf(RunnerIsNotReadyException.class);
             }
         }
     }

@@ -1,7 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import static org.assertj.core.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -9,7 +7,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -17,6 +14,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -111,7 +110,7 @@ class BattleTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 배틀이_RUNNING_상태라면 {
+        class 배틀이_READY_상태가_아니라면 {
 
             @Test
             @DisplayName("예외를 던진다.")
@@ -121,17 +120,8 @@ class BattleTest {
                 배틀.changeBattleRunning(LocalDateTime.now());
 
                 assertThatThrownBy(() -> 배틀.changeRunnerRunningStatus(박성우.getId()))
-                        .isInstanceOf(BattleAlreadyRunningException.class);
+                        .isInstanceOf(BattleIsNotReadyException.class);
             }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 배틀이_FINISHED_상태라면 {
-            @Disabled
-            @Test
-            @DisplayName("예외를 던진다.")
-            void throwException() {}
         }
     }
 
@@ -158,7 +148,7 @@ class BattleTest {
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 이미_Running_상태라면 {
+        class READY_상태가_아니라면 {
 
             @Test
             @DisplayName("예외를 던진다.")
@@ -167,18 +157,8 @@ class BattleTest {
 
                 배틀.changeBattleRunning(now);
                 assertThatThrownBy(() -> 배틀.changeBattleRunning(now))
-                        .isInstanceOf(BattleAlreadyRunningException.class);
+                        .isInstanceOf(BattleIsNotReadyException.class);
             }
-        }
-
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 배틀이_FINISHED_상태라면 {
-
-            @Disabled
-            @Test
-            @DisplayName("예외를 던진다.")
-            void throwException() {}
         }
 
         @Nested
@@ -291,10 +271,14 @@ class BattleTest {
                     .isInstanceOf(InvalidGpsDataException.class);
         }
 
-        @Disabled
         @Test
-        @DisplayName("배틀이 이미 종료되었다면 예외를 던진다.")
-        void throwBattleAlreadyFinishedException() {}
+        @DisplayName("배틀이 RUNNING 상태가 아니라면 예외를 던진다..")
+        void throwBattleIsNotRunningException() {
+            노준혁 = new Runner("노준혁");
+            배틀 = new Battle(1000, List.of(노준혁));
+            assertThatThrownBy(() -> 배틀.addRecords(노준혁.getId(), List.of()))
+                    .isInstanceOf(BattleIsNotRunningException.class);
+        }
 
         @Test
         @DisplayName("GpsData가 배틀 시작 시간보다 이전에 생성되었다면 예외를 던진다.")

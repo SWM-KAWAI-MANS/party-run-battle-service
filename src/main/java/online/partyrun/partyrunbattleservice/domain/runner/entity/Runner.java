@@ -7,10 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyFinishedException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerAlreadyRunningException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,21 +35,14 @@ public class Runner {
     }
 
     public void changeRunningStatus() {
-        validateIsRunningStatus();
-        validateIsFinishedStatus();
+        validateIsNotReadyStatus();
 
         this.status = RunnerStatus.RUNNING;
     }
 
-    private void validateIsRunningStatus() {
-        if (status.isRunning()) {
-            throw new RunnerAlreadyRunningException(this.id);
-        }
-    }
-
-    private void validateIsFinishedStatus() {
-        if (this.status.isFinished()) {
-            throw new RunnerAlreadyFinishedException(this.id);
+    private void validateIsNotReadyStatus() {
+        if (!status.isReady()) {
+            throw new RunnerIsNotReadyException(this.id);
         }
     }
 

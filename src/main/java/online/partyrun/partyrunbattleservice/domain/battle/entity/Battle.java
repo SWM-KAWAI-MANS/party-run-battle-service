@@ -55,22 +55,15 @@ public class Battle {
     }
 
     public void changeRunnerRunningStatus(String runnerId) {
-        validateIsRunningStatus();
-        validateIsFinishedStatus();
+        validateIsNotReadyStatus();
 
         final Runner runner = findRunner(runnerId);
         runner.changeRunningStatus();
     }
 
-    private void validateIsRunningStatus() {
-        if (this.status.isRunning()) {
-            throw new BattleAlreadyRunningException(this.id);
-        }
-    }
-
-    private void validateIsFinishedStatus() {
-        if (this.status.isFinished()) {
-            throw new BattleAlreadyFinishedException(this.id);
+    private void validateIsNotReadyStatus() {
+        if (!this.status.isReady()) {
+            throw new BattleIsNotReadyException(this.id);
         }
     }
 
@@ -82,8 +75,7 @@ public class Battle {
     }
 
     public void changeBattleRunning(LocalDateTime now) {
-        validateIsRunningStatus();
-        validateIsFinishedStatus();
+        validateIsNotReadyStatus();
         validateAllRunnersRunning();
 
         this.status = BattleStatus.RUNNING;
@@ -107,11 +99,17 @@ public class Battle {
     }
 
     public void addRecords(String runnerId, List<GpsData> gpsData) {
-        validateIsFinishedStatus();
+        validateIsNotRunningStatus();
         validateGpsData(gpsData);
 
         final Runner runner = findRunner(runnerId);
         runner.addRecords(gpsData);
+    }
+
+    private void validateIsNotRunningStatus() {
+        if (!this.status.isRunning()) {
+            throw new BattleIsNotRunningException(this.id);
+        }
     }
 
     private void validateGpsData(List<GpsData> gpsData) {
