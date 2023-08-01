@@ -101,9 +101,16 @@ public class BattleService {
 
         final List<GpsData> gpsData = createGpsData(request);
         battle.addRecords(runnerId, gpsData);
-        battleRepository.addRunnerRecordsAndUpdateRunnerStatus(battleId, runnerId, battle.getRunnerRecords(runnerId), battle.getRunnerStatus(runnerId));
+        battleRepository.addRunnerRecordsAndUpdateRunnerStatus(
+                battleId,
+                runnerId,
+                battle.getRunnerRecords(runnerId),
+                battle.getRunnerStatus(runnerId));
 
-        return new RunnerDistanceResponse(runnerId, battle.isRunnerFinished(runnerId), battle.getRunnerRecentDistance(runnerId));
+        return new RunnerDistanceResponse(
+                runnerId,
+                battle.isRunnerFinished(runnerId),
+                battle.getRunnerRecentDistance(runnerId));
     }
 
     private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {

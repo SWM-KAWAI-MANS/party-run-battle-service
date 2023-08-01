@@ -5,6 +5,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -23,6 +24,12 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     Optional<Battle> findBattleExceptRunnerRecords(String battleId, String runnerId);
 
     @Query(value = "{'id': ?0, 'runners.id': ?1}")
-    @Update("{'$push': {'runners.$.runnerRecords': {'$each': ?2}}, '$set' :  {'runners.$.status':  ?3}}")
-    void addRunnerRecordsAndUpdateRunnerStatus(String battleId, String runnerId, List<RunnerRecord> runnerRecords, RunnerStatus runnerStatus);
+    @Update(
+            "{'$push': {'runners.$.runnerRecords': {'$each': ?2}}, '$set' :  {'runners.$.status': "
+                + " ?3}}")
+    void addRunnerRecordsAndUpdateRunnerStatus(
+            String battleId,
+            String runnerId,
+            List<RunnerRecord> runnerRecords,
+            RunnerStatus runnerStatus);
 }
