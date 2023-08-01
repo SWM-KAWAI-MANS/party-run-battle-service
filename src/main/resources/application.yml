@@ -2,6 +2,10 @@ server:
   servlet:
     context-path: /api
 
+auth:
+  filter:
+    exclusions: "/docs/index.html"
+
 spring:
   profiles:
     active: test
