@@ -1,7 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
-import static org.assertj.core.api.Assertions.*;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -9,7 +7,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -17,6 +14,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -191,6 +190,50 @@ class BattleTest {
             RunnerStatus runnerStatus = 배틀.getRunnerStatus(박성우.getId());
 
             assertThat(runnerStatus).isEqualTo(박성우.getStatus());
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 존재하지_않는_러너라면 {
+
+            String invalidRunnerId = "invalidRunnerId";
+
+            @Test
+            @DisplayName("예외를 던진다")
+            void throwException() {
+                assertThatThrownBy(() -> 배틀.getRunnerStatus(invalidRunnerId))
+                        .isInstanceOf(RunnerNotFoundException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_종료_여부를_찾을_때 {
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+        }
+
+        @Test
+        @DisplayName("종료 상태라면 True를 반환한다.")
+        void returnIsRunnerFinished() {
+            박성우.changeRunningStatus();
+            박성우.changeFinishStatus();
+
+            boolean actual = 배틀.isRunnerFinished(박성우.getId());
+
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        @DisplayName("종료 상태가 아니면 False를 반환한다.")
+        void returnIsNotRunnerFinished() {
+            boolean actual = 배틀.isRunnerFinished(박성우.getId());
+
+            assertThat(actual).isFalse();
         }
 
         @Nested

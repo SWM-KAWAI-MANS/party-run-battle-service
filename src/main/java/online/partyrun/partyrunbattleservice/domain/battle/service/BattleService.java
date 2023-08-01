@@ -103,7 +103,7 @@ public class BattleService {
         battle.addRecords(runnerId, gpsData);
         battleRepository.addRunnerRecordsAndUpdateRunnerStatus(battleId, runnerId, battle.getRunnerRecords(runnerId), battle.getRunnerStatus(runnerId));
 
-        return new RunnerDistanceResponse(runnerId, false, battle.getRunnerRecentDistance(runnerId));
+        return new RunnerDistanceResponse(runnerId, battle.isRunnerFinished(runnerId), battle.getRunnerRecentDistance(runnerId));
     }
 
     private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {

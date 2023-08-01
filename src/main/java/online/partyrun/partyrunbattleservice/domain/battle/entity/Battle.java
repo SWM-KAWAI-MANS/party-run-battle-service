@@ -145,4 +145,10 @@ public class Battle {
 
         return runner.getRecentDistance();
     }
+
+    public boolean isRunnerFinished(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.isFinished();
+    }
 }

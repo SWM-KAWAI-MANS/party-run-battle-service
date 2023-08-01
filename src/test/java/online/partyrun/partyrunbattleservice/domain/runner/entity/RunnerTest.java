@@ -1,19 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotReadyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -104,6 +103,36 @@ class RunnerTest {
             @DisplayName("false를 반환한다.")
             void returnFalse() {
                 assertThat(박성우.isRunning()).isFalse();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태가_FINISHED인지_확인할_때 {
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class FINISHED_이라면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeRunningStatus();
+                박성우.changeFinishStatus();
+
+                assertThat(박성우.isFinished()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class FINISHED가_아니라면 {
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void returnFalse() {
+                assertThat(박성우.isFinished()).isFalse();
             }
         }
     }

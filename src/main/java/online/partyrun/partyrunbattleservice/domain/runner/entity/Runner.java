@@ -50,6 +50,10 @@ public class Runner {
         return this.status.isRunning();
     }
 
+    public boolean isFinished() {
+        return this.status.isFinished();
+    }
+
     public void addRecords(List<GpsData> gpsData) {
         validateIsNotRunningStatus();
 
