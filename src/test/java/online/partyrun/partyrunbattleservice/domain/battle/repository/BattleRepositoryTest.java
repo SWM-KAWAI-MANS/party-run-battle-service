@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.repository;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import org.junit.jupiter.api.*;
@@ -168,15 +169,18 @@ class BattleRepositoryTest {
         @Test
         @DisplayName("battleId, ruunerId, 새로운 기록을 입력받으면 runner에게 해당 기록을 저장한다.")
         void addRunnerNewRecords() {
-            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords1, 박성우.getStatus());
-            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords2, 박성우.getStatus());
-            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박현준.getId(), runnerRecords1, 박현준.getStatus());
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords1, RunnerStatus.RUNNING);
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords2, RunnerStatus.FINISHED);
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박현준.getId(), runnerRecords1, RunnerStatus.RUNNING);
 
             Battle battle = battleRepository.findById(배틀.getId()).orElseThrow();
 
             Assertions.assertAll(
                     () -> assertThat(battle.getRunnerRecords(박성우.getId())).hasSize(4),
-                    () -> assertThat(battle.getRunnerRecords(박현준.getId())).hasSize(2));
+                    () -> assertThat(battle.isRunnerFinished(박성우.getId())).isTrue(),
+                    () -> assertThat(battle.getRunnerRecords(박현준.getId())).hasSize(2),
+                    () -> assertThat(battle.isRunnerFinished(박현준.getId())).isFalse()
+            );
         }
     }
 }
