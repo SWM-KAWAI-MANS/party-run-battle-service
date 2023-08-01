@@ -1,14 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -17,6 +13,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -154,7 +153,8 @@ class BattleRepositoryTest {
 
         @BeforeEach
         void setUp() {
-            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+            int targetDistance = 100000;
+            배틀 = battleRepository.save(new Battle(targetDistance, List.of(박성우, 박현준)));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -168,10 +168,9 @@ class BattleRepositoryTest {
         @Test
         @DisplayName("battleId, ruunerId, 새로운 기록을 입력받으면 runner에게 해당 기록을 저장한다.")
         void addRunnerNewRecords() {
-            battleRepository.addRunnerRecords(배틀.getId(), 박성우.getId(), runnerRecords1);
-            battleRepository.addRunnerRecords(배틀.getId(), 박성우.getId(), runnerRecords2);
-
-            battleRepository.addRunnerRecords(배틀.getId(), 박현준.getId(), runnerRecords1);
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords1, 박성우.getStatus());
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박성우.getId(), runnerRecords2, 박성우.getStatus());
+            battleRepository.addRunnerRecordsAndUpdateRunnerStatus(배틀.getId(), 박현준.getId(), runnerRecords1, 박현준.getStatus());
 
             Battle battle = battleRepository.findById(배틀.getId()).orElseThrow();
 
