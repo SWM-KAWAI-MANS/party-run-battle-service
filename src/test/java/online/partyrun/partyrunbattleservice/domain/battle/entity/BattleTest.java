@@ -1,5 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import online.partyrun.partyrunbattleservice.domain.battle.exception.AllRunnersAreNotRunningStatusException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotStartedException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
@@ -281,6 +282,23 @@ class BattleTest {
             배틀.addRecords(박성우.getId(), gpsData);
 
             assertThat(박성우.getRunnerRecords()).hasSize(2);
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀_시작_시간을_설정할_때 {
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+        }
+        @Test
+        @DisplayName("모든 러너가 시작 상태가 아니라면 예외를 던진다.")
+        void throwException() {
+            assertThatThrownBy(() -> 배틀.setStartTime(LocalDateTime.now()))
+                    .isInstanceOf(AllRunnersAreNotRunningStatusException.class);
         }
     }
 
