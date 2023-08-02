@@ -12,12 +12,16 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BattleStartTimeResponse {
+    String type = "BATTLE_READY";
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     LocalDateTime startTime;
+
+    public BattleStartTimeResponse(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
 }
