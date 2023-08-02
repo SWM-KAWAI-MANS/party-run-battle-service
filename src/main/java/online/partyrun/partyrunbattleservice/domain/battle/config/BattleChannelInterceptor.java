@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidSubscribeRequestException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;

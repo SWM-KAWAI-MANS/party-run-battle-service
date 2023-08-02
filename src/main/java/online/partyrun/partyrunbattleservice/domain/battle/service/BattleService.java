@@ -46,7 +46,7 @@ public class BattleService {
     }
 
     private void validateRunningRunner(List<String> runnerIds) {
-        if(battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+        if (battleRepository.existsByRunnersIdInAndRunnersStatusIn(
                 runnerIds, List.of(RunnerStatus.READY, RunnerStatus.RUNNING))) {
             throw new RunnerAlreadyRunningInBattleException(runnerIds);
         }

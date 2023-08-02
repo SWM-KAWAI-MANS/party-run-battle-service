@@ -1,10 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -13,9 +17,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -38,10 +39,10 @@ class BattleRepositoryTest {
         @Test
         @DisplayName("러너가 현재 달리는 중이거나, 준비 상태라면 True를 반환한다.")
         void returnFalse() {
-            boolean actual = battleRepository.existsByRunnersIdInAndRunnersStatusIn(
-                    List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
-                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING)
-            );
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
             assertThat(actual).isFalse();
         }
 
@@ -54,9 +55,10 @@ class BattleRepositoryTest {
             노준혁.changeRunningStatus();
             battleRepository.save(배틀2);
 
-            boolean actual = battleRepository.existsByRunnersIdInAndRunnersStatusIn(
-                    List.of(박성우.getId(), 박현준.getId(), 노준혁.getId(), "invalid runner"),
-                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId(), "invalid runner"),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
 
             assertThat(actual).isTrue();
         }
@@ -66,9 +68,10 @@ class BattleRepositoryTest {
         void returnTrueOneRunner() {
             final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
 
-            boolean actual = battleRepository.existsByRunnersIdInAndRunnersStatusIn(
-                    List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
-                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
 
             assertThat(actual).isTrue();
         }
@@ -98,7 +101,8 @@ class BattleRepositoryTest {
         @DisplayName("현재 진행중인 상태의 배틀이 존재하지않으면 빈 값을 반환한다.")
         void returnEmpty() {
             final Optional<Battle> 노준혁_진행중_배틀 =
-                    battleRepository.findByRunnersIdAndRunnersStatus(노준혁.getId(), RunnerStatus.RUNNING);
+                    battleRepository.findByRunnersIdAndRunnersStatus(
+                            노준혁.getId(), RunnerStatus.RUNNING);
 
             assertThat(노준혁_진행중_배틀).isEmpty();
         }
