@@ -1,15 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -22,7 +12,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +22,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -294,37 +292,8 @@ class BattleServiceTest {
                                 진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
                 assertAll(
                         () -> assertThat(response.runnerId()).isEqualTo(박성우.getId()),
-                        () -> assertThat(response.isFinished()).isTrue(),
                         () -> assertThat(response.distance()).isPositive());
             }
-        }
-
-        @Test
-        @DisplayName("목표 거리를 다 안달렸다면 진행중이라는 정보를 제공한다.")
-        void returnRunnerIsNotFinished() {
-            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
-            GpsRequest gps_request2 = new GpsRequest(0.006, 0.006, 0, now.plusSeconds(1));
-            RunnerRecordRequest request =
-                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
-
-            RunnerDistanceResponse response =
-                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
-
-            assertThat(response.isFinished()).isFalse();
-        }
-
-        @Test
-        @DisplayName("목표 거리를 다 달렸다면 종료되었다는 정보를 제공한다.")
-        void returnRunnerIsFinished() {
-            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
-            GpsRequest gps_request2 = new GpsRequest(0.007, 0.007, 0, now.plusSeconds(1));
-            RunnerRecordRequest request =
-                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
-
-            RunnerDistanceResponse response =
-                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
-
-            assertThat(response.isFinished()).isTrue();
         }
 
         @Test

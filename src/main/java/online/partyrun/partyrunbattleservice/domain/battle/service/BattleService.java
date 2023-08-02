@@ -106,7 +106,6 @@ public class BattleService {
 
         return new RunnerDistanceResponse(
                 runnerId,
-                battle.isRunnerFinished(runnerId),
                 battle.getRunnerRecentDistance(runnerId));
     }
 
