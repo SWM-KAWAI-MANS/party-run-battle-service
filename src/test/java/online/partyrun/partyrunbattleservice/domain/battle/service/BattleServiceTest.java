@@ -1,29 +1,17 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
-import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +22,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -143,7 +140,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(() -> battleService.getReadyBattle(노준혁.getId()))
-                        .isInstanceOf(ReadyBattleNotFoundException.class);
+                        .isInstanceOf(ReadyRunnerNotFoundException.class);
             }
         }
     }
@@ -218,7 +215,7 @@ class BattleServiceTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 배틀의_상태를_RUNNING으로_변경할_떄 {
+    class 배틀을_시작할_때 {
         Runner 박성우;
         Runner 노준혁;
         Battle 배틀;
@@ -238,16 +235,12 @@ class BattleServiceTest {
         class 배틀의_id를_받으면 {
 
             @Test
-            @DisplayName("배틀의 상태를 변경한다.")
+            @DisplayName("시작 시간을 설정한다.")
             void changeBattleStatus() {
-                final BattleStartTimeResponse response = battleService.setBattleRunning(배틀.getId());
+                final BattleStartTimeResponse response = battleService.startBattle(배틀.getId());
                 final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(5);
 
-                final Battle 조회된_배틀 = battleRepository.findById(배틀.getId()).orElseThrow();
-
-                assertAll(
-                        () -> assertThat(response.getStartTime()).isEqualTo(startTime),
-                        () -> assertThat(조회된_배틀.getStatus()).isEqualTo(BattleStatus.RUNNING));
+                assertThat(response.getStartTime()).isEqualTo(startTime);
             }
         }
 
@@ -260,7 +253,7 @@ class BattleServiceTest {
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> battleService.setBattleRunning(invalidBattleId))
+                assertThatThrownBy(() -> battleService.startBattle(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
@@ -282,7 +275,7 @@ class BattleServiceTest {
         void setUp() {
             Battle 배틀 = new Battle(1000, List.of(박성우));
             배틀.changeRunnerRunningStatus(박성우.getId());
-            배틀.changeBattleRunning(now.minusMinutes(1));
+            배틀.setStartTime(now.minusMinutes(1));
 
             진행중인_배틀 = mongoTemplate.save(배틀);
         }

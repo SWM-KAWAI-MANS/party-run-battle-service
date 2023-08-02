@@ -31,7 +31,6 @@ public class Battle {
     @Id String id;
     int targetDistance;
     List<Runner> runners;
-    BattleStatus status = BattleStatus.READY;
     LocalDateTime startTime;
     @CreatedDate LocalDateTime createdAt;
 
@@ -55,16 +54,8 @@ public class Battle {
     }
 
     public void changeRunnerRunningStatus(String runnerId) {
-        validateIsNotReadyStatus();
-
         final Runner runner = findRunner(runnerId);
         runner.changeRunningStatus();
-    }
-
-    private void validateIsNotReadyStatus() {
-        if (!this.status.isReady()) {
-            throw new BattleIsNotReadyException(this.id);
-        }
     }
 
     private Runner findRunner(String runnerId) {
@@ -74,11 +65,9 @@ public class Battle {
                 .orElseThrow(() -> new RunnerNotFoundException(runnerId));
     }
 
-    public void changeBattleRunning(LocalDateTime now) {
-        validateIsNotReadyStatus();
+    public void setStartTime(LocalDateTime now) {
         validateAllRunnersRunning();
 
-        this.status = BattleStatus.RUNNING;
         this.startTime = now.plusSeconds(ADDED_SECOND_FOR_START_TIME);
     }
 
@@ -99,7 +88,7 @@ public class Battle {
     }
 
     public void addRecords(String runnerId, List<GpsData> gpsData) {
-        validateIsNotRunningStatus();
+        validateStartTime();
         validateGpsData(gpsData);
 
         final Runner runner = findRunner(runnerId);
@@ -108,9 +97,9 @@ public class Battle {
         changeFinishStatusIfExceededTargetDistance(runner);
     }
 
-    private void validateIsNotRunningStatus() {
-        if (!this.status.isRunning()) {
-            throw new BattleIsNotRunningException(this.id);
+    private void validateStartTime() {
+        if (Objects.isNull(this.startTime)) {
+            throw new BattleNotStartedException();
         }
     }
 
@@ -124,14 +113,14 @@ public class Battle {
         }
     }
 
+    private boolean hasBeforeStartTime(List<GpsData> gpsData) {
+        return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
+    }
+
     private void changeFinishStatusIfExceededTargetDistance(Runner runner) {
         if (runner.isRunningMoreThan(this.targetDistance)) {
             runner.changeFinishStatus();
         }
-    }
-
-    private boolean hasBeforeStartTime(List<GpsData> gpsData) {
-        return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
     }
 
     public List<RunnerRecord> getRunnerRecords(String runnerId) {
