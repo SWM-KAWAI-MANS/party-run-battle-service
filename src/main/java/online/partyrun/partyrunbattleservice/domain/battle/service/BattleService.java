@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -104,9 +105,16 @@ public class BattleService {
                 battle.getRunnerRecords(runnerId),
                 battle.getRunnerStatus(runnerId));
 
+        publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
         return new RunnerDistanceResponse(
                 runnerId,
                 battle.getRunnerRecentDistance(runnerId));
+    }
+
+    private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {
+        if (battle.isRunnerFinished(runnerId)) {
+            eventPublisher.publishEvent(new RunnerFinishedEvent(battle.getId(), runnerId));
+        }
     }
 
     private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {

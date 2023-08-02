@@ -5,6 +5,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -304,6 +305,13 @@ class BattleServiceTest {
                                     battleService.calculateDistance(
                                             "invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
                     .isInstanceOf(BattleNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("러너가 종료 상태라면 이벤트를 던진다.")
+        void publishRunnerFinishEvent() {
+            battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            then(publisher).should(times(1)).publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
         }
     }
 }
