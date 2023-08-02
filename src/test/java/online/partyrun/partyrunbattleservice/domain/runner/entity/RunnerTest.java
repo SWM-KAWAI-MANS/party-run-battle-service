@@ -110,6 +110,36 @@ class RunnerTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태가_FINISHED인지_확인할_때 {
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class FINISHED_이라면 {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void returnTrue() {
+                박성우.changeRunningStatus();
+                박성우.changeFinishStatus();
+
+                assertThat(박성우.isFinished()).isTrue();
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class FINISHED가_아니라면 {
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void returnFalse() {
+                assertThat(박성우.isFinished()).isFalse();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 새로운_기록을_만들_때 {
         LocalDateTime time = LocalDateTime.now();
         GpsData GPSDATA_1 = GpsData.of(1, 1, 1, time);

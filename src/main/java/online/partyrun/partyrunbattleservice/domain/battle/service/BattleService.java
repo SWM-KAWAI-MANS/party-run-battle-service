@@ -101,12 +101,16 @@ public class BattleService {
 
         final List<GpsData> gpsData = createGpsData(request);
         battle.addRecords(runnerId, gpsData);
-        battleRepository.addRunnerRecords(
-                battle.getId(), runnerId, battle.getRunnerRecords(runnerId));
+        battleRepository.addRunnerRecordsAndUpdateRunnerStatus(
+                battleId,
+                runnerId,
+                battle.getRunnerRecords(runnerId),
+                battle.getRunnerStatus(runnerId));
 
-        // TODO: 2023/07/21 현재는 종료 로직이 들어가지 않았으므로 무조건 isFinished에 false 적용
         return new RunnerDistanceResponse(
-                runnerId, false, battle.getRunnerRecentDistance(runnerId));
+                runnerId,
+                battle.isRunnerFinished(runnerId),
+                battle.getRunnerRecentDistance(runnerId));
     }
 
     private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {

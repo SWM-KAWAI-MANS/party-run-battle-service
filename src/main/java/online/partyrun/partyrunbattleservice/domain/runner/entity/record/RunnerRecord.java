@@ -44,6 +44,10 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
         return new RunnerRecord(gpsData, this.distance + distance);
     }
 
+    public boolean hasBiggerDistanceThan(int targetDistance) {
+        return this.distance > targetDistance;
+    }
+
     @Override
     public int compareTo(RunnerRecord o) {
         return this.gpsData.compareTo(o.gpsData);

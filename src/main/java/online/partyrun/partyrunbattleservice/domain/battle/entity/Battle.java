@@ -104,6 +104,8 @@ public class Battle {
 
         final Runner runner = findRunner(runnerId);
         runner.addRecords(gpsData);
+
+        changeFinishStatusIfExceededTargetDistance(runner);
     }
 
     private void validateIsNotRunningStatus() {
@@ -122,6 +124,12 @@ public class Battle {
         }
     }
 
+    private void changeFinishStatusIfExceededTargetDistance(Runner runner) {
+        if (runner.isRunningMoreThan(this.targetDistance)) {
+            runner.changeFinishStatus();
+        }
+    }
+
     private boolean hasBeforeStartTime(List<GpsData> gpsData) {
         return gpsData.stream().anyMatch(data -> data.isBefore(this.startTime));
     }
@@ -136,5 +144,11 @@ public class Battle {
         final Runner runner = findRunner(runnerId);
 
         return runner.getRecentDistance();
+    }
+
+    public boolean isRunnerFinished(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+
+        return runner.isFinished();
     }
 }

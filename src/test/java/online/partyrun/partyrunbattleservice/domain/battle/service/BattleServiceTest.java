@@ -299,8 +299,37 @@ class BattleServiceTest {
                                 진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
                 assertAll(
                         () -> assertThat(response.runnerId()).isEqualTo(박성우.getId()),
+                        () -> assertThat(response.isFinished()).isTrue(),
                         () -> assertThat(response.distance()).isPositive());
             }
+        }
+
+        @Test
+        @DisplayName("목표 거리를 다 안달렸다면 진행중이라는 정보를 제공한다.")
+        void returnRunnerIsNotFinished() {
+            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
+            GpsRequest gps_request2 = new GpsRequest(0.006, 0.006, 0, now.plusSeconds(1));
+            RunnerRecordRequest request =
+                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
+
+            RunnerDistanceResponse response =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
+
+            assertThat(response.isFinished()).isFalse();
+        }
+
+        @Test
+        @DisplayName("목표 거리를 다 달렸다면 종료되었다는 정보를 제공한다.")
+        void returnRunnerIsFinished() {
+            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
+            GpsRequest gps_request2 = new GpsRequest(0.007, 0.007, 0, now.plusSeconds(1));
+            RunnerRecordRequest request =
+                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
+
+            RunnerDistanceResponse response =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
+
+            assertThat(response.isFinished()).isTrue();
         }
 
         @Test

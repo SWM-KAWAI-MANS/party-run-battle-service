@@ -210,6 +210,50 @@ class BattleTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_종료_여부를_찾을_때 {
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner("박성우");
+            배틀 = new Battle(1000, List.of(박성우));
+        }
+
+        @Test
+        @DisplayName("종료 상태라면 True를 반환한다.")
+        void returnIsRunnerFinished() {
+            박성우.changeRunningStatus();
+            박성우.changeFinishStatus();
+
+            boolean actual = 배틀.isRunnerFinished(박성우.getId());
+
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        @DisplayName("종료 상태가 아니면 False를 반환한다.")
+        void returnIsNotRunnerFinished() {
+            boolean actual = 배틀.isRunnerFinished(박성우.getId());
+
+            assertThat(actual).isFalse();
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 존재하지_않는_러너라면 {
+
+            String invalidRunnerId = "invalidRunnerId";
+
+            @Test
+            @DisplayName("예외를 던진다")
+            void throwException() {
+                assertThatThrownBy(() -> 배틀.getRunnerStatus(invalidRunnerId))
+                        .isInstanceOf(RunnerNotFoundException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀의_러너들이_모두_RUNNING_상태인지_확인할_때 {
 
         @BeforeEach

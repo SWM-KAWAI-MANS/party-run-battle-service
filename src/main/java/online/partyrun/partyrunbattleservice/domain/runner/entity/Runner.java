@@ -50,6 +50,10 @@ public class Runner {
         return this.status.isRunning();
     }
 
+    public boolean isFinished() {
+        return this.status.isFinished();
+    }
+
     public void addRecords(List<GpsData> gpsData) {
         validateIsNotRunningStatus();
 
@@ -98,5 +102,15 @@ public class Runner {
         if (Objects.isNull(this.recentRunnerRecord)) {
             throw new InvalidRecentRunnerRecordException(this.id);
         }
+    }
+
+    public boolean isRunningMoreThan(int targetDistance) {
+        return this.recentRunnerRecord.hasBiggerDistanceThan(targetDistance);
+    }
+
+    public void changeFinishStatus() {
+        validateIsNotRunningStatus();
+
+        this.status = RunnerStatus.FINISHED;
     }
 }
