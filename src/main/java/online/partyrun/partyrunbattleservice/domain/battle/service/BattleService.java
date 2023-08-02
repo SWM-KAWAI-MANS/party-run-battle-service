@@ -82,7 +82,7 @@ public class BattleService {
         }
     }
 
-    public BattleStartTimeResponse startBattle(String battleId) {
+    public BattleStartTimeResponse start(String battleId) {
         final Battle battle = findBattle(battleId);
         final LocalDateTime now = LocalDateTime.now(clock);
         battle.setStartTime(now);

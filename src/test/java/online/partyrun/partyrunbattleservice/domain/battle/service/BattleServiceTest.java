@@ -239,7 +239,7 @@ class BattleServiceTest {
             @Test
             @DisplayName("시작 시간을 설정한다.")
             void changeBattleStatus() {
-                final BattleStartTimeResponse response = battleService.startBattle(배틀.getId());
+                final BattleStartTimeResponse response = battleService.start(배틀.getId());
                 final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(5);
 
                 assertThat(response.getStartTime()).isEqualTo(startTime);
@@ -255,7 +255,7 @@ class BattleServiceTest {
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> battleService.startBattle(invalidBattleId))
+                assertThatThrownBy(() -> battleService.start(invalidBattleId))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
