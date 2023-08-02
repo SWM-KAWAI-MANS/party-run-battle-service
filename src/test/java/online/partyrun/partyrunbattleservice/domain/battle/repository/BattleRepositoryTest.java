@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
-import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
@@ -36,50 +35,63 @@ class BattleRepositoryTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class findByStatusInAndRunnersIn는 {
+    class existsByRunnersIdInAndRunnersStatusIn는 {
         @Test
-        @DisplayName("현재 참여중인 배틀이 없으면 빈 리스트를 반환한다.")
-        void returnEmpty() {
-            final List<Battle> actual =
-                    battleRepository.findByStatusInAndRunnersIn(
-                            List.of(BattleStatus.READY), List.of(박성우, 박현준, 노준혁));
-            assertThat(actual).isEmpty();
+        @DisplayName("러너가 현재 달리는 중이거나, 준비 상태라면 True를 반환한다.")
+        void returnFalse() {
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+            assertThat(actual).isFalse();
         }
 
         @Test
-        @DisplayName("현재 참여중인 배틀이 있으면 참여한 배틀 리스트를 반환한다.")
-        void returnListBattle() {
+        @DisplayName("모든 러너가 현재 달리는 중이거나, 준비 상태라면 True를 반환한다.")
+        void returnTrueAllRunner() {
             final Battle 배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
             final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
 
             노준혁.changeRunningStatus();
-            배틀2.changeBattleRunning(LocalDateTime.now());
             battleRepository.save(배틀2);
 
-            final List<Battle> actual =
-                    battleRepository.findByStatusInAndRunnersIn(
-                            List.of(BattleStatus.READY, BattleStatus.RUNNING),
-                            List.of(박성우, 박현준, 노준혁));
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId(), "invalid runner"),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
 
-            assertThat(actual).hasSize(2);
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        @DisplayName("한명의 러너라도 현재 달리는 중이거나, 준비 상태라면 True를 반환한다.")
+        void returnTrueOneRunner() {
+            final Battle 배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁)));
+
+            boolean actual =
+                    battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+
+            assertThat(actual).isTrue();
         }
     }
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class findByStatusInAndRunnersId는 {
+    class findByRunnersIdAndRunnersStatus는 {
         Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
         @Test
-        @DisplayName("현재 진행중인 상태의 배틀이 존재하면 반환한다.")
-        void returnRunningBattle() {
+        @DisplayName("현재 준비 중인 배틀이 존재하면 반환한다.")
+        void returnReadyBattle() {
             final Battle 박성우_진행중_배틀 =
                     battleRepository
-                            .findByStatusAndRunnersId(BattleStatus.READY, 박성우.getId())
+                            .findByRunnersIdAndRunnersStatus(박성우.getId(), RunnerStatus.READY)
                             .orElseThrow();
             final Battle 박현준_진행중_배틀 =
                     battleRepository
-                            .findByStatusAndRunnersId(BattleStatus.READY, 박현준.getId())
+                            .findByRunnersIdAndRunnersStatus(박성우.getId(), RunnerStatus.READY)
                             .orElseThrow();
 
             assertThat(박성우_진행중_배틀).usingRecursiveComparison().isEqualTo(박현준_진행중_배틀).isEqualTo(배틀);
@@ -89,7 +101,8 @@ class BattleRepositoryTest {
         @DisplayName("현재 진행중인 상태의 배틀이 존재하지않으면 빈 값을 반환한다.")
         void returnEmpty() {
             final Optional<Battle> 노준혁_진행중_배틀 =
-                    battleRepository.findByStatusAndRunnersId(BattleStatus.RUNNING, 노준혁.getId());
+                    battleRepository.findByRunnersIdAndRunnersStatus(
+                            노준혁.getId(), RunnerStatus.RUNNING);
 
             assertThat(노준혁_진행중_배틀).isEmpty();
         }
@@ -97,15 +110,15 @@ class BattleRepositoryTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class existsByIdAndRunnersIdAndStatus는 {
+    class existsByIdAndRunnersIdAndRunnersStatus는 {
         Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
 
         @Test
         @DisplayName("battleId, runnerId, status를 만족하는 데이터의 존재하면 true를 반환한다.")
         void returnTrue() {
             final boolean result =
-                    battleRepository.existsByIdAndRunnersIdAndStatus(
-                            배틀.getId(), 박성우.getId(), BattleStatus.READY);
+                    battleRepository.existsByIdAndRunnersIdAndRunnersStatus(
+                            배틀.getId(), 박성우.getId(), RunnerStatus.READY);
             assertThat(result).isTrue();
         }
 
@@ -113,11 +126,11 @@ class BattleRepositoryTest {
         @DisplayName("battleId, runnerId, status를 만족하는 데이터가 없으면 false를 반환한다.")
         void returnFalse() {
             final boolean result1 =
-                    battleRepository.existsByIdAndRunnersIdAndStatus(
-                            배틀.getId(), 박성우.getId(), BattleStatus.FINISHED);
+                    battleRepository.existsByIdAndRunnersIdAndRunnersStatus(
+                            배틀.getId(), 박성우.getId(), RunnerStatus.FINISHED);
             final boolean result2 =
-                    battleRepository.existsByIdAndRunnersIdAndStatus(
-                            배틀.getId(), 노준혁.getId(), BattleStatus.RUNNING);
+                    battleRepository.existsByIdAndRunnersIdAndRunnersStatus(
+                            배틀.getId(), 노준혁.getId(), RunnerStatus.RUNNING);
 
             assertAll(() -> assertThat(result1).isFalse(), () -> assertThat(result2).isFalse());
         }
@@ -127,11 +140,19 @@ class BattleRepositoryTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀_조회_시 {
 
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준)));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우)));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class findBattleExceptRunnerRecords는 {
+
+            @BeforeEach
+            void setUp() {
+                LocalDateTime now = LocalDateTime.now();
+                박성우.changeRunningStatus();
+                배틀.setStartTime(now);
+                배틀.addRecords(박성우.getId(), List.of(GpsData.of(0, 0, 0, now.plusSeconds(10))));
+            }
 
             @Test
             @DisplayName("현재까지의 기록들을 반환하지 않는다.")
@@ -179,7 +200,7 @@ class BattleRepositoryTest {
 
             Battle battle = battleRepository.findById(배틀.getId()).orElseThrow();
 
-            Assertions.assertAll(
+            assertAll(
                     () -> assertThat(battle.getRunnerRecords(박성우.getId())).hasSize(4),
                     () -> assertThat(battle.isRunnerFinished(박성우.getId())).isTrue(),
                     () -> assertThat(battle.getRunnerRecords(박현준.getId())).hasSize(2),

@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.testmanager.docs.RestControllerTest;
 
@@ -136,7 +136,7 @@ class BattleControllerTest extends RestControllerTest {
             @DisplayName("not found를 반환한다.")
             void getRunningBattle() throws Exception {
                 given(battleService.getReadyBattle("defaultUser"))
-                        .willThrow(new ReadyBattleNotFoundException("defaultUser"));
+                        .willThrow(new ReadyRunnerNotFoundException("defaultUser"));
 
                 final ResultActions actions =
                         mockMvc.perform(

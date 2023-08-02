@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidSubscribeRequestException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -48,8 +48,8 @@ public class BattleChannelInterceptor implements ChannelInterceptor {
         final String runnerId = getRunnerId(accessor);
         String battleId = extractBattleId(accessor);
 
-        if (!battleRepository.existsByIdAndRunnersIdAndStatus(
-                battleId, runnerId, BattleStatus.READY)) {
+        if (!battleRepository.existsByIdAndRunnersIdAndRunnersStatus(
+                battleId, runnerId, RunnerStatus.READY)) {
 
             throw new InvalidSubscribeRequestException(battleId, runnerId);
         }

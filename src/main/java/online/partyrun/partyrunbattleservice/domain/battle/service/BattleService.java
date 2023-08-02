@@ -6,14 +6,14 @@ import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
-import online.partyrun.partyrunbattleservice.domain.battle.entity.BattleStatus;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyBattleNotFoundException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 
@@ -38,28 +38,25 @@ public class BattleService {
 
     public BattleResponse createBattle(BattleCreateRequest request) {
         final List<String> runnerIds = request.getRunnerIds();
+        validateRunningRunner(runnerIds);
         final List<Runner> runners = runnerService.findAllById(runnerIds);
-
-        validateRunnerInBattle(runners);
 
         final Battle battle = battleRepository.save(new Battle(request.getDistance(), runners));
         return battleMapper.toResponse(battle);
     }
 
-    private void validateRunnerInBattle(List<Runner> runners) {
-        final List<Battle> runningBattle =
-                battleRepository.findByStatusInAndRunnersIn(
-                        List.of(BattleStatus.READY, BattleStatus.RUNNING), runners);
-        if (!runningBattle.isEmpty()) {
-            throw new RunnerAlreadyRunningInBattleException(runners, runningBattle);
+    private void validateRunningRunner(List<String> runnerIds) {
+        if (battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                runnerIds, List.of(RunnerStatus.READY, RunnerStatus.RUNNING))) {
+            throw new RunnerAlreadyRunningInBattleException(runnerIds);
         }
     }
 
     public BattleResponse getReadyBattle(String runnerId) {
         final Battle battle =
                 battleRepository
-                        .findByStatusAndRunnersId(BattleStatus.READY, runnerId)
-                        .orElseThrow(() -> new ReadyBattleNotFoundException(runnerId));
+                        .findByRunnersIdAndRunnersStatus(runnerId, RunnerStatus.READY)
+                        .orElseThrow(() -> new ReadyRunnerNotFoundException(runnerId));
 
         return battleMapper.toResponse(battle);
     }
@@ -85,10 +82,10 @@ public class BattleService {
         }
     }
 
-    public BattleStartTimeResponse setBattleRunning(String battleId) {
+    public BattleStartTimeResponse start(String battleId) {
         final Battle battle = findBattle(battleId);
         final LocalDateTime now = LocalDateTime.now(clock);
-        battle.changeBattleRunning(now);
+        battle.setStartTime(now);
 
         battleRepository.save(battle);
 

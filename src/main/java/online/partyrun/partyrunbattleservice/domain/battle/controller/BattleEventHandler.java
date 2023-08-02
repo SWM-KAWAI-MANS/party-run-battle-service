@@ -25,7 +25,7 @@ public class BattleEventHandler {
 
     @EventListener
     public void setBattleRunning(BattleRunningEvent event) {
-        final BattleStartTimeResponse response = battleService.setBattleRunning(event.battleId());
+        final BattleStartTimeResponse response = battleService.start(event.battleId());
         messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
     }
 }
