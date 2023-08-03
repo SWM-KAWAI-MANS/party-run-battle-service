@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 @Slf4j
 @ControllerAdvice
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class BattleMessageExceptionHandler {
+public class BattleMessageControllerAdvice {
 
     @MessageExceptionHandler
     public void handleException(Exception exception) {
