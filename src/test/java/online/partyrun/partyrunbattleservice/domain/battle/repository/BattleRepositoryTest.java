@@ -192,11 +192,23 @@ class BattleRepositoryTest {
         @DisplayName("battleId, ruunerId, 새로운 기록을 입력받으면 runner에게 해당 기록을 저장한다.")
         void addRunnerNewRecords() {
             battleRepository.addRunnerRecordsAndUpdateRunnerStatus(
-                    배틀.getId(), 박성우.getId(), runnerRecords1, RunnerStatus.RUNNING);
+                    배틀.getId(),
+                    박성우.getId(),
+                    runnerRecords1,
+                    박성우.getRecentRunnerRecord(),
+                    RunnerStatus.RUNNING);
             battleRepository.addRunnerRecordsAndUpdateRunnerStatus(
-                    배틀.getId(), 박성우.getId(), runnerRecords2, RunnerStatus.FINISHED);
+                    배틀.getId(),
+                    박성우.getId(),
+                    runnerRecords2,
+                    박성우.getRecentRunnerRecord(),
+                    RunnerStatus.FINISHED);
             battleRepository.addRunnerRecordsAndUpdateRunnerStatus(
-                    배틀.getId(), 박현준.getId(), runnerRecords1, RunnerStatus.RUNNING);
+                    배틀.getId(),
+                    박현준.getId(),
+                    runnerRecords1,
+                    박현준.getRecentRunnerRecord(),
+                    RunnerStatus.RUNNING);
 
             Battle battle = battleRepository.findById(배틀.getId()).orElseThrow();
 

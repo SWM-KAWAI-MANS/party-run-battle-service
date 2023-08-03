@@ -140,4 +140,9 @@ public class Battle {
 
         return runner.isFinished();
     }
+
+    public RunnerRecord getRunnerRecentRecord(String runnerId) {
+        final Runner runner = findRunner(runnerId);
+        return runner.getRecentRunnerRecord();
+    }
 }

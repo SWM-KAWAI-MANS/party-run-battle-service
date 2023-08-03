@@ -15,6 +15,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -239,10 +240,11 @@ class BattleServiceTest {
             @Test
             @DisplayName("시작 시간을 설정한다.")
             void changeBattleStatus() {
-                final BattleStartTimeResponse response = battleService.start(배틀.getId());
+                final BattleStartedResponse response = battleService.start(배틀.getId());
                 final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(5);
 
-                assertThat(response.getStartTime()).isEqualTo(startTime);
+                assertThat((LocalDateTime) response.getData().get("startTime"))
+                        .isEqualTo(startTime);
             }
         }
 
@@ -265,11 +267,20 @@ class BattleServiceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 거리를_계산할_때 {
         LocalDateTime now = LocalDateTime.now().plusMinutes(1);
-        GpsRequest GPS_REQUEST1 = new GpsRequest(1, 1, 1, now);
-        GpsRequest GPS_REQUEST2 = new GpsRequest(2, 2, 2, now.plusSeconds(1));
-        GpsRequest GPS_REQUEST3 = new GpsRequest(3, 3, 3, now.plusSeconds(2));
+        GpsRequest GPS_REQUEST0 = new GpsRequest(0, 0, 0, now);
+        GpsRequest GPS_REQUEST1 = new GpsRequest(0.001, 0.001, 0.001, now);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(0.002, 0.002, 0.002, now.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(0.003, 0.003, 0.003, now.plusSeconds(2));
+        GpsRequest GPS_REQUEST4 = new GpsRequest(0.004, 0.004, 0.004, now.plusSeconds(3));
+        GpsRequest GPS_REQUEST5 = new GpsRequest(0.005, 0.005, 0.005, now.plusSeconds(4));
+        GpsRequest GPS_REQUEST6 = new GpsRequest(0.006, 0.006, 0.006, now.plusSeconds(5));
+        GpsRequest GPS_REQUEST7 = new GpsRequest(0.007, 0.007, 0.007, now.plusSeconds(6));
         RunnerRecordRequest RECORD_REQUEST1 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+                new RunnerRecordRequest(
+                        List.of(GPS_REQUEST0, GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+        RunnerRecordRequest RECORD_REQUEST2 =
+                new RunnerRecordRequest(
+                        List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6, GPS_REQUEST7));
         Runner 박성우 = new Runner("박성우");
         Battle 진행중인_배틀;
 
@@ -282,49 +293,25 @@ class BattleServiceTest {
             진행중인_배틀 = mongoTemplate.save(배틀);
         }
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 기존에_기록이_존재하지_않으면 {
-
-            @Test
-            @DisplayName("새로운 기록을 저장한다")
-            void createNewRecord() {
-                RunnerDistanceResponse response =
-                        battleService.calculateDistance(
-                                진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
-                assertAll(
-                        () -> assertThat(response.runnerId()).isEqualTo(박성우.getId()),
-                        () -> assertThat(response.isFinished()).isTrue(),
-                        () -> assertThat(response.distance()).isPositive());
-            }
+        @Test
+        @DisplayName("기존에 기록이 존재하지 않으면 새로운 기록을 저장한다")
+        void createNewRecord() {
+            RunnerDistanceResponse response =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            assertAll(
+                    () -> assertThat(response.getData().get("runnerId")).isEqualTo(박성우.getId()),
+                    () -> assertThat((double) response.getData().get("distance")).isPositive());
         }
 
         @Test
-        @DisplayName("목표 거리를 다 안달렸다면 진행중이라는 정보를 제공한다.")
-        void returnRunnerIsNotFinished() {
-            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
-            GpsRequest gps_request2 = new GpsRequest(0.006, 0.006, 0, now.plusSeconds(1));
-            RunnerRecordRequest request =
-                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
-
-            RunnerDistanceResponse response =
-                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
-
-            assertThat(response.isFinished()).isFalse();
-        }
-
-        @Test
-        @DisplayName("목표 거리를 다 달렸다면 종료되었다는 정보를 제공한다.")
-        void returnRunnerIsFinished() {
-            GpsRequest gps_request1 = new GpsRequest(0, 0, 0, now);
-            GpsRequest gps_request2 = new GpsRequest(0.007, 0.007, 0, now.plusSeconds(1));
-            RunnerRecordRequest request =
-                    new RunnerRecordRequest(List.of(gps_request1, gps_request2));
-
-            RunnerDistanceResponse response =
-                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), request);
-
-            assertThat(response.isFinished()).isTrue();
+        @DisplayName("기존에 기록이 존재하면 이어서 저장한다")
+        void createRecord() {
+            final RunnerDistanceResponse response1 =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            final RunnerDistanceResponse response2 =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
+            assertThat((double) response2.getData().get("distance"))
+                    .isGreaterThan((double) response1.getData().get("distance"));
         }
 
         @Test
@@ -335,6 +322,16 @@ class BattleServiceTest {
                                     battleService.calculateDistance(
                                             "invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
                     .isInstanceOf(BattleNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("러너가 종료 상태라면 이벤트를 던진다.")
+        void publishRunnerFinishEvent() {
+            battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
+            then(publisher)
+                    .should(times(1))
+                    .publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
         }
     }
 }

@@ -1,9 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.dto;
 
-public record RunnerDistanceResponse(
-        String type, String runnerId, boolean isFinished, double distance) {
+import java.util.Map;
 
-    public RunnerDistanceResponse(String runnerId, boolean isFinished, double distance) {
-        this("BATTLE_RUNNING", runnerId, isFinished, distance);
+public class RunnerDistanceResponse extends BattleWebSocketResponse {
+
+    public RunnerDistanceResponse(String runnerId, double distance) {
+        super("BATTLE_RUNNING", Map.of("runnerId", runnerId, "distance", distance));
     }
 }

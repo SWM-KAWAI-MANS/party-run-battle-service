@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
+import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
@@ -82,14 +83,14 @@ public class BattleService {
         }
     }
 
-    public BattleStartTimeResponse start(String battleId) {
+    public BattleStartedResponse start(String battleId) {
         final Battle battle = findBattle(battleId);
         final LocalDateTime now = LocalDateTime.now(clock);
         battle.setStartTime(now);
 
         battleRepository.save(battle);
 
-        return new BattleStartTimeResponse(battle.getStartTime());
+        return new BattleStartedResponse(battle.getStartTime());
     }
 
     public RunnerDistanceResponse calculateDistance(
@@ -102,12 +103,17 @@ public class BattleService {
                 battleId,
                 runnerId,
                 battle.getRunnerRecords(runnerId),
+                battle.getRunnerRecentRecord(runnerId),
                 battle.getRunnerStatus(runnerId));
 
-        return new RunnerDistanceResponse(
-                runnerId,
-                battle.isRunnerFinished(runnerId),
-                battle.getRunnerRecentDistance(runnerId));
+        publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
+        return new RunnerDistanceResponse(runnerId, battle.getRunnerRecentDistance(runnerId));
+    }
+
+    private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {
+        if (battle.isRunnerFinished(runnerId)) {
+            eventPublisher.publishEvent(new RunnerFinishedEvent(battle.getId(), runnerId));
+        }
     }
 
     private Battle findBattleExceptRunnerRecords(String battleId, String runnerId) {
