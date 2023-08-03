@@ -29,7 +29,7 @@ public class BattleController {
         return battleService.createBattle(request);
     }
 
-    @GetMapping("ready")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getReadyBattle(Authentication auth) {
         return battleService.getReadyBattle(auth.getName());

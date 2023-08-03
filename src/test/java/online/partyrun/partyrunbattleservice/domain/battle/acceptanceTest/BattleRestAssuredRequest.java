@@ -20,9 +20,9 @@ public abstract class BattleRestAssuredRequest {
                 request);
     }
 
-    public static ExtractableResponse<Response> 준비_상태인_배틀_조회_요청(String accessToken) {
+    public static ExtractableResponse<Response> 참여_중인_배틀_조회_요청(String accessToken) {
         return SimpleRestAssured.get(
-                String.format("/%s/%s/ready", PREFIX_URL, BATTLE_URL),
+                String.format("/%s/%s", PREFIX_URL, BATTLE_URL),
                 Map.of("Authorization", accessToken));
     }
 }
