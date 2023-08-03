@@ -1,11 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -18,7 +12,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -39,11 +32,16 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
-    private static final String TOPIC_BATTLE_PREFIX = "/topic/battle";
-    private static final String PUB_BATTLE_PREFIX = "/pub/battle";
+    private static final String TOPIC_BATTLE_PREFIX = "/topic/battles";
+    private static final String PUB_BATTLE_PREFIX = "/pub/battles";
 
     @Autowired WebSocketStompClient webSocketStompClient;
     @Autowired BattleRepository battleRepository;
@@ -74,7 +72,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
             return webSocketStompClient
                     .connectAsync(
-                            "ws://localhost:" + port + "/api/battle/connection",
+                            "ws://localhost:" + port + "/api/battles/connection",
                             headers,
                             new StompSessionHandlerAdapter() {})
                     .get(1, TimeUnit.SECONDS);

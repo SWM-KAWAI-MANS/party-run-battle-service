@@ -26,12 +26,12 @@ public class BattleEventHandler {
     @EventListener
     public void setBattleRunning(BattleRunningEvent event) {
         final BattleWebSocketResponse response = battleService.start(event.battleId());
-        messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
+        messagingTemplate.convertAndSend("/topic/battles/" + event.battleId(), response);
     }
 
     @EventListener
     public void publishRunnerFinished(RunnerFinishedEvent event) {
         final RunnerFinishedResponse response = new RunnerFinishedResponse(event.runnerId());
-        messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
+        messagingTemplate.convertAndSend("/topic/battles/" + event.battleId(), response);
     }
 }
