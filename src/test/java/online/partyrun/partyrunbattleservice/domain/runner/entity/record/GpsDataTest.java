@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 
 import org.junit.jupiter.api.*;
@@ -67,5 +68,12 @@ class GpsDataTest {
 
             assertThat(result).isFalse();
         }
+    }
+
+    @Test
+    @DisplayName("gps_생성시_시간이_null이면_예외")
+    void throwException() {
+        assertThatThrownBy(() -> GpsData.of(1, 1, 1, null))
+                .isInstanceOf(GpsTimeNullException.class);
     }
 }
