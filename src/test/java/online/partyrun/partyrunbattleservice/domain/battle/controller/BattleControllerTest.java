@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 @DisplayName("BattleController")
 class BattleControllerTest extends RestControllerTest {
 
+    private static final String BATTLE_URL = "/battles";
+
     @MockBean BattleService battleService;
 
     @Nested
@@ -50,7 +52,7 @@ class BattleControllerTest extends RestControllerTest {
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                post("/battle")
+                                post(BATTLE_URL)
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .characterEncoding(StandardCharsets.UTF_8)
@@ -85,7 +87,7 @@ class BattleControllerTest extends RestControllerTest {
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                post("/battle")
+                                post(BATTLE_URL)
                                         .with(csrf())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .characterEncoding(StandardCharsets.UTF_8)
@@ -114,7 +116,7 @@ class BattleControllerTest extends RestControllerTest {
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                get("/battle/ready")
+                                get(String.format("%s/join", BATTLE_URL))
                                         .header(
                                                 "Authorization",
                                                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
@@ -140,7 +142,7 @@ class BattleControllerTest extends RestControllerTest {
 
                 final ResultActions actions =
                         mockMvc.perform(
-                                get("/battle/running")
+                                get(String.format("%s/join", BATTLE_URL))
                                         .header(
                                                 "Authorization",
                                                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")

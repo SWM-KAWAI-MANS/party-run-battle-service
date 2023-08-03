@@ -23,13 +23,13 @@ public class BattleWebsocketController {
     BattleService battleService;
     SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/battle/{battleId}/ready")
+    @MessageMapping("/battles/{battleId}/ready")
     public void setRunnerRunning(@DestinationVariable String battleId, Authentication auth) {
         final String memberId = auth.getName();
         battleService.setRunnerRunning(battleId, memberId);
     }
 
-    @MessageMapping("/battle/{battleId}/record")
+    @MessageMapping("/battles/{battleId}/record")
     public void calculateDistance(
             @DestinationVariable String battleId,
             Authentication auth,
@@ -38,6 +38,6 @@ public class BattleWebsocketController {
         final RunnerDistanceResponse response =
                 battleService.calculateDistance(battleId, runnerId, request);
 
-        messagingTemplate.convertAndSend("/topic/battle/" + battleId, response);
+        messagingTemplate.convertAndSend("/topic/battles/" + battleId, response);
     }
 }

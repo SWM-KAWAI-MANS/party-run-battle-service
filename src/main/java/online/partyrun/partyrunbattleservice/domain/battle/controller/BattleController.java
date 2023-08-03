@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("battle")
+@RequestMapping("battles")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleController {
 
@@ -29,7 +29,7 @@ public class BattleController {
         return battleService.createBattle(request);
     }
 
-    @GetMapping("ready")
+    @GetMapping("join")
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getReadyBattle(Authentication auth) {
         return battleService.getReadyBattle(auth.getName());

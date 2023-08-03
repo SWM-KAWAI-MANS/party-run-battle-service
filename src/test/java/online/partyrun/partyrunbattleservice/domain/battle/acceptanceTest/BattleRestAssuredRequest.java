@@ -10,7 +10,7 @@ import java.util.Map;
 
 public abstract class BattleRestAssuredRequest {
     private static final String PREFIX_URL = "api";
-    private static final String BATTLE_URL = "battle";
+    private static final String BATTLE_URL = "battles";
 
     public static ExtractableResponse<Response> 배틀_생성_요청(
             String systemToken, BattleCreateRequest request) {
@@ -20,9 +20,9 @@ public abstract class BattleRestAssuredRequest {
                 request);
     }
 
-    public static ExtractableResponse<Response> 준비_상태인_배틀_조회_요청(String accessToken) {
+    public static ExtractableResponse<Response> 참여_중인_배틀_조회_요청(String accessToken) {
         return SimpleRestAssured.get(
-                String.format("/%s/%s/ready", PREFIX_URL, BATTLE_URL),
+                String.format("/%s/%s/join", PREFIX_URL, BATTLE_URL),
                 Map.of("Authorization", accessToken));
     }
 }

@@ -42,8 +42,8 @@ import java.util.concurrent.TimeUnit;
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
-    private static final String TOPIC_BATTLE_PREFIX = "/topic/battle";
-    private static final String PUB_BATTLE_PREFIX = "/pub/battle";
+    private static final String TOPIC_BATTLE_PREFIX = "/topic/battles";
+    private static final String PUB_BATTLE_PREFIX = "/pub/battles";
 
     @Autowired WebSocketStompClient webSocketStompClient;
     @Autowired BattleRepository battleRepository;
@@ -74,7 +74,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
             return webSocketStompClient
                     .connectAsync(
-                            "ws://localhost:" + port + "/api/battle/ws",
+                            "ws://localhost:" + port + "/api/battles/connection",
                             headers,
                             new StompSessionHandlerAdapter() {})
                     .get(1, TimeUnit.SECONDS);
