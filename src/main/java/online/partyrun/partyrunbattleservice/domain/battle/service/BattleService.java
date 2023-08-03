@@ -103,6 +103,7 @@ public class BattleService {
                 battleId,
                 runnerId,
                 battle.getRunnerRecords(runnerId),
+                battle.getRunnerRecentRecord(runnerId),
                 battle.getRunnerStatus(runnerId));
 
         publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);

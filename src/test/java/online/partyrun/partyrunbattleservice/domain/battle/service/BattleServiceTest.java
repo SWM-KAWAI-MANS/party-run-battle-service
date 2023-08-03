@@ -183,7 +183,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(
-                                () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                        () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
@@ -321,6 +321,7 @@ class BattleServiceTest {
         @DisplayName("러너가 종료 상태라면 이벤트를 던진다.")
         void publishRunnerFinishEvent() {
             battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
             then(publisher).should(times(1)).publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
         }
     }
