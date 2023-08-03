@@ -1,26 +1,29 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static online.partyrun.partyrunbattleservice.acceptance.SimpleRestAssured.toObject;
+import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_생성_요청;
+import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.참여_중인_배틀_조회_요청;
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
-
-import static online.partyrun.partyrunbattleservice.acceptance.SimpleRestAssured.toObject;
-import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.배틀_생성_요청;
-import static online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest.BattleRestAssuredRequest.참여_중인_배틀_조회_요청;
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("BattleAcceptanceTest")
 public class BattleAcceptanceTest extends AcceptanceTest {
