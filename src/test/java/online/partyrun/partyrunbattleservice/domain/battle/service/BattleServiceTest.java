@@ -1,5 +1,15 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -13,6 +23,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,15 +34,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -183,7 +185,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(
-                        () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                                () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
@@ -273,9 +275,11 @@ class BattleServiceTest {
         GpsRequest GPS_REQUEST6 = new GpsRequest(0.006, 0.006, 0.006, now.plusSeconds(5));
         GpsRequest GPS_REQUEST7 = new GpsRequest(0.007, 0.007, 0.007, now.plusSeconds(6));
         RunnerRecordRequest RECORD_REQUEST1 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST0, GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+                new RunnerRecordRequest(
+                        List.of(GPS_REQUEST0, GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
         RunnerRecordRequest RECORD_REQUEST2 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6, GPS_REQUEST7));
+                new RunnerRecordRequest(
+                        List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6, GPS_REQUEST7));
         Runner 박성우 = new Runner("박성우");
         Battle 진행중인_배틀;
 
@@ -292,8 +296,7 @@ class BattleServiceTest {
         @DisplayName("기존에 기록이 존재하지 않으면 새로운 기록을 저장한다")
         void createNewRecord() {
             BattleWebSocketResponse response =
-                    battleService.calculateDistance(
-                            진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
             assertAll(
                     () -> assertThat(response.data().get("runnerId")).isEqualTo(박성우.getId()),
                     () -> assertThat((double) response.data().get("distance")).isPositive());
@@ -302,9 +305,12 @@ class BattleServiceTest {
         @Test
         @DisplayName("기존에 기록이 존재하면 이어서 저장한다")
         void createRecord() {
-            final BattleWebSocketResponse response1 = battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
-            final BattleWebSocketResponse response2 = battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
-            assertThat((double) response2.data().get("distance")).isGreaterThan((double) response1.data().get("distance"));
+            final BattleWebSocketResponse response1 =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
+            final BattleWebSocketResponse response2 =
+                    battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
+            assertThat((double) response2.data().get("distance"))
+                    .isGreaterThan((double) response1.data().get("distance"));
         }
 
         @Test
@@ -322,7 +328,9 @@ class BattleServiceTest {
         void publishRunnerFinishEvent() {
             battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
             battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
-            then(publisher).should(times(1)).publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
+            then(publisher)
+                    .should(times(1))
+                    .publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
         }
     }
 }

@@ -1,5 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -12,6 +18,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -31,11 +38,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
@@ -81,15 +83,15 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private void 구독_요청(StompSession session, BlockingQueue<BattleWebSocketResponse> queue, Battle battle) {
+    private void 구독_요청(
+            StompSession session, BlockingQueue<BattleWebSocketResponse> queue, Battle battle) {
         session.subscribe(
                 String.format("%s/%s", TOPIC_BATTLE_PREFIX, battle.getId()),
                 new StompFrameHandlerImpl(queue));
     }
 
     private void 준비완료_요청(StompSession 박성우_Session) {
-        박성우_Session.send(
-                String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+        박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
     }
 
     @BeforeEach
@@ -111,7 +113,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         박성우_Queue = new LinkedBlockingDeque<>();
         박현준_Queue = new LinkedBlockingDeque<>();
         노준혁_Queue = new LinkedBlockingDeque<>();
-
     }
 
     @Nested
@@ -120,6 +121,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
         Runner 박성우 = 러너_생성(멤버_박성우);
         String accessToken = 토큰_생성(박성우);
+
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 정상적인_러너가_요청한다면 {
@@ -138,6 +140,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         class 비정상적인_러너가_요청한다면 {
 
             String invalidAccessToken = "invalid.access.token";
+
             @Test
             @DisplayName("연결에 실패한다.")
             void failToConnection() {
@@ -175,11 +178,16 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
 
                 assertAll(
-                        () -> assertThat(박성우_response)
-                                .isEqualTo(박현준_response)
-                                .isEqualTo(노준혁_response),
-                        () -> assertThat(박성우_response.data().get("startTime")).isEqualTo(LocalDateTime.now(clock).plusSeconds(5).toString())
-                );
+                        () ->
+                                assertThat(박성우_response)
+                                        .isEqualTo(박현준_response)
+                                        .isEqualTo(노준혁_response),
+                        () ->
+                                assertThat(박성우_response.data().get("startTime"))
+                                        .isEqualTo(
+                                                LocalDateTime.now(clock)
+                                                        .plusSeconds(5)
+                                                        .toString()));
             }
         }
 
@@ -297,14 +305,43 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
                 BattleWebSocketResponse 노준혁_response4 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
 
-                final List<BattleWebSocketResponse> responses = List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
+                final List<BattleWebSocketResponse> responses =
+                        List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
                 Assertions.assertAll(
-                        () -> assertThat(responses)
-                                .containsAll(List.of(노준혁_response1, 노준혁_response2, 노준혁_response3, 노준혁_response4))
-                                .containsAll(List.of(박현준_response1, 박현준_response2, 박현준_response3, 박현준_response4)),
-                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.type().equals("BATTLE_RUNNING"))).hasSize(3),
-                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.type().equals("RUNNER_FINISHED"))).hasSize(1)
-                );
+                        () ->
+                                assertThat(responses)
+                                        .containsAll(
+                                                List.of(
+                                                        노준혁_response1,
+                                                        노준혁_response2,
+                                                        노준혁_response3,
+                                                        노준혁_response4))
+                                        .containsAll(
+                                                List.of(
+                                                        박현준_response1,
+                                                        박현준_response2,
+                                                        박현준_response3,
+                                                        박현준_response4)),
+                        () ->
+                                assertThat(
+                                                responses.stream()
+                                                        .filter(
+                                                                battleWebSocketResponse ->
+                                                                        battleWebSocketResponse
+                                                                                .type()
+                                                                                .equals(
+                                                                                        "BATTLE_RUNNING")))
+                                        .hasSize(3),
+                        () ->
+                                assertThat(
+                                                responses.stream()
+                                                        .filter(
+                                                                battleWebSocketResponse ->
+                                                                        battleWebSocketResponse
+                                                                                .type()
+                                                                                .equals(
+                                                                                        "RUNNER_FINISHED")))
+                                        .hasSize(1));
             }
         }
     }

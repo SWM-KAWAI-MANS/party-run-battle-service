@@ -107,7 +107,8 @@ public class BattleService {
                 battle.getRunnerStatus(runnerId));
 
         publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
-        return BattleWebSocketResponse.createRunnerDistance(runnerId, battle.getRunnerRecentDistance(runnerId));
+        return BattleWebSocketResponse.createRunnerDistance(
+                runnerId, battle.getRunnerRecentDistance(runnerId));
     }
 
     private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {

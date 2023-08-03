@@ -9,7 +9,8 @@ public record BattleWebSocketResponse(String type, Map<String, Object> data) {
     }
 
     public static BattleWebSocketResponse createRunnerDistance(String runnerId, double distance) {
-        return new BattleWebSocketResponse("BATTLE_RUNNING", Map.of("runnerId", runnerId, "distance", distance));
+        return new BattleWebSocketResponse(
+                "BATTLE_RUNNING", Map.of("runnerId", runnerId, "distance", distance));
     }
 
     public static BattleWebSocketResponse createRunnerFinished(String runnerId) {

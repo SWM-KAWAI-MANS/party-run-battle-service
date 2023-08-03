@@ -24,9 +24,8 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
 
     @Query(value = "{'id': ?0, 'runners.id': ?1}")
     @Update(
-            "{'$push': {'runners.$.runnerRecords': {'$each': ?2}}, " +
-                    "'$set' :  {'runners.$.recentRunnerRecord': ?3, 'runners.$.status': ?4}}"
-    )
+            "{'$push': {'runners.$.runnerRecords': {'$each': ?2}}, "
+                    + "'$set' :  {'runners.$.recentRunnerRecord': ?3, 'runners.$.status': ?4}}")
     void addRunnerRecordsAndUpdateRunnerStatus(
             String battleId,
             String runnerId,
