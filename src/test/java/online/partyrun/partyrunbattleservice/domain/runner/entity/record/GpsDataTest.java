@@ -1,15 +1,15 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
-
+import online.partyrun.partyrunbattleservice.domain.runner.exception.PastGpsDataTimeException;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("GpsData")
 class GpsDataTest {
@@ -27,6 +27,13 @@ class GpsDataTest {
         void throwNullException() {
             assertThatThrownBy(() -> GPSDATA_0.calculateDistance(null))
                     .isInstanceOf(InvalidGpsDataException.class);
+        }
+
+        @Test
+        @DisplayName("과거 시간의 데이터와 비교시 예외를 던진다.")
+        void throwPastDataException() {
+            assertThatThrownBy(() -> GPSDATA_1.calculateDistance(GPSDATA_0))
+                    .isInstanceOf(PastGpsDataTimeException.class);
         }
 
         @Test
