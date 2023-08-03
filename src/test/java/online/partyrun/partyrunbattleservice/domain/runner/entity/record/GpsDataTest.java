@@ -1,14 +1,15 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
-import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
-import org.junit.jupiter.api.*;
-
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
+import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+
+import org.junit.jupiter.api.*;
+
+import java.time.LocalDateTime;
 
 @DisplayName("GpsData")
 class GpsDataTest {
