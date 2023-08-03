@@ -10,6 +10,10 @@ spring:
   profiles:
     active: test
 
+  data:
+    redis:
+      port: 6379
+      
 logging:
   level:
     org:
@@ -33,6 +37,8 @@ spring:
   data:
     mongodb:
       uri: ${DB_URI}
+    redis:
+      url: ${REDIS_URL}
 jwt:
   access-secret-key: ${JWT_ACCESS_SECRET_KEY}
   access-expire-second: ${JWT_ACCESS_EXPIRE_LENGTH}

@@ -3,7 +3,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -17,7 +16,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
-
+import online.partyrun.partyrunbattleservice.global.annotation.DistributedLock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -95,6 +94,7 @@ public class BattleService {
         return new BattleStartedResponse(battle.getStartTime());
     }
 
+    @DistributedLock(key = "#battleId.concat('-').concat(#runnerId)")
     public RunnerDistanceResponse calculateDistance(
             String battleId, String runnerId, RunnerRecordRequest request) {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
