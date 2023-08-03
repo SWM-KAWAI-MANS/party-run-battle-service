@@ -1,28 +1,27 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleWebSocketResponse;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.BlockingQueue;
 
-public class StompFrameHandlerImpl<T> implements StompFrameHandler {
+public class StompFrameHandlerImpl implements StompFrameHandler {
 
-    private final Class<T> response;
-    private final BlockingQueue<T> responses;
+    private final BlockingQueue<BattleWebSocketResponse> responses;
 
-    public StompFrameHandlerImpl(final Class<T> response, final BlockingQueue<T> responses) {
-        this.response = response;
+    public StompFrameHandlerImpl(final BlockingQueue<BattleWebSocketResponse> responses) {
         this.responses = responses;
     }
 
     @Override
     public Type getPayloadType(final StompHeaders headers) {
-        return response;
+        return BattleWebSocketResponse.class;
     }
 
     @Override
     public void handleFrame(final StompHeaders headers, final Object payload) {
-        responses.offer((T) payload);
+        responses.offer((BattleWebSocketResponse) payload);
     }
 }

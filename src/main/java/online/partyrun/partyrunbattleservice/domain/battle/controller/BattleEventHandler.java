@@ -4,13 +4,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleStartTimeResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerFinishedResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleWebSocketResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -27,13 +24,13 @@ public class BattleEventHandler {
 
     @EventListener
     public void setBattleRunning(BattleRunningEvent event) {
-        final BattleStartTimeResponse response = battleService.start(event.battleId());
+        final BattleWebSocketResponse response = battleService.start(event.battleId());
         messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
     }
 
     @EventListener
     public void publishRunnerFinished(RunnerFinishedEvent event) {
-        final RunnerFinishedResponse response = new RunnerFinishedResponse(event.runnerId());
+        final BattleWebSocketResponse response = BattleWebSocketResponse.createRunnerFinished(event.runnerId());
         messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
     }
 }
