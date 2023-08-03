@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.PastGpsDataTimeException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -38,12 +38,19 @@ public class GpsData implements Comparable<GpsData> {
 
     public double calculateDistance(GpsData other) {
         validateNull(other);
+        validateIsBeforeData(other.time);
         return this.location.calculateDistance(other.location, new HaversineDistanceCalculator());
     }
 
     private void validateNull(GpsData other) {
         if (Objects.isNull(other)) {
             throw new InvalidGpsDataException();
+        }
+    }
+
+    private void validateIsBeforeData(LocalDateTime time) {
+        if (this.time.isAfter(time)) {
+            throw new PastGpsDataTimeException(this.time, time);
         }
     }
 
