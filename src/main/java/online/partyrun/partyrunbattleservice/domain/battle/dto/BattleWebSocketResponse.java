@@ -14,5 +14,4 @@ public class BattleWebSocketResponse {
 
     String type;
     Map<String, Object> data;
-
 }

@@ -107,7 +107,7 @@ public class BattleService {
                 battle.getRunnerStatus(runnerId));
 
         publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
-        return new  RunnerDistanceResponse(runnerId, battle.getRunnerRecentDistance(runnerId));
+        return new RunnerDistanceResponse(runnerId, battle.getRunnerRecentDistance(runnerId));
     }
 
     private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {
