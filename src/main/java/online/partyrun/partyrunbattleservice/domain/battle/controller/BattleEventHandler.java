@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleWebSocketResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerFinishedResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.event.RunnerFinishedEvent;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
@@ -28,8 +29,7 @@ public class BattleEventHandler {
 
     @EventListener
     public void publishRunnerFinished(RunnerFinishedEvent event) {
-        final BattleWebSocketResponse response =
-                BattleWebSocketResponse.createRunnerFinished(event.runnerId());
+        final RunnerFinishedResponse response = new RunnerFinishedResponse(event.runnerId());
         messagingTemplate.convertAndSend("/topic/battle/" + event.battleId(), response);
     }
 }

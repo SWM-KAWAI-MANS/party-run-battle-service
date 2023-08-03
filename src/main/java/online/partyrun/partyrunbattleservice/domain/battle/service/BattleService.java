@@ -83,17 +83,17 @@ public class BattleService {
         }
     }
 
-    public BattleWebSocketResponse start(String battleId) {
+    public BattleStartedResponse start(String battleId) {
         final Battle battle = findBattle(battleId);
         final LocalDateTime now = LocalDateTime.now(clock);
         battle.setStartTime(now);
 
         battleRepository.save(battle);
 
-        return BattleWebSocketResponse.createBattleStarted(battle.getStartTime());
+        return new BattleStartedResponse(battle.getStartTime());
     }
 
-    public BattleWebSocketResponse calculateDistance(
+    public RunnerDistanceResponse calculateDistance(
             String battleId, String runnerId, RunnerRecordRequest request) {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
 
@@ -107,8 +107,7 @@ public class BattleService {
                 battle.getRunnerStatus(runnerId));
 
         publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
-        return BattleWebSocketResponse.createRunnerDistance(
-                runnerId, battle.getRunnerRecentDistance(runnerId));
+        return new  RunnerDistanceResponse(runnerId, battle.getRunnerRecentDistance(runnerId));
     }
 
     private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {

@@ -1,19 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.battle.dto;
 
-import java.time.LocalDateTime;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.util.Map;
 
-public record BattleWebSocketResponse(String type, Map<String, Object> data) {
-    public static BattleWebSocketResponse createBattleStarted(LocalDateTime startTime) {
-        return new BattleWebSocketResponse("BATTLE_START", Map.of("startTime", startTime));
-    }
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class BattleWebSocketResponse {
 
-    public static BattleWebSocketResponse createRunnerDistance(String runnerId, double distance) {
-        return new BattleWebSocketResponse(
-                "BATTLE_RUNNING", Map.of("runnerId", runnerId, "distance", distance));
-    }
+    String type;
+    Map<String, Object> data;
 
-    public static BattleWebSocketResponse createRunnerFinished(String runnerId) {
-        return new BattleWebSocketResponse("RUNNER_FINISHED", Map.of("runnerId", runnerId));
-    }
 }

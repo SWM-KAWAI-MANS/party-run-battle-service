@@ -1,15 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -23,7 +13,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +23,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
@@ -240,10 +238,10 @@ class BattleServiceTest {
             @Test
             @DisplayName("시작 시간을 설정한다.")
             void changeBattleStatus() {
-                final BattleWebSocketResponse response = battleService.start(배틀.getId());
+                final BattleStartedResponse response = battleService.start(배틀.getId());
                 final LocalDateTime startTime = LocalDateTime.now(clock).plusSeconds(5);
 
-                assertThat((LocalDateTime) response.data().get("startTime")).isEqualTo(startTime);
+                assertThat((LocalDateTime) response.getData().get("startTime")).isEqualTo(startTime);
             }
         }
 
@@ -295,22 +293,22 @@ class BattleServiceTest {
         @Test
         @DisplayName("기존에 기록이 존재하지 않으면 새로운 기록을 저장한다")
         void createNewRecord() {
-            BattleWebSocketResponse response =
+            RunnerDistanceResponse response =
                     battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
             assertAll(
-                    () -> assertThat(response.data().get("runnerId")).isEqualTo(박성우.getId()),
-                    () -> assertThat((double) response.data().get("distance")).isPositive());
+                    () -> assertThat(response.getData().get("runnerId")).isEqualTo(박성우.getId()),
+                    () -> assertThat((double) response.getData().get("distance")).isPositive());
         }
 
         @Test
         @DisplayName("기존에 기록이 존재하면 이어서 저장한다")
         void createRecord() {
-            final BattleWebSocketResponse response1 =
+            final RunnerDistanceResponse response1 =
                     battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
-            final BattleWebSocketResponse response2 =
+            final RunnerDistanceResponse response2 =
                     battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST2);
-            assertThat((double) response2.data().get("distance"))
-                    .isGreaterThan((double) response1.data().get("distance"));
+            assertThat((double) response2.getData().get("distance"))
+                    .isGreaterThan((double) response1.getData().get("distance"));
         }
 
         @Test

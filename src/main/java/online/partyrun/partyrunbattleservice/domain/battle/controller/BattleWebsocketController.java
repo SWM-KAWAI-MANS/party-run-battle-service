@@ -1,15 +1,12 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
 import jakarta.validation.Valid;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleWebSocketResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerDistanceResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.RunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
-
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -35,8 +32,7 @@ public class BattleWebsocketController {
             Authentication auth,
             @Valid RunnerRecordRequest request) {
         final String runnerId = auth.getName();
-        final BattleWebSocketResponse response =
-                battleService.calculateDistance(battleId, runnerId, request);
+        final RunnerDistanceResponse response = battleService.calculateDistance(battleId, runnerId, request);
 
         messagingTemplate.convertAndSend("/topic/battle/" + battleId, response);
     }
