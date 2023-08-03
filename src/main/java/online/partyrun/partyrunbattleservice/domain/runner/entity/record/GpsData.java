@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 
 import java.time.LocalDateTime;
@@ -21,7 +21,14 @@ public class GpsData implements Comparable<GpsData> {
 
     public static GpsData of(
             double longitude, double latitude, double altitude, LocalDateTime time) {
+        validateTime(time);
         return new GpsData(Location.of(longitude, latitude, altitude), time);
+    }
+
+    private static void validateTime(LocalDateTime time) {
+        if (Objects.isNull(time)) {
+            throw new GpsTimeNullException();
+        }
     }
 
     public boolean isBefore(LocalDateTime time) {
