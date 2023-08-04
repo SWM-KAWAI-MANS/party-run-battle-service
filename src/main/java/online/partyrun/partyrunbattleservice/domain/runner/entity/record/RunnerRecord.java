@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.IllegalRecordDistanceException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -51,5 +52,9 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
     @Override
     public int compareTo(RunnerRecord o) {
         return this.gpsData.compareTo(o.gpsData);
+    }
+
+    public LocalDateTime getTime() {
+        return this.gpsData.getTime();
     }
 }

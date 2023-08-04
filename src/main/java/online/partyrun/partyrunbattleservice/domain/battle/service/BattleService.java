@@ -3,7 +3,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -13,16 +12,18 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -129,6 +130,31 @@ public class BattleService {
     }
 
     public FinishedBattleResponse getFinishedBattle(String battleId, String runnerId) {
-        throw new UnsupportedOperationException();
+        final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
+        final List<Runner> runners = battle.getRunners();
+
+        return new FinishedBattleResponse(battle.getTargetDistance(), battle.getStartTime(), toFinishedRunnerResponses(runners));
+    }
+
+    private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
+        final List<Runner> copiedRunner = new ArrayList<>(runners);
+        Collections.sort(copiedRunner);
+
+        final List<FinishedRunnerResponse> result = new ArrayList<>();
+
+        int rank = 1;
+        for (Runner runner : copiedRunner) {
+            if (runner.isFinished()) {
+                FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank);
+                result.add(response);
+                rank++;
+            }
+        }
+
+        return result;
+    }
+
+    private FinishedRunnerResponse toFinishedRunnerResponse(Runner runner, int rank) {
+        return new FinishedRunnerResponse(runner.getId(), rank, runner.getEndTime());
     }
 }

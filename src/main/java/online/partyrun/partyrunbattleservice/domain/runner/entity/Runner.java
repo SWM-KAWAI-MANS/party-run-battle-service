@@ -9,6 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Runner {
+public class Runner implements Comparable<Runner> {
     private static final int DEFAULT_DISTANCE = 0;
     private static final int FIRST_GPSDATA = 0;
 
@@ -112,5 +113,21 @@ public class Runner {
         validateIsNotRunningStatus();
 
         this.status = RunnerStatus.FINISHED;
+    }
+
+    public LocalDateTime getEndTime() {
+        validateIsFinishedStatus();
+        return this.recentRunnerRecord.getTime();
+    }
+
+    private void validateIsFinishedStatus() {
+        if (!isFinished()) {
+            throw new RunnerIsNotFinisedException(this.id);
+        }
+    }
+
+    @Override
+    public int compareTo(Runner o) {
+        return this.recentRunnerRecord.compareTo(o.recentRunnerRecord);
     }
 }
