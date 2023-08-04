@@ -1,19 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerTest;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,8 +18,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BattleController.class)
 @DisplayName("BattleController")
@@ -153,6 +155,35 @@ class BattleControllerTest extends RestControllerTest {
 
                 setPrintDocs(actions, "battle not found");
             }
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀_결과를_조회할_때 {
+
+        @Test
+        @DisplayName("러너들의 결과를 반환한다.")
+        void getFinishedBattle() throws Exception {
+            String battleId = "battleId";
+            LocalDateTime now = LocalDateTime.now();
+            given(battleService.getFinishedBattle(battleId, "defaultUser"))
+                    .willReturn(new FinishedBattleResponse(1000, now.minusMinutes(5),
+                            List.of(new FinishedRunnerResponse("parkseongwoo", 1, now),new FinishedRunnerResponse("nojunhyuk", 2, now.plusMinutes(1))))
+                    );
+
+            final ResultActions actions =
+                    mockMvc.perform(
+                            get(String.format("%s/%s/finished", BATTLE_URL, battleId))
+                                    .header(
+                                            "Authorization",
+                                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .characterEncoding(StandardCharsets.UTF_8));
+
+            actions.andExpect(status().isOk());
+
+            setPrintDocs(actions, "get finished battle");
         }
     }
 }
