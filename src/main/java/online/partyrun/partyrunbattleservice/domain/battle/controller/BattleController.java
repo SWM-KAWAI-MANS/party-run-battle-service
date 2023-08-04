@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.controller;
 import jakarta.validation.Valid;
 
 import lombok.AccessLevel;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
@@ -39,6 +40,7 @@ public class BattleController {
         return battleService.getReadyBattle(auth.getName());
     }
 
+    @Generated
     @GetMapping("clock")
     @ResponseStatus(HttpStatus.OK)
     public LocalDateTime returnClock() {
