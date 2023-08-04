@@ -127,4 +127,8 @@ public class BattleService {
     private List<GpsData> createGpsData(RunnerRecordRequest request) {
         return request.record().stream().map(GpsRequest::toEntity).toList();
     }
+
+    public FinishedBattleResponse getFinishedBattle(String battleId, String runnerId) {
+        throw new UnsupportedOperationException();
+    }
 }
