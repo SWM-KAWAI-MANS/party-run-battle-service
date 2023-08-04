@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.PastGpsDataTimeException;
 
 import org.junit.jupiter.api.*;
 
@@ -27,6 +28,13 @@ class GpsDataTest {
         void throwNullException() {
             assertThatThrownBy(() -> GPSDATA_0.calculateDistance(null))
                     .isInstanceOf(InvalidGpsDataException.class);
+        }
+
+        @Test
+        @DisplayName("과거 시간의 데이터와 비교시 예외를 던진다.")
+        void throwPastDataException() {
+            assertThatThrownBy(() -> GPSDATA_1.calculateDistance(GPSDATA_0))
+                    .isInstanceOf(PastGpsDataTimeException.class);
         }
 
         @Test
