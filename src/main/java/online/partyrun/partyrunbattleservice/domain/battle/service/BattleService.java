@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -137,18 +136,17 @@ public class BattleService {
     }
 
     private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
-        final List<Runner> copiedRunner = new ArrayList<>(runners);
-        Collections.sort(copiedRunner);
+        final List<Runner> finishedRunners = runners.stream()
+                .filter(Runner::isFinished)
+                .sorted()
+                .toList();
 
         final List<FinishedRunnerResponse> result = new ArrayList<>();
 
         int rank = 1;
-        for (Runner runner : copiedRunner) {
-            if (runner.isFinished()) {
-                FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank);
-                result.add(response);
-                rank++;
-            }
+        for (Runner runner : finishedRunners) {
+            FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank++);
+            result.add(response);
         }
 
         return result;
