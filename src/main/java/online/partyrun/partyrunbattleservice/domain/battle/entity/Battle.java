@@ -14,7 +14,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsD
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
@@ -32,13 +31,21 @@ public class Battle {
     int targetDistance;
     List<Runner> runners;
     LocalDateTime startTime;
-    @CreatedDate LocalDateTime createdAt;
+    LocalDateTime createdAt;
 
-    public Battle(int targetDistance, List<Runner> runners) {
+    public Battle(int targetDistance, List<Runner> runners, LocalDateTime createdAt) {
         validateDistance(targetDistance);
         validateRunners(runners);
+        validateCreatedAt(createdAt);
         this.targetDistance = targetDistance;
         this.runners = runners;
+        this.createdAt = createdAt;
+    }
+
+    private void validateCreatedAt(LocalDateTime createdAt) {
+        if (Objects.isNull(createdAt)) {
+            throw new InvalidBattleCreatedAtException();
+        }
     }
 
     private void validateDistance(int distance) {

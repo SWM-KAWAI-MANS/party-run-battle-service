@@ -3,7 +3,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.controller;
 import jakarta.validation.Valid;
 
 import lombok.AccessLevel;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
@@ -15,9 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("battles")
@@ -25,7 +21,6 @@ import java.time.LocalDateTime;
 public class BattleController {
 
     BattleService battleService;
-    Clock clock;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,12 +33,5 @@ public class BattleController {
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getReadyBattle(Authentication auth) {
         return battleService.getReadyBattle(auth.getName());
-    }
-
-    @Generated
-    @GetMapping("clock")
-    @ResponseStatus(HttpStatus.OK)
-    public LocalDateTime returnClock() {
-        return LocalDateTime.now(clock);
     }
 }

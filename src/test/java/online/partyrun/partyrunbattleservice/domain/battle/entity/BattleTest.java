@@ -2,10 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
 import static org.assertj.core.api.Assertions.*;
 
-import online.partyrun.partyrunbattleservice.domain.battle.exception.AllRunnersAreNotRunningStatusException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.BattleNotStartedException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidDistanceException;
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidRunnerNumberInBattleException;
+import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
@@ -28,6 +25,7 @@ class BattleTest {
     Runner 노준혁;
     Runner 박현준;
     Battle 배틀;
+    LocalDateTime now = LocalDateTime.now();
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -50,7 +48,8 @@ class BattleTest {
             @Test
             @DisplayName("배틀을 생성한다.")
             void createBattle() {
-                assertThatCode(() -> new Battle(distance, runnerList)).doesNotThrowAnyException();
+                assertThatCode(() -> new Battle(distance, runnerList, now))
+                        .doesNotThrowAnyException();
             }
         }
 
@@ -62,7 +61,7 @@ class BattleTest {
             @ValueSource(ints = {-1, 0})
             @DisplayName("예외를 던진다.")
             void throwException(int distance) {
-                assertThatThrownBy(() -> new Battle(distance, runnerList))
+                assertThatThrownBy(() -> new Battle(distance, runnerList, now))
                         .isInstanceOf(InvalidDistanceException.class);
             }
         }
@@ -75,8 +74,20 @@ class BattleTest {
             @NullAndEmptySource
             @DisplayName("예외를 던진다.")
             void throwException(List<Runner> runners) {
-                assertThatThrownBy(() -> new Battle(distance, runners))
+                assertThatThrownBy(() -> new Battle(distance, runners, now))
                         .isInstanceOf(InvalidRunnerNumberInBattleException.class);
+            }
+        }
+
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 생성시간이_없다면 {
+
+            @Test
+            @DisplayName("예외를 던진다.")
+            void throwException() {
+                assertThatThrownBy(() -> new Battle(distance, runnerList, null))
+                        .isInstanceOf(InvalidBattleCreatedAtException.class);
             }
         }
     }
@@ -90,7 +101,7 @@ class BattleTest {
             박성우 = new Runner("박성우");
             노준혁 = new Runner("노준혁");
             박현준 = new Runner("박현준");
-            배틀 = new Battle(1000, List.of(박성우, 박현준));
+            배틀 = new Battle(1000, List.of(박성우, 박현준), now);
         }
 
         @Test
@@ -120,7 +131,7 @@ class BattleTest {
         @BeforeEach
         void setUp() {
             박성우 = new Runner("박성우");
-            배틀 = new Battle(1000, List.of(박성우));
+            배틀 = new Battle(1000, List.of(박성우), now);
         }
 
         @Test
@@ -153,7 +164,7 @@ class BattleTest {
         @BeforeEach
         void setUp() {
             박성우 = new Runner("박성우");
-            배틀 = new Battle(1000, List.of(박성우));
+            배틀 = new Battle(1000, List.of(박성우), now);
         }
 
         @Test
@@ -198,7 +209,7 @@ class BattleTest {
         void setUp() {
             박성우 = new Runner("박성우");
             박현준 = new Runner("박현준");
-            배틀 = new Battle(1000, List.of(박성우, 박현준));
+            배틀 = new Battle(1000, List.of(박성우, 박현준), now);
         }
 
         @Nested
@@ -238,7 +249,7 @@ class BattleTest {
         @BeforeEach
         void setUp() {
             박성우 = new Runner("박성우");
-            배틀 = new Battle(1000, List.of(박성우));
+            배틀 = new Battle(1000, List.of(박성우), now);
 
             박성우.changeRunningStatus();
 
@@ -249,7 +260,7 @@ class BattleTest {
         @Test
         @DisplayName("배틀이 시작하지 않았으면 예외를 던진다.")
         void throwNotStartedException() {
-            Battle notStartedBattle = new Battle(1000, List.of(박성우));
+            Battle notStartedBattle = new Battle(1000, List.of(박성우), now);
             assertThatThrownBy(() -> notStartedBattle.addRecords(박성우.getId(), List.of()))
                     .isInstanceOf(BattleNotStartedException.class);
         }
@@ -293,7 +304,7 @@ class BattleTest {
         @BeforeEach
         void setUp() {
             박성우 = new Runner("박성우");
-            배틀 = new Battle(1000, List.of(박성우));
+            배틀 = new Battle(1000, List.of(박성우), now);
         }
 
         @Test
@@ -312,7 +323,7 @@ class BattleTest {
         @BeforeEach
         void setUp() {
             박성우 = new Runner("박성우");
-            배틀 = new Battle(1000, List.of(박성우));
+            배틀 = new Battle(1000, List.of(박성우), now);
 
             박성우.changeRunningStatus();
 

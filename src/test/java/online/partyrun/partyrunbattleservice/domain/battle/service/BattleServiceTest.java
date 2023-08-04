@@ -46,6 +46,12 @@ class BattleServiceTest {
     @Autowired MongoTemplate mongoTemplate;
     @Autowired ApplicationEventPublisher publisher;
     @Autowired Clock clock;
+    LocalDateTime now;
+
+    @BeforeEach
+    void setUpNow() {
+        now = LocalDateTime.now(clock);
+    }
 
     @AfterEach
     void setUp() {
@@ -151,9 +157,17 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_RUNNING으로_변경할_때 {
-        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁)));
+
+        Runner 박성우;
+        Runner 노준혁;
+        Battle 배틀;
+
+        @BeforeEach
+        void setUp() {
+            박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+            노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
+        }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -227,7 +241,7 @@ class BattleServiceTest {
         void setUp() {
             박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
             노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-            Battle battle = new Battle(1000, List.of(박성우, 노준혁));
+            Battle battle = new Battle(1000, List.of(박성우, 노준혁), now);
             박성우.changeRunningStatus();
             노준혁.changeRunningStatus();
             배틀 = battleRepository.save(battle);
@@ -286,7 +300,7 @@ class BattleServiceTest {
 
         @BeforeEach
         void setUp() {
-            Battle 배틀 = new Battle(1000, List.of(박성우));
+            Battle 배틀 = new Battle(1000, List.of(박성우), now);
             배틀.changeRunnerRunningStatus(박성우.getId());
             배틀.setStartTime(now.minusMinutes(1));
 

@@ -108,7 +108,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         박현준_Session = 웹소켓_연결(박현준_accessToken);
         노준혁_Session = 웹소켓_연결(노준혁_accessToken);
 
-        배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준, 노준혁)));
+        배틀 =
+                battleRepository.save(
+                        new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now(clock)));
 
         박성우_Queue = new LinkedBlockingDeque<>();
         박현준_Queue = new LinkedBlockingDeque<>();
