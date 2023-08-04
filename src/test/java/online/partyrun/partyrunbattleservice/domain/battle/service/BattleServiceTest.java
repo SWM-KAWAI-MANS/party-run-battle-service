@@ -1,5 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -14,6 +23,7 @@ import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepo
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,31 +35,17 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 @SpringBootTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
 class BattleServiceTest {
 
-    @Autowired
-    BattleService battleService;
-    @Autowired
-    BattleRepository battleRepository;
-    @Autowired
-    MemberRepository memberRepository;
-    @Autowired
-    MongoTemplate mongoTemplate;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    @Autowired
-    Clock clock;
+    @Autowired BattleService battleService;
+    @Autowired BattleRepository battleRepository;
+    @Autowired MemberRepository memberRepository;
+    @Autowired MongoTemplate mongoTemplate;
+    @Autowired ApplicationEventPublisher publisher;
+    @Autowired Clock clock;
     LocalDateTime now;
     Runner 박성우;
     Runner 노준혁;
@@ -85,7 +81,8 @@ class BattleServiceTest {
             @Test
             @DisplayName(" 생성된 배틀의 정보를 반환한다.")
             void returnBattle() {
-                BattleCreateRequest request = new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
+                BattleCreateRequest request =
+                        new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
 
                 final BattleResponse response = battleService.createBattle(request);
                 assertThat(response.id()).isNotNull();
@@ -99,7 +96,8 @@ class BattleServiceTest {
             @Test
             @DisplayName("예외를 던진다.")
             void throwExceptionsByAllRunner() {
-                BattleCreateRequest request = new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
+                BattleCreateRequest request =
+                        new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
 
                 battleService.createBattle(request);
 
@@ -116,14 +114,14 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwExceptionsByOneRunner() {
                 assertThatThrownBy(
-                        () ->
-                                battleService.createBattle(
-                                        new BattleCreateRequest(
-                                                1000,
-                                                List.of(
-                                                        박성우.getId(),
-                                                        장세연.getId(),
-                                                        이승열.getId()))))
+                                () ->
+                                        battleService.createBattle(
+                                                new BattleCreateRequest(
+                                                        1000,
+                                                        List.of(
+                                                                박성우.getId(),
+                                                                장세연.getId(),
+                                                                이승열.getId()))))
                         .isInstanceOf(RunnerAlreadyRunningInBattleException.class);
             }
         }
@@ -172,12 +170,12 @@ class BattleServiceTest {
                 battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
 
                 assertThat(
-                        battleRepository
-                                .findById(배틀.getId())
-                                .orElseThrow()
-                                .getRunners()
-                                .get(0)
-                                .getStatus())
+                                battleRepository
+                                        .findById(배틀.getId())
+                                        .orElseThrow()
+                                        .getRunners()
+                                        .get(0)
+                                        .getStatus())
                         .isEqualTo(RunnerStatus.RUNNING);
             }
         }
@@ -192,7 +190,7 @@ class BattleServiceTest {
             @DisplayName("예외를 던진다.")
             void throwException() {
                 assertThatThrownBy(
-                        () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
+                                () -> battleService.setRunnerRunning(invalidBattleId, 박성우.getId()))
                         .isInstanceOf(BattleNotFoundException.class);
             }
         }
@@ -319,9 +317,9 @@ class BattleServiceTest {
         @DisplayName("배틀을 조회하지 못하면 예외를 던진다.")
         void throwException() {
             assertThatThrownBy(
-                    () ->
-                            battleService.calculateDistance(
-                                    "invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
+                            () ->
+                                    battleService.calculateDistance(
+                                            "invalidBattleId", 박성우.getId(), RECORD_REQUEST1))
                     .isInstanceOf(BattleNotFoundException.class);
         }
 
@@ -361,8 +359,10 @@ class BattleServiceTest {
         @Test
         @DisplayName("종료되지 않은 러너의 결과는 반환하지 않는다.")
         void returnOnlyFinishedRunnerResult() {
-            FinishedBattleResponse response = battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
-            assertThat(response.runners()).extracting("id", "rank")
+            FinishedBattleResponse response =
+                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            assertThat(response.runners())
+                    .extracting("id", "rank")
                     .containsExactly(tuple(박성우.getId(), 1));
         }
 
@@ -372,8 +372,10 @@ class BattleServiceTest {
             배틀.addRecords(노준혁.getId(), List.of(gpsData0, gpsData2));
             mongoTemplate.save(배틀);
 
-            FinishedBattleResponse response = battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
-            assertThat(response.runners()).extracting("id", "rank")
+            FinishedBattleResponse response =
+                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            assertThat(response.runners())
+                    .extracting("id", "rank")
                     .containsExactly(tuple(박성우.getId(), 1), tuple(노준혁.getId(), 2));
         }
     }

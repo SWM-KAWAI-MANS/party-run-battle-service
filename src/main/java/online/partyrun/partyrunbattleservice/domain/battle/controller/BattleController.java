@@ -38,7 +38,8 @@ public class BattleController {
 
     @GetMapping("{battleId}/finished")
     @ResponseStatus(HttpStatus.OK)
-    public FinishedBattleResponse getFinishedBattle(@PathVariable("battleId") String battleId, Authentication auth) {
+    public FinishedBattleResponse getFinishedBattle(
+            @PathVariable("battleId") String battleId, Authentication auth) {
         return battleService.getFinishedBattle(battleId, auth.getName());
     }
 }

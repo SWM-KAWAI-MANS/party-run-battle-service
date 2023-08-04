@@ -5,5 +5,5 @@ import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerRes
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record FinishedBattleResponse(double targetDistance, LocalDateTime startTime, List<FinishedRunnerResponse> runners) {
-}
+public record FinishedBattleResponse(
+        double targetDistance, LocalDateTime startTime, List<FinishedRunnerResponse> runners) {}

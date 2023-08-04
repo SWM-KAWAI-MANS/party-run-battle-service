@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -17,6 +18,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -132,14 +134,15 @@ public class BattleService {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
         final List<Runner> runners = battle.getRunners();
 
-        return new FinishedBattleResponse(battle.getTargetDistance(), battle.getStartTime(), toFinishedRunnerResponses(runners));
+        return new FinishedBattleResponse(
+                battle.getTargetDistance(),
+                battle.getStartTime(),
+                toFinishedRunnerResponses(runners));
     }
 
     private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
-        final List<Runner> finishedRunners = runners.stream()
-                .filter(Runner::isFinished)
-                .sorted()
-                .toList();
+        final List<Runner> finishedRunners =
+                runners.stream().filter(Runner::isFinished).sorted().toList();
 
         final List<FinishedRunnerResponse> result = new ArrayList<>();
 
