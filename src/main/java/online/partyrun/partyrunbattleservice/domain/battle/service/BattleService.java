@@ -42,7 +42,7 @@ public class BattleService {
         validateRunningRunner(runnerIds);
         final List<Runner> runners = runnerService.findAllById(runnerIds);
 
-        final Battle battle = battleRepository.save(new Battle(request.getDistance(), runners));
+        final Battle battle = battleRepository.save(new Battle(request.getDistance(), runners, LocalDateTime.now(clock)));
         return battleMapper.toResponse(battle);
     }
 
