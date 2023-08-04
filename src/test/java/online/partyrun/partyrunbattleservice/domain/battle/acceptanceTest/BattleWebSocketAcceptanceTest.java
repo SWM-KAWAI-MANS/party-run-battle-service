@@ -1,5 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -12,6 +18,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -31,11 +38,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
@@ -106,7 +108,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         박현준_Session = 웹소켓_연결(박현준_accessToken);
         노준혁_Session = 웹소켓_연결(노준혁_accessToken);
 
-        배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now(clock)));
+        배틀 =
+                battleRepository.save(
+                        new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now(clock)));
 
         박성우_Queue = new LinkedBlockingDeque<>();
         박현준_Queue = new LinkedBlockingDeque<>();

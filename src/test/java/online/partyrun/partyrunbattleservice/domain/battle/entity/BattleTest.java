@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.entity;
 
+import static org.assertj.core.api.Assertions.*;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -7,6 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -14,8 +17,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Battle")
 class BattleTest {
@@ -47,7 +48,8 @@ class BattleTest {
             @Test
             @DisplayName("배틀을 생성한다.")
             void createBattle() {
-                assertThatCode(() -> new Battle(distance, runnerList, now)).doesNotThrowAnyException();
+                assertThatCode(() -> new Battle(distance, runnerList, now))
+                        .doesNotThrowAnyException();
             }
         }
 

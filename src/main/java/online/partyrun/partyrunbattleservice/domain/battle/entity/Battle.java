@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -12,6 +13,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerR
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;

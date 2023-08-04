@@ -1,16 +1,17 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("BattleDao")
 @SpringBootTest
@@ -26,7 +27,9 @@ class BattleDaoTest {
         Runner 박성우 = new Runner("박성우");
         Runner 박현준 = new Runner("박현준");
         Runner 노준혁 = new Runner("노준혁");
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now()));
+        Battle 배틀 =
+                battleRepository.save(
+                        new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now()));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
