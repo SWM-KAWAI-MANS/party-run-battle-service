@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Runner implements Comparable<Runner> {
+public class Runner {
     private static final int DEFAULT_DISTANCE = 0;
     private static final int FIRST_GPSDATA = 0;
 
@@ -124,10 +124,5 @@ public class Runner implements Comparable<Runner> {
         if (!isFinished()) {
             throw new RunnerIsNotFinisedException(this.id);
         }
-    }
-
-    @Override
-    public int compareTo(Runner o) {
-        return this.recentRunnerRecord.compareTo(o.recentRunnerRecord);
     }
 }

@@ -1,21 +1,19 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotFinisedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotReadyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -250,45 +248,6 @@ class RunnerTest {
             박성우.changeFinishStatus();
 
             assertThat(박성우.getEndTime()).isEqualTo(now.plusSeconds(1));
-        }
-    }
-
-    @Nested
-    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너들_끼리_비교를_할_때 {
-
-        Runner 노준혁;
-
-        @BeforeEach
-        void setUp() {
-            LocalDateTime now = LocalDateTime.now();
-
-            박성우.changeRunningStatus();
-            GpsData GPSDATA_1 = GpsData.of(1, 1, 1, now);
-
-            박성우.addRecords(List.of(GPSDATA_1));
-
-            노준혁 = new Runner("노준혁");
-            노준혁.changeRunningStatus();
-            GpsData GPSDATA_2 = GpsData.of(2, 2, 2, now.plusSeconds(1));
-
-            노준혁.addRecords(List.of(GPSDATA_2));
-        }
-
-        @Test
-        @DisplayName("최근 기록이 더 이전일 수록 작다.")
-        void compareTo() {
-            assertThat(박성우.compareTo(노준혁)).isNegative();
-        }
-
-        @Test
-        @DisplayName("러너들을 정렬 할 때, 최근 기록 시간이 더 작을 수록 앞에 온다.")
-        void sort() {
-            final List<Runner> runners = new ArrayList<>(List.of(노준혁, 박성우));
-
-            Collections.sort(runners);
-
-            assertThat(runners).containsExactly(박성우, 노준혁);
         }
     }
 }
