@@ -1,8 +1,11 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static java.util.Comparator.comparing;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -17,6 +20,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +28,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Comparator.comparing;
 
 @Service
 @RequiredArgsConstructor
@@ -142,7 +144,10 @@ public class BattleService {
 
     private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
         final List<Runner> finishedRunners =
-                runners.stream().filter(Runner::isFinished).sorted(comparing(Runner::getRecentRunnerRecord)).toList();
+                runners.stream()
+                        .filter(Runner::isFinished)
+                        .sorted(comparing(Runner::getRecentRunnerRecord))
+                        .toList();
 
         final List<FinishedRunnerResponse> result = new ArrayList<>();
 
