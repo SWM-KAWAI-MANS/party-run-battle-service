@@ -83,16 +83,13 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
 
-    testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.1'
+    testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
     testImplementation 'com.github.SWM-KAWAI-MANS:jwt-manager:1.2.0'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
-    testImplementation('it.ozimov:embedded-redis:0.7.3') {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'
-    }
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 }
