@@ -1,21 +1,22 @@
 package online.partyrun.partyrunbattleservice.domain.member.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박성우;
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박현준;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
+import online.partyrun.partyrunbattleservice.domain.battle.config.EmbeddedRedisCallBack;
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
-
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박성우;
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.멤버_박현준;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 @SpringBootTest
+@ExtendWith(EmbeddedRedisCallBack.class)
 @DisplayName("MemberService")
 class MemberServiceTest {
 
