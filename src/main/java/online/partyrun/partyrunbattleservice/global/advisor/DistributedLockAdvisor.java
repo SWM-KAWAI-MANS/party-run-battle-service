@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.partyrunbattleservice.global.annotation.DistributedLock;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -32,11 +34,20 @@ public class DistributedLockAdvisor {
         Method method = signature.getMethod();
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-        String key = REDISSON_LOCK_PREFIX + CustomSpelParser.getDynamicValue(signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
+        String key =
+                REDISSON_LOCK_PREFIX
+                        + CustomSpelParser.getDynamicValue(
+                                signature.getParameterNames(),
+                                joinPoint.getArgs(),
+                                distributedLock.key());
         RLock rLock = redissonClient.getLock(key);
 
         try {
-            boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+            boolean available =
+                    rLock.tryLock(
+                            distributedLock.waitTime(),
+                            distributedLock.leaseTime(),
+                            distributedLock.timeUnit());
 
             if (!available) {
                 return false;
@@ -54,7 +65,10 @@ public class DistributedLockAdvisor {
         try {
             rLock.unlock();
         } catch (IllegalMonitorStateException e) {
-            log.info(String.format("%s 메소드에 걸린 %s 키 Reddison Lock은 이미 unLock 상태입니다.", method.getName(), key));
+            log.info(
+                    String.format(
+                            "%s 메소드에 걸린 %s 키 Reddison Lock은 이미 unLock 상태입니다.",
+                            method.getName(), key));
         }
     }
 }

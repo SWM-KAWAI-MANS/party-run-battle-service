@@ -1,16 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.runner.service;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.testmanager.redis.EnableRedisTest;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @EnableRedisTest

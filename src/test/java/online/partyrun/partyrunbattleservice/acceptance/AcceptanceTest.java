@@ -1,7 +1,9 @@
 package online.partyrun.partyrunbattleservice.acceptance;
 
 import io.restassured.RestAssured;
+
 import online.partyrun.testmanager.redis.EnableRedisTest;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
