@@ -155,7 +155,9 @@ jacocoTestCoverageVerification {
                     '**.*Mapper*',
                     '**.*ControllerAdvice*',
                     '**.*Interceptor*',
-                    '**.*Event*'
+                    '**.*Event*',
+                    '**.*Advisor*',
+                    '**.*Parser*'
             ]
         }
 
