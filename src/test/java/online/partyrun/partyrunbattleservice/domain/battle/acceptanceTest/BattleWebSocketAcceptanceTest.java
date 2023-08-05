@@ -29,6 +29,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -311,7 +312,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
                 final List<BattleWebSocketResponse> responses =
                         List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
-                Assertions.assertAll(
+                assertAll(
                         () ->
                                 assertThat(responses)
                                         .containsAll(
@@ -346,6 +347,22 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                                                                                 .equals(
                                                                                         "RUNNER_FINISHED")))
                                         .hasSize(1));
+            }
+
+            @Test
+            @DisplayName("클라이언트가 중복으로 요청을 보내면 예외를 던진다.")
+            void throwExceptionForDuplicatedRequest() throws InterruptedException {
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
+
+                BattleWebSocketResponse response1 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse response2 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+
+
+                assertAll(
+                        () -> assertThat(Objects.isNull(response1) && Objects.isNull(response2)).isFalse(),
+                        () -> assertThat(Objects.isNull(response1) || Objects.isNull(response2)).isTrue()
+                );
             }
         }
     }
