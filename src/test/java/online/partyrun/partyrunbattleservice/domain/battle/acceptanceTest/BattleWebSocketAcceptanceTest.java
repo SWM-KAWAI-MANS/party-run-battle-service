@@ -2,7 +2,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
-import online.partyrun.partyrunbattleservice.domain.battle.config.EmbeddedRedisCallBack;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.WebSocketTestConfiguration;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleWebSocketResponse;
@@ -14,7 +13,6 @@ import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -42,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
-@ExtendWith(EmbeddedRedisCallBack.class)
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     private static final String TOPIC_BATTLE_PREFIX = "/topic/battles";
     private static final String PUB_BATTLE_PREFIX = "/pub/battles";

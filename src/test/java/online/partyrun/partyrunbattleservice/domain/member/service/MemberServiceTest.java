@@ -1,10 +1,9 @@
 package online.partyrun.partyrunbattleservice.domain.member.service;
 
-import online.partyrun.partyrunbattleservice.domain.battle.config.EmbeddedRedisCallBack;
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
+import online.partyrun.testmanager.redis.EnableRedisTest;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-@ExtendWith(EmbeddedRedisCallBack.class)
+@EnableRedisTest
 @DisplayName("MemberService")
 class MemberServiceTest {
 

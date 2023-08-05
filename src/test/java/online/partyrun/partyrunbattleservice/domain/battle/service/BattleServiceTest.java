@@ -1,6 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import online.partyrun.partyrunbattleservice.domain.battle.config.EmbeddedRedisCallBack;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -14,8 +13,8 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+import online.partyrun.testmanager.redis.EnableRedisTest;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 @SpringBootTest
-@ExtendWith(EmbeddedRedisCallBack.class)
+@EnableRedisTest
 @Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
 class BattleServiceTest {
