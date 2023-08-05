@@ -12,8 +12,7 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      url: redis://localhost:6379
 
 logging:
   level:
@@ -39,8 +38,8 @@ spring:
     mongodb:
       uri: ${DB_URI}
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      url: ${REDIS_URL}
+
 jwt:
   access-secret-key: ${JWT_ACCESS_SECRET_KEY}
   access-expire-second: ${JWT_ACCESS_EXPIRE_LENGTH}
