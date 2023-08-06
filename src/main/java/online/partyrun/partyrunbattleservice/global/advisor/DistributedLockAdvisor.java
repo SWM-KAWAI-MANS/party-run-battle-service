@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import online.partyrun.partyrunbattleservice.global.annotation.DistributedLock;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,11 +37,20 @@ public class DistributedLockAdvisor {
         Method method = signature.getMethod();
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-        String key = REDISSON_LOCK_PREFIX + getDynamicValue(signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
+        String key =
+                REDISSON_LOCK_PREFIX
+                        + getDynamicValue(
+                                signature.getParameterNames(),
+                                joinPoint.getArgs(),
+                                distributedLock.key());
         RLock rLock = redissonClient.getLock(key);
 
         try {
-            boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+            boolean available =
+                    rLock.tryLock(
+                            distributedLock.waitTime(),
+                            distributedLock.leaseTime(),
+                            distributedLock.timeUnit());
 
             if (!available) {
                 return false;
