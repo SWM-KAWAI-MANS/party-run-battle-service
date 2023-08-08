@@ -34,6 +34,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -200,9 +201,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             @Test
             @DisplayName("응답을 받지 못한다.")
             void getBattleStartTime() throws InterruptedException {
-                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(300, TimeUnit.MILLISECONDS);
 
                 assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
             }
@@ -212,6 +213,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들의_기록을_저장할_때 {
+        LocalDateTime now = LocalDateTime.now();
 
         @BeforeEach
         void setUpData() throws InterruptedException {
@@ -230,20 +232,19 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
             // 배틀 시간 변경
             Query query = Query.query(Criteria.where("id").is(배틀.getId()));
-            mongoTemplate.updateFirst(
-                    query, Update.update("startTime", LocalDateTime.now()), Battle.class);
+            mongoTemplate.updateFirst(query, Update.update("startTime", now), Battle.class);
         }
 
-        LocalDateTime now = LocalDateTime.now().plusMinutes(1);
-        GpsRequest GPS_REQUEST1 = new GpsRequest(0, 0, 0, now);
-        GpsRequest GPS_REQUEST2 = new GpsRequest(0.001, 0.001, 0.001, now.plusSeconds(1));
-        GpsRequest GPS_REQUEST3 = new GpsRequest(0.002, 0.002, 0.002, now.plusSeconds(2));
-        GpsRequest GPS_REQUEST4 = new GpsRequest(0.003, 0.003, 0.003, now.plusSeconds(3));
-        GpsRequest GPS_REQUEST5 = new GpsRequest(0.004, 0.004, 0.004, now.plusSeconds(4));
-        GpsRequest GPS_REQUEST6 = new GpsRequest(0.005, 0.005, 0.005, now.plusSeconds(5));
-        GpsRequest GPS_REQUEST7 = new GpsRequest(0.006, 0.006, 0.006, now.plusSeconds(6));
-        GpsRequest GPS_REQUEST8 = new GpsRequest(0.007, 0.007, 0.007, now.plusSeconds(7));
-        GpsRequest GPS_REQUEST9 = new GpsRequest(0.008, 0.008, 0.008, now.plusSeconds(8));
+        LocalDateTime gpsTime = now.plusMinutes(1);
+        GpsRequest GPS_REQUEST1 = new GpsRequest(0, 0, 0, gpsTime);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(0.001, 0.001, 0.001, gpsTime.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(0.002, 0.002, 0.002, gpsTime.plusSeconds(2));
+        GpsRequest GPS_REQUEST4 = new GpsRequest(0.003, 0.003, 0.003, gpsTime.plusSeconds(3));
+        GpsRequest GPS_REQUEST5 = new GpsRequest(0.004, 0.004, 0.004, gpsTime.plusSeconds(4));
+        GpsRequest GPS_REQUEST6 = new GpsRequest(0.005, 0.005, 0.005, gpsTime.plusSeconds(5));
+        GpsRequest GPS_REQUEST7 = new GpsRequest(0.006, 0.006, 0.006, gpsTime.plusSeconds(6));
+        GpsRequest GPS_REQUEST8 = new GpsRequest(0.007, 0.007, 0.007, gpsTime.plusSeconds(7));
+        GpsRequest GPS_REQUEST9 = new GpsRequest(0.008, 0.008, 0.008, gpsTime.plusSeconds(8));
         RunnerRecordRequest RECORD_REQUEST1 =
                 new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
         RunnerRecordRequest RECORD_REQUEST2 =
@@ -287,9 +288,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             @DisplayName("러너가 목표거리를 달리면 러너 종료 응답을 한다.")
             void returnRunnerFinished() throws InterruptedException {
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
-                Thread.sleep(1000);
+                Thread.sleep(300);
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST2);
-                Thread.sleep(1000);
+                Thread.sleep(300);
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST3);
 
                 BattleWebSocketResponse 박성우_response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
@@ -309,7 +310,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
                 final List<BattleWebSocketResponse> responses =
                         List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
-                Assertions.assertAll(
+                assertAll(
                         () ->
                                 assertThat(responses)
                                         .containsAll(
@@ -344,6 +345,24 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                                                                                 .equals(
                                                                                         "RUNNER_FINISHED")))
                                         .hasSize(1));
+            }
+
+            @Test
+            @DisplayName("클라이언트가 중복으로 요청을 보내면 예외를 던진다.")
+            void throwExceptionForDuplicatedRequest() throws InterruptedException {
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
+
+                BattleWebSocketResponse response1 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse response2 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+
+                assertAll(
+                        () ->
+                                assertThat(Objects.isNull(response1) && Objects.isNull(response2))
+                                        .isFalse(),
+                        () ->
+                                assertThat(Objects.isNull(response1) || Objects.isNull(response2))
+                                        .isTrue());
             }
         }
     }
