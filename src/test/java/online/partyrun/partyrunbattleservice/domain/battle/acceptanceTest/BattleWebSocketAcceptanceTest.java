@@ -75,7 +75,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
             return webSocketStompClient
                     .connectAsync(
-                            "ws://localhost:" + port + "/api/battles/connection",
+                            "ws://localhost:" + port + "/api/ws/battles/connection",
                             headers,
                             new StompSessionHandlerAdapter() {})
                     .get(1, TimeUnit.SECONDS);

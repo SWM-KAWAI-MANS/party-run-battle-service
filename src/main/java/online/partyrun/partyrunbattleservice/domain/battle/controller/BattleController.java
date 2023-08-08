@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
 import org.springframework.http.HttpStatus;
@@ -33,5 +34,12 @@ public class BattleController {
     @ResponseStatus(HttpStatus.OK)
     public BattleResponse getReadyBattle(Authentication auth) {
         return battleService.getReadyBattle(auth.getName());
+    }
+
+    @GetMapping("{battleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public FinishedBattleResponse getFinishedBattle(
+            @PathVariable("battleId") String battleId, Authentication auth) {
+        return battleService.getFinishedBattle(battleId, auth.getName());
     }
 }

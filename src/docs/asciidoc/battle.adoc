@@ -37,3 +37,7 @@ operation::get battle[snippets='http-request,http-response']
 
 operation::battle not found[snippets='http-request,http-response']
 
+=== 배틀 결과 조회
+러너가 배틀이 끝나고 결과를 조회할 때 (배틀을 끝낸 러너들만 조회 대상이 된다.)
+
+operation::get finished battle[snippets='http-request,http-response']

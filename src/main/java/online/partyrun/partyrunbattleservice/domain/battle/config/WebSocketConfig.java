@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/battles/connection").setAllowedOrigins("*");
+        registry.addEndpoint("/ws/battles/connection").setAllowedOrigins("*");
     }
 
     @Override

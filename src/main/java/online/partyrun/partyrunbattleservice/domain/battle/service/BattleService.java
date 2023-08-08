@@ -1,5 +1,7 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
+import static java.util.Comparator.comparing;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +15,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -128,5 +132,37 @@ public class BattleService {
 
     private List<GpsData> createGpsData(RunnerRecordRequest request) {
         return request.record().stream().map(GpsRequest::toEntity).toList();
+    }
+
+    public FinishedBattleResponse getFinishedBattle(String battleId, String runnerId) {
+        final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
+        final List<Runner> runners = battle.getRunners();
+
+        return new FinishedBattleResponse(
+                battle.getTargetDistance(),
+                battle.getStartTime(),
+                toFinishedRunnerResponses(runners));
+    }
+
+    private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
+        final List<Runner> finishedRunners =
+                runners.stream()
+                        .filter(Runner::isFinished)
+                        .sorted(comparing(Runner::getRecentRunnerRecord))
+                        .toList();
+
+        final List<FinishedRunnerResponse> result = new ArrayList<>();
+
+        int rank = 1;
+        for (Runner runner : finishedRunners) {
+            FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank++);
+            result.add(response);
+        }
+
+        return result;
+    }
+
+    private FinishedRunnerResponse toFinishedRunnerResponse(Runner runner, int rank) {
+        return new FinishedRunnerResponse(runner.getId(), rank, runner.getEndTime());
     }
 }

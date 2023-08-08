@@ -2,8 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 
 import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.then;
@@ -23,6 +22,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.testmanager.redis.EnableRedisTest;
 
 import org.junit.jupiter.api.*;
@@ -49,33 +49,43 @@ class BattleServiceTest {
     @Autowired ApplicationEventPublisher publisher;
     @Autowired Clock clock;
     LocalDateTime now;
+    Runner 박성우;
+    Runner 노준혁;
+    Runner 박현준;
+    Runner 장세연;
+    Runner 이승열;
+    Battle 배틀;
 
     @BeforeEach
-    void setUpNow() {
+    void setUp() {
         now = LocalDateTime.now(clock);
+        박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
+        노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
+        박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
+        장세연 = new Runner(memberRepository.save(멤버_장세연).getId());
+        이승열 = new Runner(memberRepository.save(멤버_이승열).getId());
+
+        배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
     }
 
     @AfterEach
-    void setUp() {
+    void tearDown() {
         mongoTemplate.getDb().drop();
     }
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_생성할_때 {
-
-        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-        Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-        Runner 박현준 = new Runner(memberRepository.save(멤버_박현준).getId());
-        BattleCreateRequest request =
-                new BattleCreateRequest(1000, List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 현재_배틀에_참여하고_있는_러너가_없다면 {
+
             @Test
             @DisplayName(" 생성된 배틀의 정보를 반환한다.")
             void returnBattle() {
+                BattleCreateRequest request =
+                        new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
+
                 final BattleResponse response = battleService.createBattle(request);
                 assertThat(response.id()).isNotNull();
             }
@@ -88,6 +98,9 @@ class BattleServiceTest {
             @Test
             @DisplayName("예외를 던진다.")
             void throwExceptionsByAllRunner() {
+                BattleCreateRequest request =
+                        new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
+
                 battleService.createBattle(request);
 
                 assertThatThrownBy(() -> battleService.createBattle(request))
@@ -98,15 +111,10 @@ class BattleServiceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 한명이라도_다른_배틀에_참여하고_있는_러너가_있다면 {
-            Runner 장세연 = new Runner(memberRepository.save(멤버_장세연).getId());
-            Runner 이승열 = new Runner(memberRepository.save(멤버_이승열).getId());
 
             @Test
             @DisplayName("예외를 던진다.")
             void throwExceptionsByOneRunner() {
-
-                battleService.createBattle(request);
-
                 assertThatThrownBy(
                                 () ->
                                         battleService.createBattle(
@@ -124,10 +132,6 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_조회할_때 {
-
-        Runner 박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-        BattleCreateRequest request = new BattleCreateRequest(1000, List.of(박성우.getId()));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class runner의_id가_주어지면 {
@@ -135,9 +139,10 @@ class BattleServiceTest {
             @Test
             @DisplayName("진행중인 battle 정보 반환한다.")
             void returnBattleId() {
+                BattleCreateRequest request = new BattleCreateRequest(1000, List.of(장세연.getId()));
                 battleService.createBattle(request);
 
-                final BattleResponse response = battleService.getReadyBattle(박성우.getId());
+                final BattleResponse response = battleService.getReadyBattle(장세연.getId());
                 assertThat(response.id()).isNotNull();
             }
         }
@@ -145,12 +150,10 @@ class BattleServiceTest {
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 현재_배틀에_참여하고있지_않는_runner의_id가_주어지면 {
-            Runner 노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-
             @Test
             @DisplayName("예외를 던진다.")
             void throwException() {
-                assertThatThrownBy(() -> battleService.getReadyBattle(노준혁.getId()))
+                assertThatThrownBy(() -> battleService.getReadyBattle(장세연.getId()))
                         .isInstanceOf(ReadyRunnerNotFoundException.class);
             }
         }
@@ -159,18 +162,6 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너의_상태를_RUNNING으로_변경할_때 {
-
-        Runner 박성우;
-        Runner 노준혁;
-        Battle 배틀;
-
-        @BeforeEach
-        void setUp() {
-            박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-            노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
-        }
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀과_러너의_아이디를_받으면 {
@@ -235,17 +226,11 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀을_시작할_때 {
-        Runner 박성우;
-        Runner 노준혁;
-        Battle 배틀;
-
         @BeforeEach
         void setUp() {
-            박성우 = new Runner(memberRepository.save(멤버_박성우).getId());
-            노준혁 = new Runner(memberRepository.save(멤버_노준혁).getId());
-            Battle battle = new Battle(1000, List.of(박성우, 노준혁), now);
             박성우.changeRunningStatus();
             노준혁.changeRunningStatus();
+            Battle battle = new Battle(1000, List.of(박성우, 노준혁), now);
             배틀 = battleRepository.save(battle);
         }
 
@@ -282,6 +267,8 @@ class BattleServiceTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 거리를_계산할_때 {
+
+        Battle 진행중인_배틀;
         LocalDateTime now = LocalDateTime.now().plusMinutes(1);
         GpsRequest GPS_REQUEST0 = new GpsRequest(0, 0, 0, now);
         GpsRequest GPS_REQUEST1 = new GpsRequest(0.001, 0.001, 0.001, now);
@@ -297,13 +284,11 @@ class BattleServiceTest {
         RunnerRecordRequest RECORD_REQUEST2 =
                 new RunnerRecordRequest(
                         List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6, GPS_REQUEST7));
-        Runner 박성우 = new Runner("박성우");
-        Battle 진행중인_배틀;
 
         @BeforeEach
         void setUp() {
-            Battle 배틀 = new Battle(1000, List.of(박성우), now);
             배틀.changeRunnerRunningStatus(박성우.getId());
+            배틀.changeRunnerRunningStatus(노준혁.getId());
             배틀.setStartTime(now.minusMinutes(1));
 
             진행중인_배틀 = mongoTemplate.save(배틀);
@@ -348,6 +333,52 @@ class BattleServiceTest {
             then(publisher)
                     .should(times(1))
                     .publishEvent(new RunnerFinishedEvent(진행중인_배틀.getId(), 박성우.getId()));
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 배틀_결과를_조회할_때 {
+        GpsData gpsData0;
+        GpsData gpsData1;
+        GpsData gpsData2;
+
+        @BeforeEach
+        void setUp() {
+            박성우.changeRunningStatus();
+            노준혁.changeRunningStatus();
+            배틀.setStartTime(now.minusMinutes(1));
+
+            gpsData0 = GpsData.of(0, 0, 0, now);
+            gpsData1 = GpsData.of(1, 1, 0, now.plusSeconds(1));
+            gpsData2 = GpsData.of(1, 1, 0, now.plusSeconds(2));
+
+            배틀.addRecords(박성우.getId(), List.of(gpsData0, gpsData1));
+
+            배틀 = mongoTemplate.save(배틀);
+        }
+
+        @Test
+        @DisplayName("종료되지 않은 러너의 결과는 반환하지 않는다.")
+        void returnOnlyFinishedRunnerResult() {
+            FinishedBattleResponse response =
+                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            assertThat(response.runners())
+                    .extracting("id", "rank")
+                    .containsExactly(tuple(박성우.getId(), 1));
+        }
+
+        @Test
+        @DisplayName("종료된 러너들의 결과를 반환한다.")
+        void returnFinishedRunnerResult() {
+            배틀.addRecords(노준혁.getId(), List.of(gpsData0, gpsData2));
+            mongoTemplate.save(배틀);
+
+            FinishedBattleResponse response =
+                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            assertThat(response.runners())
+                    .extracting("id", "rank")
+                    .containsExactly(tuple(박성우.getId(), 1), tuple(노준혁.getId(), 2));
         }
     }
 }

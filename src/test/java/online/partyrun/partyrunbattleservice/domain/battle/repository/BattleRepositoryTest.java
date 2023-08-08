@@ -141,7 +141,7 @@ class BattleRepositoryTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀_조회_시 {
 
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우), now));
+        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -150,9 +150,12 @@ class BattleRepositoryTest {
             @BeforeEach
             void setUp() {
                 LocalDateTime now = LocalDateTime.now();
+                노준혁.changeRunningStatus();
                 박성우.changeRunningStatus();
                 배틀.setStartTime(now);
                 배틀.addRecords(박성우.getId(), List.of(GpsData.of(0, 0, 0, now.plusSeconds(10))));
+                배틀.addRecords(노준혁.getId(), List.of(GpsData.of(0, 0, 0, now.plusSeconds(10))));
+                battleRepository.save(배틀);
             }
 
             @Test
