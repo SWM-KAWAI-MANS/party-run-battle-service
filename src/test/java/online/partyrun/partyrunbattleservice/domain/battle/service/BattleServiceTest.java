@@ -381,4 +381,15 @@ class BattleServiceTest {
                     .containsExactly(tuple(박성우.getId(), 1), tuple(노준혁.getId(), 2));
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너의_상태를_종료할_때 {
+
+        @Test
+        void changeRunnerFinished() {
+            MessageResponse response = battleService.changeRunnerFinished("박성우");
+            assertThat(response).isNotNull();
+        }
+    }
 }

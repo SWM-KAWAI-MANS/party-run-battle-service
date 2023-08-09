@@ -6,9 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 
 import org.springframework.http.HttpStatus;
@@ -41,5 +39,11 @@ public class BattleController {
     public FinishedBattleResponse getFinishedBattle(
             @PathVariable("battleId") String battleId, Authentication auth) {
         return battleService.getFinishedBattle(battleId, auth.getName());
+    }
+
+    @PostMapping("/runners/finished")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageResponse changeRunnerFinished(Authentication auth) {
+        return battleService.changeRunnerFinished(auth.getName());
     }
 }

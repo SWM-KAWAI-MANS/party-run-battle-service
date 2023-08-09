@@ -223,4 +223,43 @@ class BattleRepositoryTest {
                     () -> assertThat(battle.isRunnerFinished(박현준.getId())).isFalse());
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class updateReadyOrRunningRunnerStatus는 {
+
+        Battle 배틀1;
+        Battle 배틀2;
+
+        @BeforeEach
+        void setUp() {
+            배틀1 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+            노준혁.changeRunningStatus();
+            배틀2 = battleRepository.save(new Battle(1000, List.of(노준혁), now));
+        }
+
+        @Test
+        @DisplayName("Ready 또는 Running 상태의 러너를 Finished 상태로 변경한다.")
+        void changeStatus() {
+            battleRepository.updateReadyOrRunningRunnerStatus(
+                    박성우.getId(),
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
+                    RunnerStatus.FINISHED);
+            battleRepository.updateReadyOrRunningRunnerStatus(
+                    노준혁.getId(),
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
+                    RunnerStatus.FINISHED);
+
+            Battle result1 = battleRepository.findById(배틀1.getId()).orElseThrow();
+            Battle result2 = battleRepository.findById(배틀2.getId()).orElseThrow();
+
+            assertAll(
+                    () ->
+                            assertThat(result1.getRunnerStatus(박성우.getId()))
+                                    .isEqualTo(RunnerStatus.FINISHED),
+                    () ->
+                            assertThat(result2.getRunnerStatus(노준혁.getId()))
+                                    .isEqualTo(RunnerStatus.FINISHED));
+        }
+    }
 }

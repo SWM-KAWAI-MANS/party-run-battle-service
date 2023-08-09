@@ -165,4 +165,11 @@ public class BattleService {
     private FinishedRunnerResponse toFinishedRunnerResponse(Runner runner, int rank) {
         return new FinishedRunnerResponse(runner.getId(), rank, runner.getEndTime());
     }
+
+    public MessageResponse changeRunnerFinished(String runnerId) {
+        battleRepository.updateReadyOrRunningRunnerStatus(
+                runnerId, List.of(RunnerStatus.READY, RunnerStatus.RUNNING), RunnerStatus.FINISHED);
+
+        return new MessageResponse("요청이 정상적으로 처리되었습니다.");
+    }
 }

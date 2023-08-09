@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.MessageResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
@@ -168,15 +169,17 @@ class BattleControllerTest extends RestControllerTest {
         void getFinishedBattle() throws Exception {
             String battleId = "battleId";
             LocalDateTime now = LocalDateTime.now();
-            given(battleService.getFinishedBattle(battleId, "defaultUser"))
-                    .willReturn(
-                            new FinishedBattleResponse(
-                                    1000,
-                                    now.minusMinutes(5),
-                                    List.of(
-                                            new FinishedRunnerResponse("parkseongwoo", 1, now),
-                                            new FinishedRunnerResponse(
-                                                    "nojunhyuk", 2, now.plusMinutes(1)))));
+
+            FinishedBattleResponse response =
+                    new FinishedBattleResponse(
+                            1000,
+                            now.minusMinutes(5),
+                            List.of(
+                                    new FinishedRunnerResponse("parkseongwoo", 1, now),
+                                    new FinishedRunnerResponse(
+                                            "nojunhyuk", 2, now.plusMinutes(1))));
+
+            given(battleService.getFinishedBattle(battleId, "defaultUser")).willReturn(response);
 
             final ResultActions actions =
                     mockMvc.perform(
@@ -187,7 +190,33 @@ class BattleControllerTest extends RestControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .characterEncoding(StandardCharsets.UTF_8));
 
-            actions.andExpect(status().isOk());
+            actions.andExpect(status().isOk()).andExpect(content().json(toRequestBody(response)));
+
+            setPrintDocs(actions, "get finished battle");
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_접속했을_때 {
+
+        @Test
+        @DisplayName("배틀에 속해있다면 종료시킨다.")
+        void changeRunnerFinished() throws Exception {
+            MessageResponse response = new MessageResponse("요청이 정상적으로 처리되었습니다.");
+            given(battleService.changeRunnerFinished("defaultUser")).willReturn(response);
+
+            final ResultActions actions =
+                    mockMvc.perform(
+                            post(String.format("%s/runners/finished", BATTLE_URL))
+                                    .with(csrf())
+                                    .header(
+                                            "Authorization",
+                                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .characterEncoding(StandardCharsets.UTF_8));
+
+            actions.andExpect(status().isOk()).andExpect(content().json(toRequestBody(response)));
 
             setPrintDocs(actions, "get finished battle");
         }
