@@ -15,6 +15,8 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     boolean existsByIdAndRunnersIdAndRunnersStatus(
             String battleId, String runnerId, RunnerStatus status);
 
+    boolean existsByRunnersAndRunnersStatusIn(String runnerId, List<RunnerStatus> ready);
+
     boolean existsByRunnersIdInAndRunnersStatusIn(List<String> runnersId, List<RunnerStatus> ready);
 
     Optional<Battle> findByRunnersIdAndRunnersStatus(String runnerId, RunnerStatus runnerStatus);
@@ -32,4 +34,8 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
             List<RunnerRecord> runnerRecords,
             RunnerRecord recentRecord,
             RunnerStatus runnerStatus);
+
+    @Query(value = "{'runners.id': ?0, 'runners.status': { $in: ?1 }}")
+    @Update("{'$set' :  {'runners.$.status': ?3}}")
+    void updateReadyOrRunningRunnerStatus(String runnerId, List<RunnerStatus> preRunnerStatus, RunnerStatus runnerStatus);
 }
