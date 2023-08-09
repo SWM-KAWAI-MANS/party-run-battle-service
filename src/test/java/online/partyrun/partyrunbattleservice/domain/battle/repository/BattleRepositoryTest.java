@@ -1,10 +1,14 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -13,9 +17,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataMongoTest
 @DisplayName("BattleRepository")
@@ -240,16 +241,25 @@ class BattleRepositoryTest {
         @Test
         @DisplayName("Ready 또는 Running 상태의 러너를 Finished 상태로 변경한다.")
         void changeStatus() {
-            battleRepository.updateReadyOrRunningRunnerStatus(박성우.getId(), List.of(RunnerStatus.READY, RunnerStatus.RUNNING), RunnerStatus.FINISHED);
-            battleRepository.updateReadyOrRunningRunnerStatus(노준혁.getId(), List.of(RunnerStatus.READY, RunnerStatus.RUNNING), RunnerStatus.FINISHED);
+            battleRepository.updateReadyOrRunningRunnerStatus(
+                    박성우.getId(),
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
+                    RunnerStatus.FINISHED);
+            battleRepository.updateReadyOrRunningRunnerStatus(
+                    노준혁.getId(),
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
+                    RunnerStatus.FINISHED);
 
             Battle result1 = battleRepository.findById(배틀1.getId()).orElseThrow();
             Battle result2 = battleRepository.findById(배틀2.getId()).orElseThrow();
 
             assertAll(
-                    () -> assertThat(result1.getRunnerStatus(박성우.getId())).isEqualTo(RunnerStatus.FINISHED),
-                    () -> assertThat(result2.getRunnerStatus(노준혁.getId())).isEqualTo(RunnerStatus.FINISHED)
-            );
+                    () ->
+                            assertThat(result1.getRunnerStatus(박성우.getId()))
+                                    .isEqualTo(RunnerStatus.FINISHED),
+                    () ->
+                            assertThat(result2.getRunnerStatus(노준혁.getId()))
+                                    .isEqualTo(RunnerStatus.FINISHED));
         }
     }
 }

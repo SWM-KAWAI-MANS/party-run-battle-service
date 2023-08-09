@@ -37,5 +37,6 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
 
     @Query(value = "{'runners.id': ?0, 'runners.status': { $in: ?1 }}")
     @Update("{'$set' :  {'runners.$.status': ?2}}")
-    void updateReadyOrRunningRunnerStatus(String runnerId, List<RunnerStatus> preRunnerStatus, RunnerStatus runnerStatus);
+    void updateReadyOrRunningRunnerStatus(
+            String runnerId, List<RunnerStatus> preRunnerStatus, RunnerStatus runnerStatus);
 }

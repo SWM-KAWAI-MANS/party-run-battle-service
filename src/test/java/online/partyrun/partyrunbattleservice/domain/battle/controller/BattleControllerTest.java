@@ -1,5 +1,12 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
@@ -9,6 +16,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerTest;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,13 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BattleController.class)
 @DisplayName("BattleController")
@@ -169,13 +170,14 @@ class BattleControllerTest extends RestControllerTest {
             String battleId = "battleId";
             LocalDateTime now = LocalDateTime.now();
 
-            FinishedBattleResponse response = new FinishedBattleResponse(
-                    1000,
-                    now.minusMinutes(5),
-                    List.of(
-                            new FinishedRunnerResponse("parkseongwoo", 1, now),
-                            new FinishedRunnerResponse(
-                                    "nojunhyuk", 2, now.plusMinutes(1))));
+            FinishedBattleResponse response =
+                    new FinishedBattleResponse(
+                            1000,
+                            now.minusMinutes(5),
+                            List.of(
+                                    new FinishedRunnerResponse("parkseongwoo", 1, now),
+                                    new FinishedRunnerResponse(
+                                            "nojunhyuk", 2, now.plusMinutes(1))));
 
             given(battleService.getFinishedBattle(battleId, "defaultUser")).willReturn(response);
 
@@ -188,8 +190,7 @@ class BattleControllerTest extends RestControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .characterEncoding(StandardCharsets.UTF_8));
 
-            actions.andExpect(status().isOk())
-                    .andExpect(content().json(toRequestBody(response)));
+            actions.andExpect(status().isOk()).andExpect(content().json(toRequestBody(response)));
 
             setPrintDocs(actions, "get finished battle");
         }
@@ -215,8 +216,7 @@ class BattleControllerTest extends RestControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .characterEncoding(StandardCharsets.UTF_8));
 
-            actions.andExpect(status().isOk())
-                    .andExpect(content().json(toRequestBody(response)));
+            actions.andExpect(status().isOk()).andExpect(content().json(toRequestBody(response)));
 
             setPrintDocs(actions, "get finished battle");
         }
