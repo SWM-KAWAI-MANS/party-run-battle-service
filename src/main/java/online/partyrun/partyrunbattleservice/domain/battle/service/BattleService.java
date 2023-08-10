@@ -1,11 +1,8 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static java.util.Comparator.comparing;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -21,7 +18,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 import online.partyrun.partyrunbattleservice.global.annotation.DistributedLock;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +26,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Comparator.comparing;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleService {
 
-    BattleMapper battleMapper;
     BattleRepository battleRepository;
     BattleDao battleDao;
     RunnerService runnerService;
@@ -50,7 +47,7 @@ public class BattleService {
         final Battle battle =
                 battleRepository.save(
                         new Battle(request.getDistance(), runners, LocalDateTime.now(clock)));
-        return battleMapper.toResponse(battle);
+        return new BattleResponse(battle.getId());
     }
 
     private void validateRunningRunner(List<String> runnerIds) {
@@ -66,7 +63,7 @@ public class BattleService {
                         .findByRunnersIdAndRunnersStatus(runnerId, RunnerStatus.READY)
                         .orElseThrow(() -> new ReadyRunnerNotFoundException(runnerId));
 
-        return battleMapper.toResponse(battle);
+        return new BattleResponse(battle.getId());
     }
 
     public void setRunnerRunning(String battleId, String runnerId) {

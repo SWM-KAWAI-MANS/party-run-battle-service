@@ -80,11 +80,6 @@ dependencies {
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
-    //mapstruct
-    implementation 'org.mapstruct:mapstruct:1.5.1.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
-    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
-
     testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
