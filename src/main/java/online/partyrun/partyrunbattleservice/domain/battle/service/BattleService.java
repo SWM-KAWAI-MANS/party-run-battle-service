@@ -39,7 +39,7 @@ public class BattleService {
     ApplicationEventPublisher eventPublisher;
     Clock clock;
 
-    public BattleResponse createBattle(BattleCreateRequest request) {
+    public BattleIdResponse createBattle(BattleCreateRequest request) {
         final List<String> runnerIds = request.getRunnerIds();
         validateRunningRunner(runnerIds);
         final List<Runner> runners = runnerService.findAllById(runnerIds);
@@ -47,7 +47,7 @@ public class BattleService {
         final Battle battle =
                 battleRepository.save(
                         new Battle(request.getDistance(), runners, LocalDateTime.now(clock)));
-        return new BattleResponse(battle.getId());
+        return new BattleIdResponse(battle.getId());
     }
 
     private void validateRunningRunner(List<String> runnerIds) {
@@ -57,13 +57,13 @@ public class BattleService {
         }
     }
 
-    public BattleResponse getReadyBattle(String runnerId) {
+    public BattleIdResponse getReadyBattle(String runnerId) {
         final Battle battle =
                 battleRepository
                         .findByRunnersIdAndRunnersStatus(runnerId, RunnerStatus.READY)
                         .orElseThrow(() -> new ReadyRunnerNotFoundException(runnerId));
 
-        return new BattleResponse(battle.getId());
+        return new BattleIdResponse(battle.getId());
     }
 
     public void setRunnerRunning(String battleId, String runnerId) {

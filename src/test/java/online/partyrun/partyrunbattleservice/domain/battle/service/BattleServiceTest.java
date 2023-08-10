@@ -86,7 +86,7 @@ class BattleServiceTest {
                 BattleCreateRequest request =
                         new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
 
-                final BattleResponse response = battleService.createBattle(request);
+                final BattleIdResponse response = battleService.createBattle(request);
                 assertThat(response.id()).isNotNull();
             }
         }
@@ -142,7 +142,7 @@ class BattleServiceTest {
                 BattleCreateRequest request = new BattleCreateRequest(1000, List.of(장세연.getId()));
                 battleService.createBattle(request);
 
-                final BattleResponse response = battleService.getReadyBattle(장세연.getId());
+                final BattleIdResponse response = battleService.getReadyBattle(장세연.getId());
                 assertThat(response.id()).isNotNull();
             }
         }

@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.MessageResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
@@ -47,7 +47,7 @@ class BattleControllerTest extends RestControllerTest {
         class 정상적인_러너들의_id가_주어지면 {
 
             BattleCreateRequest request = new BattleCreateRequest(1000, List.of("1", "2", "3"));
-            BattleResponse response = new BattleResponse("battle_id");
+            BattleIdResponse response = new BattleIdResponse("battle_id");
 
             @Test
             @DisplayName("배틀 생성을 수행한다")
@@ -111,7 +111,7 @@ class BattleControllerTest extends RestControllerTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀에_참여하고_있는_러너의_id가_주어지면 {
 
-            BattleResponse response = new BattleResponse("battle_id");
+            BattleIdResponse response = new BattleIdResponse("battle_id");
 
             @Test
             @DisplayName("배틀 정보를 반환한다.")
