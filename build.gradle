@@ -157,7 +157,8 @@ jacocoTestCoverageVerification {
                     '**.*Event*',
                     '**.*Advisor*',
                     '**.*Parser*',
-                    '**.*Listener*'
+                    '**.*Listener*',
+                    '**.*Message*'
             ]
         }
 
