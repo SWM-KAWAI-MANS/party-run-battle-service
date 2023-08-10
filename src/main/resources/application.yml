@@ -21,11 +21,11 @@ spring:
       region:
         static: ap-northeast-2
       credentials:
-        access-key: TEST AWS SQS ACCESS KEY
-        secret-key: AWS SQS SECRET KEY
+        access-key: TESTAWSSQSACCES
+        secret-key: AWSSQSSECRETKEY
 
       sqs:
-        queue-url: TEST QUEUE
+        queue-url: https://sqs.ap-northeast-2.amazonaws.com/111111111111/testqueue-dev
 
 logging:
   level:
