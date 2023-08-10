@@ -6,6 +6,8 @@ auth:
   filter:
     exclusions: "/docs/index.html"
 
+---
+
 spring:
   profiles:
     active: test
@@ -13,6 +15,17 @@ spring:
   data:
     redis:
       url: redis://localhost:16379
+
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: TEST AWS SQS ACCESS KEY
+        secret-key: AWS SQS SECRET KEY
+
+      sqs:
+        queue-url: TEST QUEUE
 
 logging:
   level:
@@ -40,10 +53,18 @@ spring:
     redis:
       url: ${REDIS_URL}
 
+  cloud:
+    aws:
+      region:
+        static: ${AWS_SQS_REGION}
+      credentials:
+        access-key: ${AWS_SQS_ACCESS_KEY}
+        secret-key: ${AWS_SQS_SECRET_KEY}
+      sqs:
+        queue-url: ${AWS_SQS_QUEUE_URL}
+
 jwt:
   access-secret-key: ${JWT_ACCESS_SECRET_KEY}
   access-expire-second: ${JWT_ACCESS_EXPIRE_LENGTH}
   refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
   refresh-expire-second: ${JWT_REFRESH_EXPIRE_LENGTH}
-
-
