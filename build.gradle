@@ -77,6 +77,8 @@ dependencies {
     implementation 'com.github.SWM-KAWAI-MANS:spring-security-authorization-manager:1.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
+    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
     //mapstruct
     implementation 'org.mapstruct:mapstruct:1.5.1.Final'
@@ -154,7 +156,9 @@ jacocoTestCoverageVerification {
                     '**.*Interceptor*',
                     '**.*Event*',
                     '**.*Advisor*',
-                    '**.*Parser*'
+                    '**.*Parser*',
+                    '**.*Listener*',
+                    '**.*Message*'
             ]
         }
 

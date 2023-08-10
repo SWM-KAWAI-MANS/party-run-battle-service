@@ -58,4 +58,18 @@ class MemberServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 멤버를_저장할_때 {
+
+        @Test
+        @DisplayName("멤버의 아이디를 통해 멤버를 저장한다.")
+        void save() {
+            final String memberId = "박성우";
+            memberService.save(memberId);
+
+            assertThat(memberRepository.findById(memberId)).isNotEmpty();
+        }
+    }
 }

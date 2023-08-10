@@ -28,4 +28,9 @@ public class MemberService {
             throw new InvalidMemberException(memberIds);
         }
     }
+
+    public void save(String memberId) {
+        final Member member = new Member(memberId);
+        memberRepository.save(member);
+    }
 }
