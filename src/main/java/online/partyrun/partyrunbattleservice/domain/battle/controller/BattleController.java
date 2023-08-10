@@ -36,9 +36,9 @@ public class BattleController {
 
     @GetMapping("{battleId}")
     @ResponseStatus(HttpStatus.OK)
-    public FinishedBattleResponse getFinishedBattle(
+    public BattleResponse getBattle(
             @PathVariable("battleId") String battleId, Authentication auth) {
-        return battleService.getFinishedBattle(battleId, auth.getName());
+        return battleService.getBattle(battleId, auth.getName());
     }
 
     @PostMapping("/runners/finished")

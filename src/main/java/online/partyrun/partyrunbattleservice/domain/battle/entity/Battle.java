@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -13,10 +12,10 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerR
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
-
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -151,5 +150,23 @@ public class Battle {
     public RunnerRecord getRunnerRecentRecord(String runnerId) {
         final Runner runner = findRunner(runnerId);
         return runner.getRecentRunnerRecord();
+    }
+
+    public List<Runner> getRunnersOrderByRank() {
+        Comparator<Runner> rankComparator = (runner1, runner2) -> {
+            boolean isFinished1 = runner1.isRunningMoreThan(targetDistance);
+            boolean isFinished2 = runner2.isRunningMoreThan(targetDistance);
+
+            if (isFinished1 && !isFinished2) {
+                return -1;
+            } else if (!isFinished1 && isFinished2) {
+                return 1;
+            } else {
+                return Double.compare(runner2.getDistance(), runner1.getDistance());
+            }
+        };
+        return this.runners.stream()
+                .sorted(rankComparator)
+                .toList();
     }
 }

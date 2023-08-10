@@ -1,14 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
@@ -24,7 +15,6 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.testmanager.redis.EnableRedisTest;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +25,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @EnableRedisTest
@@ -351,7 +349,7 @@ class BattleServiceTest {
 
             gpsData0 = GpsData.of(0, 0, 0, now);
             gpsData1 = GpsData.of(1, 1, 0, now.plusSeconds(1));
-            gpsData2 = GpsData.of(1, 1, 0, now.plusSeconds(2));
+            gpsData2 = GpsData.of(0.0001, 0.0001, 0, now.plusSeconds(2));
 
             배틀.addRecords(박성우.getId(), List.of(gpsData0, gpsData1));
 
@@ -359,23 +357,13 @@ class BattleServiceTest {
         }
 
         @Test
-        @DisplayName("종료되지 않은 러너의 결과는 반환하지 않는다.")
-        void returnOnlyFinishedRunnerResult() {
-            FinishedBattleResponse response =
-                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
-            assertThat(response.runners())
-                    .extracting("id", "rank")
-                    .containsExactly(tuple(박성우.getId(), 1));
-        }
-
-        @Test
-        @DisplayName("종료된 러너들의 결과를 반환한다.")
+        @DisplayName("모든 러너들의 결과를 반환한다.")
         void returnFinishedRunnerResult() {
-            배틀.addRecords(노준혁.getId(), List.of(gpsData0, gpsData2));
+            배틀.addRecords(노준혁.getId(), List.of(gpsData1, gpsData2));
             mongoTemplate.save(배틀);
 
-            FinishedBattleResponse response =
-                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            BattleResponse response =
+                    battleService.getBattle(배틀.getId(), 박성우.getId());
             assertThat(response.runners())
                     .extracting("id", "rank")
                     .containsExactly(tuple(박성우.getId(), 1), tuple(노준혁.getId(), 2));

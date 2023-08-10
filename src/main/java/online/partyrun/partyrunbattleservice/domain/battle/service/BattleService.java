@@ -12,7 +12,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
@@ -25,8 +25,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Comparator.comparing;
 
 @Service
 @RequiredArgsConstructor
@@ -131,36 +129,26 @@ public class BattleService {
         return request.record().stream().map(GpsRequest::toEntity).toList();
     }
 
-    public FinishedBattleResponse getFinishedBattle(String battleId, String runnerId) {
+    public BattleResponse getBattle(String battleId, String runnerId) {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
-        final List<Runner> runners = battle.getRunners();
+        final List<Runner> runners = battle.getRunnersOrderByRank();
 
-        return new FinishedBattleResponse(
+        return new BattleResponse(
                 battle.getTargetDistance(),
                 battle.getStartTime(),
-                toFinishedRunnerResponses(runners));
+                toRunnerResponses(runners));
     }
 
-    private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
-        final List<Runner> finishedRunners =
-                runners.stream()
-                        .filter(Runner::isFinished)
-                        .sorted(comparing(Runner::getRecentRunnerRecord))
-                        .toList();
-
-        final List<FinishedRunnerResponse> result = new ArrayList<>();
+    private List<RunnerResponse> toRunnerResponses(List<Runner> runners) {
+        final List<RunnerResponse> result = new ArrayList<>();
 
         int rank = 1;
-        for (Runner runner : finishedRunners) {
-            FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank++);
+        for (Runner runner : runners) {
+            RunnerResponse response = new RunnerResponse(runner.getId(), rank++, runner.getLastRecordTime());
             result.add(response);
         }
 
         return result;
-    }
-
-    private FinishedRunnerResponse toFinishedRunnerResponse(Runner runner, int rank) {
-        return new FinishedRunnerResponse(runner.getId(), rank, runner.getEndTime());
     }
 
     public MessageResponse changeRunnerFinished(String runnerId) {

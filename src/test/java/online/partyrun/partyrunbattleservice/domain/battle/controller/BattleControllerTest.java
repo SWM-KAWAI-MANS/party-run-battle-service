@@ -9,12 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleIdResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.MessageResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerTest;
 
 import org.junit.jupiter.api.*;
@@ -170,16 +170,16 @@ class BattleControllerTest extends RestControllerTest {
             String battleId = "battleId";
             LocalDateTime now = LocalDateTime.now();
 
-            FinishedBattleResponse response =
-                    new FinishedBattleResponse(
+            BattleResponse response =
+                    new BattleResponse(
                             1000,
                             now.minusMinutes(5),
                             List.of(
-                                    new FinishedRunnerResponse("parkseongwoo", 1, now),
-                                    new FinishedRunnerResponse(
+                                    new RunnerResponse("parkseongwoo", 1, now),
+                                    new RunnerResponse(
                                             "nojunhyuk", 2, now.plusMinutes(1))));
 
-            given(battleService.getFinishedBattle(battleId, "defaultUser")).willReturn(response);
+            given(battleService.getBattle(battleId, "defaultUser")).willReturn(response);
 
             final ResultActions actions =
                     mockMvc.perform(

@@ -1,20 +1,18 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotFinisedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotReadyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Runner")
 class RunnerTest {
@@ -226,17 +224,10 @@ class RunnerTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너의_종료시간을_가져올_때 {
+    class 러너의_마지막_기록의_시간을_가져올_때 {
 
         @Test
-        @DisplayName("러너가 종료상태가 아니라면 예외를 던진다.")
-        void throwException() {
-            assertThatThrownBy(() -> 박성우.getEndTime())
-                    .isInstanceOf(RunnerIsNotFinisedException.class);
-        }
-
-        @Test
-        @DisplayName("종료 시간을 반환한다.")
+        @DisplayName("마지막 기록 시간을 반환한다.")
         void returnEndTime() {
             박성우.changeRunningStatus();
             LocalDateTime now = LocalDateTime.now();
@@ -248,7 +239,7 @@ class RunnerTest {
             박성우.addRecords(recentGpsData);
             박성우.changeFinishStatus();
 
-            assertThat(박성우.getEndTime()).isEqualTo(now.plusSeconds(1));
+            assertThat(박성우.getLastRecordTime()).isEqualTo(now.plusSeconds(1));
         }
     }
 }
