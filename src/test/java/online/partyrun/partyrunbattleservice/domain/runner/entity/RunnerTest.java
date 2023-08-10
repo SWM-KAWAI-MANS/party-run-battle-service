@@ -241,5 +241,33 @@ class RunnerTest {
 
             assertThat(박성우.getLastRecordTime()).isEqualTo(now.plusSeconds(1));
         }
+
+        @Test
+        @DisplayName("최근 기록이 없다면 null 반환")
+        void returnFalse() {
+            assertThat(박성우.getLastRecordTime()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_목표거리에_도달했는지_확인할_떄 {
+
+        @Test
+        @DisplayName("최근 기록이 없다면 false 반환")
+        void returnFalse() {
+            assertThat(박성우.isRunningMoreThan(100)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_최근_거리를_확인할_때 {
+
+        @Test
+        @DisplayName("최근 기록이 없다면 0반환")
+        void returnFalse() {
+            assertThat(박성우.getDistance()).isZero();
+        }
     }
 }

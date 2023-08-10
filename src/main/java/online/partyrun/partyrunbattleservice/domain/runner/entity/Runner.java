@@ -135,4 +135,8 @@ public class Runner {
         }
         return this.recentRunnerRecord.getDistance();
     }
+
+    public int compareToLastRecordTime(Runner other) {
+        return this.recentRunnerRecord.compareTo(other.recentRunnerRecord);
+    }
 }

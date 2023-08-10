@@ -157,13 +157,14 @@ public class Battle {
             boolean isFinished1 = runner1.isRunningMoreThan(targetDistance);
             boolean isFinished2 = runner2.isRunningMoreThan(targetDistance);
 
-            if (isFinished1 && !isFinished2) {
+            if (isFinished1 && isFinished2) {
+                return runner1.compareToLastRecordTime(runner2);
+            } else if (isFinished1) {
                 return -1;
-            } else if (!isFinished1 && isFinished2) {
+            } else if (isFinished2){
                 return 1;
-            } else {
-                return Double.compare(runner2.getDistance(), runner1.getDistance());
             }
+            return Double.compare(runner2.getDistance(), runner1.getDistance());
         };
         return this.runners.stream()
                 .sorted(rankComparator)
