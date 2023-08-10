@@ -298,7 +298,7 @@ class BattleServiceTest {
             RunnerDistanceResponse response =
                     battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
             assertAll(
-                    () -> assertThat(response.getData().get("runnerId")).isEqualTo(박성우.getId()),
+                    () -> assertThat(response.getData()).containsEntry("runnerId", 박성우.getId()),
                     () -> assertThat((double) response.getData().get("distance")).isPositive());
         }
 

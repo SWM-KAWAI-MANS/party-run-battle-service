@@ -169,7 +169,7 @@ class RunnerTest {
                                                     .map(RunnerRecord::getGpsData)
                                                     .toList())
                                     .isEqualTo(gpsData),
-                    () -> assertThat(박성우.getRunnerRecords().get(0).getDistance()).isEqualTo(0));
+                    () -> assertThat(박성우.getRunnerRecords().get(0).getDistance()).isZero());
         }
 
         @Test
@@ -192,7 +192,7 @@ class RunnerTest {
                                                     .skip(1)
                                                     .toList())
                                     .isEqualTo(newGpsData),
-                    () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotEqualTo(0));
+                    () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotZero());
         }
     }
 
