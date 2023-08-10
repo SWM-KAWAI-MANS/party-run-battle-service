@@ -176,8 +176,7 @@ class BattleControllerTest extends RestControllerTest {
                             now.minusMinutes(5),
                             List.of(
                                     new RunnerResponse("parkseongwoo", 1, now),
-                                    new RunnerResponse(
-                                            "nojunhyuk", 2, now.plusMinutes(1))));
+                                    new RunnerResponse("nojunhyuk", 2, now.plusMinutes(1))));
 
             given(battleService.getBattle(battleId, "defaultUser")).willReturn(response);
 

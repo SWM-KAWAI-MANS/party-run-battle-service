@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 import online.partyrun.partyrunbattleservice.domain.battle.exception.*;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
@@ -12,6 +13,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerR
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataTimeException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFoundException;
+
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
@@ -153,21 +155,20 @@ public class Battle {
     }
 
     public List<Runner> getRunnersOrderByRank() {
-        Comparator<Runner> rankComparator = (runner1, runner2) -> {
-            boolean isFinished1 = runner1.isRunningMoreThan(targetDistance);
-            boolean isFinished2 = runner2.isRunningMoreThan(targetDistance);
+        Comparator<Runner> rankComparator =
+                (runner1, runner2) -> {
+                    boolean isFinished1 = runner1.isRunningMoreThan(targetDistance);
+                    boolean isFinished2 = runner2.isRunningMoreThan(targetDistance);
 
-            if (isFinished1 && isFinished2) {
-                return runner1.compareToLastRecordTime(runner2);
-            } else if (isFinished1) {
-                return -1;
-            } else if (isFinished2){
-                return 1;
-            }
-            return Double.compare(runner2.getDistance(), runner1.getDistance());
-        };
-        return this.runners.stream()
-                .sorted(rankComparator)
-                .toList();
+                    if (isFinished1 && isFinished2) {
+                        return runner1.compareToLastRecordTime(runner2);
+                    } else if (isFinished1) {
+                        return -1;
+                    } else if (isFinished2) {
+                        return 1;
+                    }
+                    return Double.compare(runner2.getDistance(), runner1.getDistance());
+                };
+        return this.runners.stream().sorted(rankComparator).toList();
     }
 }
