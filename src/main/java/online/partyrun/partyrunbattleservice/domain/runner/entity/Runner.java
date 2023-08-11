@@ -74,7 +74,7 @@ public class Runner {
         final List<GpsData> copiedGpsData = new ArrayList<>(gpsData);
         Collections.sort(copiedGpsData);
 
-        if (Objects.isNull(this.recentRunnerRecord)) {
+        if (hasNotRecentRecord()) {
             final GpsData firstGpsData = copiedGpsData.get(FIRST_GPSDATA);
             final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, DEFAULT_DISTANCE);
 
@@ -100,12 +100,19 @@ public class Runner {
     }
 
     private void validateRecentRunnerRecords() {
-        if (Objects.isNull(this.recentRunnerRecord)) {
+        if (hasNotRecentRecord()) {
             throw new InvalidRecentRunnerRecordException(this.id);
         }
     }
 
+    private boolean hasNotRecentRecord() {
+        return Objects.isNull(this.recentRunnerRecord);
+    }
+
     public boolean isRunningMoreThan(int targetDistance) {
+        if (hasNotRecentRecord()) {
+            return false;
+        }
         return this.recentRunnerRecord.hasBiggerDistanceThan(targetDistance);
     }
 
@@ -115,14 +122,21 @@ public class Runner {
         this.status = RunnerStatus.FINISHED;
     }
 
-    public LocalDateTime getEndTime() {
-        validateIsFinishedStatus();
+    public LocalDateTime getLastRecordTime() {
+        if (hasNotRecentRecord()) {
+            return null;
+        }
         return this.recentRunnerRecord.getTime();
     }
 
-    private void validateIsFinishedStatus() {
-        if (!isFinished()) {
-            throw new RunnerIsNotFinisedException(this.id);
+    public double getDistance() {
+        if (hasNotRecentRecord()) {
+            return 0;
         }
+        return this.recentRunnerRecord.getDistance();
+    }
+
+    public int compareToLastRecordTime(Runner other) {
+        return this.recentRunnerRecord.compareTo(other.recentRunnerRecord);
     }
 }

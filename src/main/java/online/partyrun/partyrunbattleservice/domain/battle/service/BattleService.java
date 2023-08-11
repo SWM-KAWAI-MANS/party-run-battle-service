@@ -1,7 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import static java.util.Comparator.comparing;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,7 +13,7 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
@@ -35,14 +33,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BattleService {
 
-    BattleMapper battleMapper;
     BattleRepository battleRepository;
     BattleDao battleDao;
     RunnerService runnerService;
     ApplicationEventPublisher eventPublisher;
     Clock clock;
 
-    public BattleResponse createBattle(BattleCreateRequest request) {
+    public BattleIdResponse createBattle(BattleCreateRequest request) {
         final List<String> runnerIds = request.getRunnerIds();
         validateRunningRunner(runnerIds);
         final List<Runner> runners = runnerService.findAllById(runnerIds);
@@ -50,7 +47,7 @@ public class BattleService {
         final Battle battle =
                 battleRepository.save(
                         new Battle(request.getDistance(), runners, LocalDateTime.now(clock)));
-        return battleMapper.toResponse(battle);
+        return new BattleIdResponse(battle.getId());
     }
 
     private void validateRunningRunner(List<String> runnerIds) {
@@ -60,13 +57,13 @@ public class BattleService {
         }
     }
 
-    public BattleResponse getReadyBattle(String runnerId) {
+    public BattleIdResponse getReadyBattle(String runnerId) {
         final Battle battle =
                 battleRepository
                         .findByRunnersIdAndRunnersStatus(runnerId, RunnerStatus.READY)
                         .orElseThrow(() -> new ReadyRunnerNotFoundException(runnerId));
 
-        return battleMapper.toResponse(battle);
+        return new BattleIdResponse(battle.getId());
     }
 
     public void setRunnerRunning(String battleId, String runnerId) {
@@ -134,36 +131,25 @@ public class BattleService {
         return request.record().stream().map(GpsRequest::toEntity).toList();
     }
 
-    public FinishedBattleResponse getFinishedBattle(String battleId, String runnerId) {
+    public BattleResponse getBattle(String battleId, String runnerId) {
         final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
-        final List<Runner> runners = battle.getRunners();
+        final List<Runner> runners = battle.getRunnersOrderByRank();
 
-        return new FinishedBattleResponse(
-                battle.getTargetDistance(),
-                battle.getStartTime(),
-                toFinishedRunnerResponses(runners));
+        return new BattleResponse(
+                battle.getTargetDistance(), battle.getStartTime(), toRunnerResponses(runners));
     }
 
-    private List<FinishedRunnerResponse> toFinishedRunnerResponses(List<Runner> runners) {
-        final List<Runner> finishedRunners =
-                runners.stream()
-                        .filter(Runner::isFinished)
-                        .sorted(comparing(Runner::getRecentRunnerRecord))
-                        .toList();
-
-        final List<FinishedRunnerResponse> result = new ArrayList<>();
+    private List<RunnerResponse> toRunnerResponses(List<Runner> runners) {
+        final List<RunnerResponse> result = new ArrayList<>();
 
         int rank = 1;
-        for (Runner runner : finishedRunners) {
-            FinishedRunnerResponse response = toFinishedRunnerResponse(runner, rank++);
+        for (Runner runner : runners) {
+            RunnerResponse response =
+                    new RunnerResponse(runner.getId(), rank++, runner.getLastRecordTime());
             result.add(response);
         }
 
         return result;
-    }
-
-    private FinishedRunnerResponse toFinishedRunnerResponse(Runner runner, int rank) {
-        return new FinishedRunnerResponse(runner.getId(), rank, runner.getEndTime());
     }
 
     public MessageResponse changeRunnerFinished(String runnerId) {

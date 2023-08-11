@@ -17,6 +17,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerNotFo
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -151,5 +152,23 @@ public class Battle {
     public RunnerRecord getRunnerRecentRecord(String runnerId) {
         final Runner runner = findRunner(runnerId);
         return runner.getRecentRunnerRecord();
+    }
+
+    public List<Runner> getRunnersOrderByRank() {
+        Comparator<Runner> rankComparator =
+                (runner1, runner2) -> {
+                    boolean isFinished1 = runner1.isRunningMoreThan(targetDistance);
+                    boolean isFinished2 = runner2.isRunningMoreThan(targetDistance);
+
+                    if (isFinished1 && isFinished2) {
+                        return runner1.compareToLastRecordTime(runner2);
+                    } else if (isFinished1) {
+                        return -1;
+                    } else if (isFinished2) {
+                        return 1;
+                    }
+                    return Double.compare(runner2.getDistance(), runner1.getDistance());
+                };
+        return this.runners.stream().sorted(rankComparator).toList();
     }
 }

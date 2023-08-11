@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
-import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotFinisedException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotReadyException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.RunnerIsNotRunningException;
 
@@ -171,7 +170,7 @@ class RunnerTest {
                                                     .map(RunnerRecord::getGpsData)
                                                     .toList())
                                     .isEqualTo(gpsData),
-                    () -> assertThat(박성우.getRunnerRecords().get(0).getDistance()).isEqualTo(0));
+                    () -> assertThat(박성우.getRunnerRecords().get(0).getDistance()).isZero());
         }
 
         @Test
@@ -194,7 +193,7 @@ class RunnerTest {
                                                     .skip(1)
                                                     .toList())
                                     .isEqualTo(newGpsData),
-                    () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotEqualTo(0));
+                    () -> assertThat(박성우.getRunnerRecords().get(1).getDistance()).isNotZero());
         }
     }
 
@@ -226,17 +225,10 @@ class RunnerTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너의_종료시간을_가져올_때 {
+    class 러너의_마지막_기록의_시간을_가져올_때 {
 
         @Test
-        @DisplayName("러너가 종료상태가 아니라면 예외를 던진다.")
-        void throwException() {
-            assertThatThrownBy(() -> 박성우.getEndTime())
-                    .isInstanceOf(RunnerIsNotFinisedException.class);
-        }
-
-        @Test
-        @DisplayName("종료 시간을 반환한다.")
+        @DisplayName("마지막 기록 시간을 반환한다.")
         void returnEndTime() {
             박성우.changeRunningStatus();
             LocalDateTime now = LocalDateTime.now();
@@ -248,7 +240,35 @@ class RunnerTest {
             박성우.addRecords(recentGpsData);
             박성우.changeFinishStatus();
 
-            assertThat(박성우.getEndTime()).isEqualTo(now.plusSeconds(1));
+            assertThat(박성우.getLastRecordTime()).isEqualTo(now.plusSeconds(1));
+        }
+
+        @Test
+        @DisplayName("최근 기록이 없다면 null 반환")
+        void returnFalse() {
+            assertThat(박성우.getLastRecordTime()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_목표거리에_도달했는지_확인할_떄 {
+
+        @Test
+        @DisplayName("최근 기록이 없다면 false 반환")
+        void returnFalse() {
+            assertThat(박성우.isRunningMoreThan(100)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class 러너가_최근_거리를_확인할_때 {
+
+        @Test
+        @DisplayName("최근 기록이 없다면 0반환")
+        void returnFalse() {
+            assertThat(박성우.getDistance()).isZero();
         }
     }
 }

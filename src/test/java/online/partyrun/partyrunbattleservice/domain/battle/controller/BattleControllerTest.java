@@ -8,13 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.FinishedBattleResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.MessageResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.FinishedRunnerResponse;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerTest;
 
 import org.junit.jupiter.api.*;
@@ -47,7 +47,7 @@ class BattleControllerTest extends RestControllerTest {
         class 정상적인_러너들의_id가_주어지면 {
 
             BattleCreateRequest request = new BattleCreateRequest(1000, List.of("1", "2", "3"));
-            BattleResponse response = new BattleResponse("battle_id");
+            BattleIdResponse response = new BattleIdResponse("battle_id");
 
             @Test
             @DisplayName("배틀 생성을 수행한다")
@@ -111,7 +111,7 @@ class BattleControllerTest extends RestControllerTest {
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 배틀에_참여하고_있는_러너의_id가_주어지면 {
 
-            BattleResponse response = new BattleResponse("battle_id");
+            BattleIdResponse response = new BattleIdResponse("battle_id");
 
             @Test
             @DisplayName("배틀 정보를 반환한다.")
@@ -170,16 +170,15 @@ class BattleControllerTest extends RestControllerTest {
             String battleId = "battleId";
             LocalDateTime now = LocalDateTime.now();
 
-            FinishedBattleResponse response =
-                    new FinishedBattleResponse(
+            BattleResponse response =
+                    new BattleResponse(
                             1000,
                             now.minusMinutes(5),
                             List.of(
-                                    new FinishedRunnerResponse("parkseongwoo", 1, now),
-                                    new FinishedRunnerResponse(
-                                            "nojunhyuk", 2, now.plusMinutes(1))));
+                                    new RunnerResponse("parkseongwoo", 1, now),
+                                    new RunnerResponse("nojunhyuk", 2, now.plusMinutes(1))));
 
-            given(battleService.getFinishedBattle(battleId, "defaultUser")).willReturn(response);
+            given(battleService.getBattle(battleId, "defaultUser")).willReturn(response);
 
             final ResultActions actions =
                     mockMvc.perform(

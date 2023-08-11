@@ -86,7 +86,7 @@ class BattleServiceTest {
                 BattleCreateRequest request =
                         new BattleCreateRequest(1000, List.of(장세연.getId(), 이승열.getId()));
 
-                final BattleResponse response = battleService.createBattle(request);
+                final BattleIdResponse response = battleService.createBattle(request);
                 assertThat(response.id()).isNotNull();
             }
         }
@@ -142,7 +142,7 @@ class BattleServiceTest {
                 BattleCreateRequest request = new BattleCreateRequest(1000, List.of(장세연.getId()));
                 battleService.createBattle(request);
 
-                final BattleResponse response = battleService.getReadyBattle(장세연.getId());
+                final BattleIdResponse response = battleService.getReadyBattle(장세연.getId());
                 assertThat(response.id()).isNotNull();
             }
         }
@@ -300,7 +300,7 @@ class BattleServiceTest {
             RunnerDistanceResponse response =
                     battleService.calculateDistance(진행중인_배틀.getId(), 박성우.getId(), RECORD_REQUEST1);
             assertAll(
-                    () -> assertThat(response.getData().get("runnerId")).isEqualTo(박성우.getId()),
+                    () -> assertThat(response.getData()).containsEntry("runnerId", 박성우.getId()),
                     () -> assertThat((double) response.getData().get("distance")).isPositive());
         }
 
@@ -351,7 +351,7 @@ class BattleServiceTest {
 
             gpsData0 = GpsData.of(0, 0, 0, now);
             gpsData1 = GpsData.of(1, 1, 0, now.plusSeconds(1));
-            gpsData2 = GpsData.of(1, 1, 0, now.plusSeconds(2));
+            gpsData2 = GpsData.of(0.0001, 0.0001, 0, now.plusSeconds(2));
 
             배틀.addRecords(박성우.getId(), List.of(gpsData0, gpsData1));
 
@@ -359,23 +359,12 @@ class BattleServiceTest {
         }
 
         @Test
-        @DisplayName("종료되지 않은 러너의 결과는 반환하지 않는다.")
-        void returnOnlyFinishedRunnerResult() {
-            FinishedBattleResponse response =
-                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
-            assertThat(response.runners())
-                    .extracting("id", "rank")
-                    .containsExactly(tuple(박성우.getId(), 1));
-        }
-
-        @Test
-        @DisplayName("종료된 러너들의 결과를 반환한다.")
+        @DisplayName("모든 러너들의 결과를 반환한다.")
         void returnFinishedRunnerResult() {
-            배틀.addRecords(노준혁.getId(), List.of(gpsData0, gpsData2));
+            배틀.addRecords(노준혁.getId(), List.of(gpsData1, gpsData2));
             mongoTemplate.save(배틀);
 
-            FinishedBattleResponse response =
-                    battleService.getFinishedBattle(배틀.getId(), 박성우.getId());
+            BattleResponse response = battleService.getBattle(배틀.getId(), 박성우.getId());
             assertThat(response.runners())
                     .extracting("id", "rank")
                     .containsExactly(tuple(박성우.getId(), 1), tuple(노준혁.getId(), 2));

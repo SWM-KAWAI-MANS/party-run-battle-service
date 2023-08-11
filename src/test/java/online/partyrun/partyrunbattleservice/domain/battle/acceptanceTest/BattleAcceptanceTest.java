@@ -14,7 +14,7 @@ import io.restassured.response.Response;
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
-import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
+import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 
@@ -58,7 +58,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
                                 assertThat(response.statusCode())
                                         .isEqualTo(HttpStatus.CREATED.value()),
                         () ->
-                                assertThat(toObject(response, BattleResponse.class).id())
+                                assertThat(toObject(response, BattleIdResponse.class).id())
                                         .isNotNull());
             }
         }
@@ -89,7 +89,7 @@ public class BattleAcceptanceTest extends AcceptanceTest {
                 assertAll(
                         () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                         () ->
-                                assertThat(toObject(response, BattleResponse.class).id())
+                                assertThat(toObject(response, BattleIdResponse.class).id())
                                         .isNotNull());
             }
         }
