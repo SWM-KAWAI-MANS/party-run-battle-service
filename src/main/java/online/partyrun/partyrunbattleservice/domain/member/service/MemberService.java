@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
+import online.partyrun.partyrunbattleservice.domain.member.exception.MemberNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,5 +34,10 @@ public class MemberService {
     public void save(String memberId) {
         final Member member = new Member(memberId);
         memberRepository.save(member);
+    }
+
+    public void delete(String memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+        memberRepository.delete(member);
     }
 }

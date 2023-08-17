@@ -32,5 +32,9 @@ public class SqsMessageListener {
         if (sqsMessage.isCreatedMessage()) {
             memberService.save((String) sqsMessage.value());
         }
+
+        if (sqsMessage.isDeletedMessage()) {
+            memberService.delete((String) sqsMessage.value());
+        }
     }
 }
