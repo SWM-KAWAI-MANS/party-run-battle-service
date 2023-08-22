@@ -179,11 +179,11 @@ class BattleControllerTest extends RestControllerTest {
                                             new RunnerRecordResponse(0.00001, 0.00001, 0, now, 1.5)
                                     )
                             ),
-                            new RunnerResponse("runner노준혁", 1, now,
+                            new RunnerResponse("runner노준혁", 2, now,
                                     List.of(
                                             new RunnerRecordResponse(0, 0, 0, now.minusSeconds(1), 0),
                                             new RunnerRecordResponse(0.000005, 0.000005, 0, now, 0.75),
-                                            new RunnerRecordResponse(0.00001, 0.00001, 0, now.plusSeconds(1), 0.75)
+                                            new RunnerRecordResponse(0.00001, 0.00001, 0, now.plusSeconds(1), 1.5)
                                     )
                             )
                     )
