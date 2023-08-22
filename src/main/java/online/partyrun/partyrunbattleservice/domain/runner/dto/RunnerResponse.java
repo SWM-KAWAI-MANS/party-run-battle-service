@@ -1,5 +1,13 @@
 package online.partyrun.partyrunbattleservice.domain.runner.dto;
 
-import java.time.LocalDateTime;
+import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 
-public record RunnerResponse(String id, int rank, LocalDateTime endTime) {}
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record RunnerResponse(String id, int rank, LocalDateTime endTime, List<RunnerRecordResponse> records) {
+
+    public RunnerResponse(int rank, Runner runner) {
+        this(runner.getId(), rank, runner.getLastRecordTime(), runner.getRunnerRecords().stream().map(RunnerRecordResponse::new).toList());
+    }
+}

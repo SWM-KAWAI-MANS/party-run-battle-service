@@ -1,12 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleCreateRequest;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.BattleResponse;
@@ -14,9 +7,9 @@ import online.partyrun.partyrunbattleservice.domain.battle.dto.MessageResponse;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidNumberOfBattleRunnerException;
 import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunnerNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
+import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerRecordResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.testmanager.docs.RestControllerTest;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,13 +24,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(BattleController.class)
 @DisplayName("BattleController")
 class BattleControllerTest extends RestControllerTest {
 
     private static final String BATTLE_URL = "/battles";
 
-    @MockBean BattleService battleService;
+    @MockBean
+    BattleService battleService;
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -170,13 +171,23 @@ class BattleControllerTest extends RestControllerTest {
             String battleId = "battleId";
             LocalDateTime now = LocalDateTime.now();
 
-            BattleResponse response =
-                    new BattleResponse(
-                            1000,
-                            now.minusMinutes(5),
-                            List.of(
-                                    new RunnerResponse("parkseongwoo", 1, now),
-                                    new RunnerResponse("nojunhyuk", 2, now.plusMinutes(1))));
+
+            BattleResponse response = new BattleResponse(1.5, now.minusMinutes(5),
+                    List.of(new RunnerResponse("runner박성우", 1, now,
+                                    List.of(
+                                            new RunnerRecordResponse(0, 0, 0, now.minusSeconds(1), 0),
+                                            new RunnerRecordResponse(0.00001, 0.00001, 0, now, 1.5)
+                                    )
+                            ),
+                            new RunnerResponse("runner노준혁", 1, now,
+                                    List.of(
+                                            new RunnerRecordResponse(0, 0, 0, now.minusSeconds(1), 0),
+                                            new RunnerRecordResponse(0.000005, 0.000005, 0, now, 0.75),
+                                            new RunnerRecordResponse(0.00001, 0.00001, 0, now.plusSeconds(1), 0.75)
+                                    )
+                            )
+                    )
+            );
 
             given(battleService.getBattle(battleId, "defaultUser")).willReturn(response);
 

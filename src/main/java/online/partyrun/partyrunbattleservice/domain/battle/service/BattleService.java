@@ -3,7 +3,6 @@ package online.partyrun.partyrunbattleservice.domain.battle.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -13,19 +12,16 @@ import online.partyrun.partyrunbattleservice.domain.battle.exception.ReadyRunner
 import online.partyrun.partyrunbattleservice.domain.battle.exception.RunnerAlreadyRunningInBattleException;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleDao;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.dto.RunnerResponse;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.service.RunnerService;
 import online.partyrun.partyrunbattleservice.global.annotation.DistributedLock;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -132,24 +128,13 @@ public class BattleService {
     }
 
     public BattleResponse getBattle(String battleId, String runnerId) {
-        final Battle battle = findBattleExceptRunnerRecords(battleId, runnerId);
-        final List<Runner> runners = battle.getRunnersOrderByRank();
-
-        return new BattleResponse(
-                battle.getTargetDistance(), battle.getStartTime(), toRunnerResponses(runners));
+        final Battle battle = findBattle(battleId, runnerId);
+        return BattleResponse.from(battle);
     }
 
-    private List<RunnerResponse> toRunnerResponses(List<Runner> runners) {
-        final List<RunnerResponse> result = new ArrayList<>();
-
-        int rank = 1;
-        for (Runner runner : runners) {
-            RunnerResponse response =
-                    new RunnerResponse(runner.getId(), rank++, runner.getLastRecordTime());
-            result.add(response);
-        }
-
-        return result;
+    private Battle findBattle(String battleId, String runnerId) {
+        return battleRepository.findByIdAndRunnersId(battleId, runnerId)
+                .orElseThrow(() -> new BattleNotFoundException(battleId, runnerId));
     }
 
     public MessageResponse changeRunnerFinished(String runnerId) {
