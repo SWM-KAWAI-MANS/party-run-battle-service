@@ -10,10 +10,7 @@ import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerR
 import online.partyrun.partyrunbattleservice.domain.runner.exception.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -61,7 +58,7 @@ public class Runner {
         final List<RunnerRecord> newRecords = createRecords(gpsData);
 
         this.runnerRecords.addAll(newRecords);
-        this.recentRunnerRecord = Collections.max(newRecords);
+        this.recentRunnerRecord = Collections.max(this.runnerRecords);
     }
 
     private void validateIsNotRunningStatus() {
@@ -77,6 +74,7 @@ public class Runner {
         if (hasNotRecentRecord()) {
             final GpsData firstGpsData = copiedGpsData.get(FIRST_GPSDATA_INDEX);
             final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, DEFAULT_DISTANCE);
+            this.runnerRecords.add(firstRecord);
 
             return createRecords(firstRecord, copiedGpsData);
         }
@@ -86,9 +84,13 @@ public class Runner {
 
     private List<RunnerRecord> createRecords(RunnerRecord record, List<GpsData> gpsData) {
         List<RunnerRecord> records = new ArrayList<>();
+
         for (GpsData newGpsData : gpsData) {
-            record = record.createNextRecord(newGpsData);
-            records.add(record);
+            final Optional<RunnerRecord> newRecord = record.createNextRecord(newGpsData);
+            if (newRecord.isPresent()) {
+                record = newRecord.get();
+                records.add(record);
+            }
         }
 
         return records;

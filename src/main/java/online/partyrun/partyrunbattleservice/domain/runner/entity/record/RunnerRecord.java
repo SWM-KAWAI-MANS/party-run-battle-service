@@ -4,18 +4,20 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.IllegalRecordDistanceException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RunnerRecord implements Comparable<RunnerRecord> {
     private static final double MIN_DISTANCE = 0;
+    private static final double MIN_DURATION_SECOND = 0;
+    private static final double MAXIMUM_RUNNER_SPEED_OF_METERS_PER_SECOND = 12.42;
 
     GpsData gpsData;
     double distance;
@@ -39,10 +41,20 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
         }
     }
 
-    public RunnerRecord createNextRecord(GpsData gpsData) {
-        double distance = this.gpsData.calculateDistance(gpsData);
+    public Optional<RunnerRecord> createNextRecord(GpsData gpsData) {
+        final double distanceBetweenGpsData = this.gpsData.calculateDistance(gpsData);
+        final double durationSeconds = this.gpsData.calculateDuration(gpsData);
 
-        return new RunnerRecord(gpsData, this.distance + distance);
+        if (distanceBetweenGpsData == MIN_DURATION_SECOND) {
+            return Optional.empty();
+        }
+
+        final double runnerSpeedOfMetersPerSecond = distanceBetweenGpsData / durationSeconds;
+        if (MAXIMUM_RUNNER_SPEED_OF_METERS_PER_SECOND >= runnerSpeedOfMetersPerSecond) {
+            return Optional.of(new RunnerRecord(gpsData, this.distance + distanceBetweenGpsData));
+        }
+
+        return Optional.empty();
     }
 
     public boolean hasBiggerDistanceThan(int targetDistance) {
