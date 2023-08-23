@@ -17,7 +17,7 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Runner {
     private static final int DEFAULT_DISTANCE = 0;
-    private static final int FIRST_GPSDATA_INDEX = 0;
+    private static final int FIRST_GPS_DATA_INDEX = 0;
 
     String id;
     RunnerStatus status = RunnerStatus.READY;
@@ -72,7 +72,7 @@ public class Runner {
         Collections.sort(copiedGpsData);
 
         if (hasNotRecentRecord()) {
-            final GpsData firstGpsData = copiedGpsData.get(FIRST_GPSDATA_INDEX);
+            final GpsData firstGpsData = copiedGpsData.get(FIRST_GPS_DATA_INDEX);
             final RunnerRecord firstRecord = new RunnerRecord(firstGpsData, DEFAULT_DISTANCE);
             this.runnerRecords.add(firstRecord);
 
