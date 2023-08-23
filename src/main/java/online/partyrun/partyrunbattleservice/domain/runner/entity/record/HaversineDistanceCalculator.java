@@ -10,9 +10,9 @@ public class HaversineDistanceCalculator implements DistanceCalculator<GeoJsonPo
         final double lat1 = point1.getY();
         final double lng1 = point1.getX();
         final double lat2 = point2.getY();
-        final double lhg2 = point2.getX();
+        final double lng2 = point2.getX();
 
-        return EARTH_RADIUS * distanceRadians(lat1, lng1, lat2, lhg2);
+        return EARTH_RADIUS * distanceRadians(lat1, lng1, lat2, lng2);
     }
 
     private double distanceRadians(double lat1, double lng1, double lat2, double lng2) {
