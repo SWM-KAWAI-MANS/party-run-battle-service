@@ -1,14 +1,10 @@
 package online.partyrun.partyrunbattleservice.domain.battle.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -18,16 +14,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DataMongoTest
 @DisplayName("BattleRepository")
 class BattleRepositoryTest {
 
     @Autowired MongoTemplate mongoTemplate;
     @Autowired private BattleRepository battleRepository;
-    Runner 박성우 = new Runner("박성우");
-    Runner 박현준 = new Runner("박현준");
-    Runner 노준혁 = new Runner("노준혁");
+    Runner 박성우;
+    Runner 박현준;
+    Runner 노준혁;
     LocalDateTime now = LocalDateTime.now();
+
+    @BeforeEach
+    void setUp() {
+        박성우 = new Runner("박성우");
+        박현준 = new Runner("박현준");
+        노준혁 = new Runner("노준혁");
+    }
 
     @AfterEach
     void tearDown() {
@@ -81,7 +87,12 @@ class BattleRepositoryTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class findByRunnersIdAndRunnersStatus는 {
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+        Battle 배틀;
+
+        @BeforeEach
+        void setUp() {
+            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+        }
 
         @Test
         @DisplayName("현재 준비 중인 배틀이 존재하면 반환한다.")
@@ -112,7 +123,12 @@ class BattleRepositoryTest {
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class existsByIdAndRunnersIdAndRunnersStatus는 {
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+        Battle 배틀;
+
+        @BeforeEach
+        void setUp() {
+            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+        }
 
         @Test
         @DisplayName("battleId, runnerId, status를 만족하는 데이터의 존재하면 true를 반환한다.")
@@ -141,7 +157,12 @@ class BattleRepositoryTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 배틀_조회_시 {
 
-        Battle 배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
+        Battle 배틀;
+
+        @BeforeEach
+        void setUp() {
+            배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
+        }
 
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -161,14 +182,11 @@ class BattleRepositoryTest {
             @Test
             @DisplayName("현재까지의 기록들을 반환하지 않는다.")
             void returnNullRecords() {
-                Battle result =
-                        battleRepository
+                Battle result = battleRepository
                                 .findBattleExceptRunnerRecords(배틀.getId(), 박성우.getId())
                                 .orElseThrow();
-                assertThat(
-                                result.getRunners().stream()
-                                        .allMatch(r -> r.getRunnerRecords().isEmpty()))
-                        .isTrue();
+
+                assertThat(result.getRunners().stream().allMatch(r -> r.getRunnerRecords().isEmpty())).isTrue();
             }
         }
     }

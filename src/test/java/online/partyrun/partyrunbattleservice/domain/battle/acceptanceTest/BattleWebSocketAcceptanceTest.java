@@ -1,11 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.acceptanceTest;
 
-import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.jwtmanager.JwtGenerator;
 import online.partyrun.partyrunbattleservice.acceptance.AcceptanceTest;
 import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
@@ -18,7 +12,6 @@ import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepo
 import online.partyrun.partyrunbattleservice.domain.member.entity.Member;
 import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepository;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -40,18 +33,29 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
+import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @Import({WebSocketTestConfiguration.class, TestTimeConfig.class})
 @DisplayName("BattleWebSocketAcceptance")
 public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     private static final String TOPIC_BATTLE_PREFIX = "/topic/battles";
     private static final String PUB_BATTLE_PREFIX = "/pub/battles";
 
-    @Autowired WebSocketStompClient webSocketStompClient;
-    @Autowired BattleRepository battleRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired MongoTemplate mongoTemplate;
-    @Autowired JwtGenerator jwtGenerator;
-    @Autowired Clock clock;
+    @Autowired
+    WebSocketStompClient webSocketStompClient;
+    @Autowired
+    BattleRepository battleRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    MongoTemplate mongoTemplate;
+    @Autowired
+    JwtGenerator jwtGenerator;
+    @Autowired
+    Clock clock;
     Battle 배틀;
     StompSession 박성우_Session;
     StompSession 박현준_Session;
@@ -60,8 +64,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     BlockingQueue<BattleWebSocketResponse> 박현준_Queue;
     BlockingQueue<BattleWebSocketResponse> 노준혁_Queue;
 
-    private Runner 러너_생성(Member 멤버박성우) {
-        return new Runner(memberRepository.save(멤버박성우).getId());
+    private Runner 러너_생성(Member member) {
+        return new Runner(memberRepository.save(member).getId());
     }
 
     private String 토큰_생성(Runner 노준혁) {
@@ -77,7 +81,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                     .connectAsync(
                             "ws://localhost:" + port + "/api/ws/battles/connection",
                             headers,
-                            new StompSessionHandlerAdapter() {})
+                            new StompSessionHandlerAdapter() {
+                            })
                     .get(1, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException();
@@ -109,9 +114,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         박현준_Session = 웹소켓_연결(박현준_accessToken);
         노준혁_Session = 웹소켓_연결(노준혁_accessToken);
 
-        배틀 =
-                battleRepository.save(
-                        new Battle(1000, List.of(박성우, 박현준, 노준혁), LocalDateTime.now(clock)));
+        배틀 = battleRepository.save(new Battle(10, List.of(박성우, 박현준, 노준혁), LocalDateTime.now(clock)));
 
         박성우_Queue = new LinkedBlockingDeque<>();
         박현준_Queue = new LinkedBlockingDeque<>();
@@ -186,11 +189,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                                         .isEqualTo(박현준_response)
                                         .isEqualTo(노준혁_response),
                         () ->
-                                assertThat(박성우_response.getData().get("startTime"))
-                                        .isEqualTo(
-                                                LocalDateTime.now(clock)
-                                                        .plusSeconds(5)
-                                                        .toString()));
+                                assertThat(박성우_response.getData())
+                                        .containsEntry("startTime", LocalDateTime.now(clock).plusSeconds(5).toString()));
             }
         }
 
@@ -214,6 +214,19 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 러너들의_기록을_저장할_때 {
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime gpsTime = now.plusMinutes(1);
+        GpsRequest GPS_REQUEST1 = new GpsRequest(0, 0, 0, gpsTime);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(0.00001, 0.00001, 0.00001, gpsTime.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(0.00002, 0.00002, 0.00002, gpsTime.plusSeconds(2));
+        RunnerRecordRequest RECORD_REQUEST1 = new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
+        GpsRequest GPS_REQUEST4 = new GpsRequest(0.00003, 0.00003, 0.00003, gpsTime.plusSeconds(3));
+        GpsRequest GPS_REQUEST5 = new GpsRequest(0.00004, 0.00004, 0.00004, gpsTime.plusSeconds(4));
+        GpsRequest GPS_REQUEST6 = new GpsRequest(0.00005, 0.00005, 0.00005, gpsTime.plusSeconds(5));
+        RunnerRecordRequest RECORD_REQUEST2 = new RunnerRecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6));
+        GpsRequest GPS_REQUEST7 = new GpsRequest(0.00006, 0.00006, 0.00006, gpsTime.plusSeconds(6));
+        GpsRequest GPS_REQUEST8 = new GpsRequest(0.00007, 0.00007, 0.00007, gpsTime.plusSeconds(7));
+        GpsRequest GPS_REQUEST9 = new GpsRequest(0.00008, 0.00008, 0.00008, gpsTime.plusSeconds(8));
+        RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
 
         @BeforeEach
         void setUpData() throws InterruptedException {
@@ -235,23 +248,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             mongoTemplate.updateFirst(query, Update.update("startTime", now), Battle.class);
         }
 
-        LocalDateTime gpsTime = now.plusMinutes(1);
-        GpsRequest GPS_REQUEST1 = new GpsRequest(0, 0, 0, gpsTime);
-        GpsRequest GPS_REQUEST2 = new GpsRequest(0.001, 0.001, 0.001, gpsTime.plusSeconds(1));
-        GpsRequest GPS_REQUEST3 = new GpsRequest(0.002, 0.002, 0.002, gpsTime.plusSeconds(2));
-        GpsRequest GPS_REQUEST4 = new GpsRequest(0.003, 0.003, 0.003, gpsTime.plusSeconds(3));
-        GpsRequest GPS_REQUEST5 = new GpsRequest(0.004, 0.004, 0.004, gpsTime.plusSeconds(4));
-        GpsRequest GPS_REQUEST6 = new GpsRequest(0.005, 0.005, 0.005, gpsTime.plusSeconds(5));
-        GpsRequest GPS_REQUEST7 = new GpsRequest(0.006, 0.006, 0.006, gpsTime.plusSeconds(6));
-        GpsRequest GPS_REQUEST8 = new GpsRequest(0.007, 0.007, 0.007, gpsTime.plusSeconds(7));
-        GpsRequest GPS_REQUEST9 = new GpsRequest(0.008, 0.008, 0.008, gpsTime.plusSeconds(8));
-        RunnerRecordRequest RECORD_REQUEST1 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
-        RunnerRecordRequest RECORD_REQUEST2 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST4, GPS_REQUEST5, GPS_REQUEST6));
-        RunnerRecordRequest RECORD_REQUEST3 =
-                new RunnerRecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
-
         @Nested
         @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
         class 좌표를_받으면 {
@@ -269,15 +265,15 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 좌표_보내기_요청(노준혁_Session, RECORD_REQUEST1);
                 좌표_보내기_요청(박현준_Session, RECORD_REQUEST1);
 
-                BattleWebSocketResponse 박성우_response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박성우_response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박성우_response3 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response1 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response2 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response3 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response1 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response2 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 박성우_response1 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response2 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response3 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response1 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response2 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response3 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response1 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response2 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
 
                 assertThat(List.of(박성우_response1, 박성우_response2, 박성우_response3))
                         .containsAll(List.of(노준혁_response1, 노준혁_response2, 노준혁_response3))
@@ -293,58 +289,30 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 Thread.sleep(300);
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST3);
 
-                BattleWebSocketResponse 박성우_response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박성우_response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박성우_response3 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박성우_response4 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-
-                BattleWebSocketResponse 박현준_response1 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response2 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response3 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response4 = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-
-                BattleWebSocketResponse 노준혁_response1 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response2 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response4 = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 박성우_response1 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response2 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response3 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response4 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
+                
+                BattleWebSocketResponse 박현준_response1 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response2 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response3 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박현준_response4 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
+                
+                BattleWebSocketResponse 노준혁_response1 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response2 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 노준혁_response4 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
 
                 final List<BattleWebSocketResponse> responses =
                         List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
                 assertAll(
-                        () ->
-                                assertThat(responses)
-                                        .containsAll(
-                                                List.of(
-                                                        노준혁_response1,
-                                                        노준혁_response2,
-                                                        노준혁_response3,
-                                                        노준혁_response4))
-                                        .containsAll(
-                                                List.of(
-                                                        박현준_response1,
-                                                        박현준_response2,
-                                                        박현준_response3,
-                                                        박현준_response4)),
-                        () ->
-                                assertThat(
-                                                responses.stream()
-                                                        .filter(
-                                                                battleWebSocketResponse ->
-                                                                        battleWebSocketResponse
-                                                                                .getType()
-                                                                                .equals(
-                                                                                        "BATTLE_RUNNING")))
-                                        .hasSize(3),
-                        () ->
-                                assertThat(
-                                                responses.stream()
-                                                        .filter(
-                                                                battleWebSocketResponse ->
-                                                                        battleWebSocketResponse
-                                                                                .getType()
-                                                                                .equals(
-                                                                                        "RUNNER_FINISHED")))
-                                        .hasSize(1));
+                        () -> assertThat(responses).containsAll(List.of(노준혁_response1, 노준혁_response2, 노준혁_response3, 노준혁_response4))
+                                .containsAll(List.of(박현준_response1, 박현준_response2, 박현준_response3, 박현준_response4)),
+                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("BATTLE_RUNNING")))
+                                .hasSize(3),
+                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("RUNNER_FINISHED")))
+                                .hasSize(1));
             }
 
             @Test
@@ -357,12 +325,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 BattleWebSocketResponse response2 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
 
                 assertAll(
-                        () ->
-                                assertThat(Objects.isNull(response1) && Objects.isNull(response2))
-                                        .isFalse(),
-                        () ->
-                                assertThat(Objects.isNull(response1) || Objects.isNull(response2))
-                                        .isTrue());
+                        () -> assertThat(Objects.isNull(response1) && Objects.isNull(response2)).isFalse(),
+                        () -> assertThat(Objects.isNull(response1) || Objects.isNull(response2)).isTrue()
+                );
             }
         }
     }
