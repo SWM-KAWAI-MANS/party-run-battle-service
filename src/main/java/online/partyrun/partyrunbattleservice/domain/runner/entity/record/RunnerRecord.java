@@ -42,16 +42,16 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
     }
 
     public Optional<RunnerRecord> createNextRecord(GpsData gpsData) {
-        final double distanceBetweenGpsData = this.gpsData.calculateDistance(gpsData);
+        final double movingDistance = this.gpsData.calculateDistance(gpsData);
         final double durationSeconds = this.gpsData.calculateDuration(gpsData);
 
-        if (distanceBetweenGpsData == MIN_DURATION_SECOND) {
+        if (movingDistance == MIN_DURATION_SECOND) {
             return Optional.empty();
         }
 
-        final double runnerSpeedOfMetersPerSecond = distanceBetweenGpsData / durationSeconds;
+        final double runnerSpeedOfMetersPerSecond = movingDistance / durationSeconds;
         if (MAXIMUM_RUNNER_SPEED_OF_METERS_PER_SECOND >= runnerSpeedOfMetersPerSecond) {
-            return Optional.of(new RunnerRecord(gpsData, this.distance + distanceBetweenGpsData));
+            return Optional.of(new RunnerRecord(gpsData, this.distance + movingDistance));
         }
 
         return Optional.empty();
