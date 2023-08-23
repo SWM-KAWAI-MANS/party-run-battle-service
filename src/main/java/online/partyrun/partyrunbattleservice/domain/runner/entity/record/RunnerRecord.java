@@ -45,7 +45,7 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
         final double movingDistance = this.gpsData.calculateDistance(gpsData);
         final double durationSeconds = this.gpsData.calculateDuration(gpsData);
 
-        if (movingDistance == MIN_DURATION_SECOND) {
+        if (durationSeconds == MIN_DURATION_SECOND) {
             return Optional.empty();
         }
 
