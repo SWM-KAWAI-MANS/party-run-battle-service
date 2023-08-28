@@ -90,7 +90,7 @@ public class BattleService {
 
         battleRepository.save(battle);
 
-        return new BattleStartedResponse(battle.getStartTime());
+        return new BattleStartedResponse(battleId, battle.getStartTime());
     }
 
     @DistributedLock(key = "#battleId.concat('-').concat(#runnerId)")
@@ -108,7 +108,7 @@ public class BattleService {
                 battle.getRunnerStatus(runnerId));
 
         publishRunnerFinishedEventIfRunnerFinished(battle, runnerId);
-        return new RunnerDistanceResponse(runnerId, battle.getRunnerRecentDistance(runnerId));
+        return new RunnerDistanceResponse(battleId, runnerId, battle.getRunnerRecentDistance(runnerId));
     }
 
     private void publishRunnerFinishedEventIfRunnerFinished(Battle battle, String runnerId) {

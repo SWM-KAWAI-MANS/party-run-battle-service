@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class BattleStartedResponse extends BattleWebSocketResponse {
 
-    public BattleStartedResponse(LocalDateTime startTime) {
-        super("BATTLE_START", Map.of("startTime", startTime));
+    public BattleStartedResponse(String battleId, LocalDateTime startTime) {
+        super("BATTLE_START", battleId, Map.of("startTime", startTime));
     }
 }
