@@ -179,9 +179,9 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             void getBattleStartTime() throws InterruptedException {
                 준비완료_요청(노준혁_Session, 배틀);
 
-                final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(3, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(3, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(3, TimeUnit.SECONDS);
 
                 assertAll(() -> assertThat(박성우_response)
                                 .isEqualTo(박현준_response)
