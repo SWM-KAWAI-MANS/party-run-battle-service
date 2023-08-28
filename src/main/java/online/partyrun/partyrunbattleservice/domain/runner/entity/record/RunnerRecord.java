@@ -45,16 +45,10 @@ public class RunnerRecord implements Comparable<RunnerRecord> {
         final double movingDistanceMeter = this.gpsData.calculateDistance(gpsData);
         final double durationSeconds = this.gpsData.calculateDuration(gpsData);
 
-        if (durationSeconds == MIN_DURATION_SECOND) {
+        if (durationSeconds == MIN_DURATION_SECOND || MAXIMUM_RUNNER_SPEED_OF_METERS_PER_SECOND < movingDistanceMeter / durationSeconds) {
             return Optional.empty();
         }
-
-        final double runnerSpeedOfMetersPerSecond = movingDistanceMeter / durationSeconds;
-        if (MAXIMUM_RUNNER_SPEED_OF_METERS_PER_SECOND >= runnerSpeedOfMetersPerSecond) {
-            return Optional.of(new RunnerRecord(gpsData, this.distance + movingDistanceMeter));
-        }
-
-        return Optional.empty();
+        return Optional.of(new RunnerRecord(gpsData, this.distance + movingDistanceMeter));
     }
 
     public boolean hasBiggerDistanceThan(int targetDistance) {
