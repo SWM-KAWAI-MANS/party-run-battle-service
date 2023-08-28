@@ -11,7 +11,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
