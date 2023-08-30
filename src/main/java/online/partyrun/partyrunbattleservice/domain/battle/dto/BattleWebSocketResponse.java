@@ -13,5 +13,6 @@ import java.util.Map;
 public class BattleWebSocketResponse {
 
     String type;
+    String battleId;
     Map<String, Object> data;
 }

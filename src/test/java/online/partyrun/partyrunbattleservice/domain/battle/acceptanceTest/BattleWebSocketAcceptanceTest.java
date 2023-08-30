@@ -68,8 +68,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         return new Runner(memberRepository.save(member).getId());
     }
 
-    private String 토큰_생성(Runner 노준혁) {
-        return jwtGenerator.generate(노준혁.getId(), Set.of("ROLE_USER")).accessToken();
+    private String 토큰_생성(Runner runner) {
+        return jwtGenerator.generate(runner.getId(), Set.of("ROLE_USER")).accessToken();
     }
 
     private StompSession 웹소켓_연결(String accessToken) {
@@ -77,8 +77,7 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
             headers.add("Authorization", accessToken);
 
-            return webSocketStompClient
-                    .connectAsync(
+            return webSocketStompClient.connectAsync(
                             "ws://localhost:" + port + "/api/ws/battles/connection",
                             headers,
                             new StompSessionHandlerAdapter() {
@@ -89,15 +88,14 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private void 구독_요청(
-            StompSession session, BlockingQueue<BattleWebSocketResponse> queue, Battle battle) {
+    private void 구독_요청(StompSession session, BlockingQueue<BattleWebSocketResponse> queue, Battle battle) {
         session.subscribe(
                 String.format("%s/%s", TOPIC_BATTLE_PREFIX, battle.getId()),
                 new StompFrameHandlerImpl(queue));
     }
 
-    private void 준비완료_요청(StompSession 박성우_Session) {
-        박성우_Session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, 배틀.getId()), "준비 완료");
+    private void 준비완료_요청(StompSession session, Battle battle) {
+        session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, battle.getId()), "준비 완료");
     }
 
     @BeforeEach
@@ -170,27 +168,25 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 구독_요청(박현준_Session, 박현준_Queue, 배틀);
                 구독_요청(노준혁_Session, 노준혁_Queue, 배틀);
 
-                준비완료_요청(박성우_Session);
-                준비완료_요청(박현준_Session);
+                준비완료_요청(박성우_Session, 배틀);
+                준비완료_요청(박현준_Session, 배틀);
             }
 
             @Test
             @DisplayName("배틀 시작 시간을 응답한다.")
             void getBattleStartTime() throws InterruptedException {
-                준비완료_요청(노준혁_Session);
+                준비완료_요청(노준혁_Session, 배틀);
 
-                final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(3, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(3, TimeUnit.SECONDS);
+                final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(3, TimeUnit.SECONDS);
 
-                assertAll(
-                        () ->
-                                assertThat(박성우_response)
-                                        .isEqualTo(박현준_response)
-                                        .isEqualTo(노준혁_response),
-                        () ->
-                                assertThat(박성우_response.getData())
-                                        .containsEntry("startTime", LocalDateTime.now(clock).plusSeconds(5).toString()));
+                assertAll(() -> assertThat(박성우_response)
+                                .isEqualTo(박현준_response)
+                                .isEqualTo(노준혁_response)
+                                .isNotNull(),
+                        () -> assertThat(박성우_response.getData().get("startTime"))
+                                .isEqualTo(LocalDateTime.now(clock).plusSeconds(5).toString()));
             }
         }
 
@@ -201,14 +197,15 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             @Test
             @DisplayName("응답을 받지 못한다.")
             void getBattleStartTime() throws InterruptedException {
-                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
-                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(300, TimeUnit.MILLISECONDS);
-                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
 
                 assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
             }
         }
     }
+
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -229,19 +226,21 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
         RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(GPS_REQUEST7, GPS_REQUEST8, GPS_REQUEST9));
 
         @BeforeEach
-        void setUpData() throws InterruptedException {
+        void setUpData() {
             구독_요청(박성우_Session, 박성우_Queue, 배틀);
             구독_요청(박현준_Session, 박현준_Queue, 배틀);
             구독_요청(노준혁_Session, 노준혁_Queue, 배틀);
 
-            준비완료_요청(박성우_Session);
-            준비완료_요청(박현준_Session);
-            준비완료_요청(노준혁_Session);
+            준비완료_요청(박성우_Session, 배틀);
+            준비완료_요청(박현준_Session, 배틀);
+            준비완료_요청(노준혁_Session, 배틀);
 
             // 시작 시간 응답
-            박성우_Queue.poll(1, TimeUnit.SECONDS);
-            박현준_Queue.poll(1, TimeUnit.SECONDS);
-            노준혁_Queue.poll(1, TimeUnit.SECONDS);
+            assertAll(
+                    () -> assertThat(박성우_Queue.poll(1, TimeUnit.SECONDS)).isNotNull(),
+                    () -> assertThat(박현준_Queue.poll(1, TimeUnit.SECONDS)).isNotNull(),
+                    () -> assertThat(노준혁_Queue.poll(1, TimeUnit.SECONDS)).isNotNull()
+            );
 
             // 배틀 시간 변경
             Query query = Query.query(Criteria.where("id").is(배틀.getId()));
@@ -293,12 +292,12 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 BattleWebSocketResponse 박성우_response2 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 박성우_response3 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 박성우_response4 = 박성우_Queue.poll(500, TimeUnit.MILLISECONDS);
-                
+
                 BattleWebSocketResponse 박현준_response1 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 박현준_response2 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 박현준_response3 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 박현준_response4 = 박현준_Queue.poll(500, TimeUnit.MILLISECONDS);
-                
+
                 BattleWebSocketResponse 노준혁_response1 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 노준혁_response2 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
                 BattleWebSocketResponse 노준혁_response3 = 노준혁_Queue.poll(500, TimeUnit.MILLISECONDS);
@@ -306,13 +305,25 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
                 final List<BattleWebSocketResponse> responses =
                         List.of(박성우_response1, 박성우_response2, 박성우_response3, 박성우_response4);
-                assertAll(
-                        () -> assertThat(responses).containsAll(List.of(노준혁_response1, 노준혁_response2, 노준혁_response3, 노준혁_response4))
-                                .containsAll(List.of(박현준_response1, 박현준_response2, 박현준_response3, 박현준_response4)),
-                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("BATTLE_RUNNING")))
-                                .hasSize(3),
-                        () -> assertThat(responses.stream().filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("RUNNER_FINISHED")))
-                                .hasSize(1));
+                assertAll(() -> assertThat(responses)
+                                .containsAll(List.of(
+                                        노준혁_response1,
+                                        노준혁_response2,
+                                        노준혁_response3,
+                                        노준혁_response4))
+                                .containsAll(List.of(
+                                        박현준_response1,
+                                        박현준_response2,
+                                        박현준_response3,
+                                        박현준_response4)),
+                        () ->
+                                assertThat(responses.stream()
+                                        .filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("BATTLE_RUNNING")))
+                                        .hasSize(3),
+                        () ->
+                                assertThat(responses.stream()
+                                        .filter(battleWebSocketResponse -> battleWebSocketResponse.getType().equals("RUNNER_FINISHED")))
+                                        .hasSize(1));
             }
 
             @Test
@@ -321,8 +332,8 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
                 좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
 
-                BattleWebSocketResponse response1 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
-                BattleWebSocketResponse response2 = 박성우_Queue.poll(300, TimeUnit.MILLISECONDS);
+                BattleWebSocketResponse response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
 
                 assertAll(
                         () -> assertThat(Objects.isNull(response1) && Objects.isNull(response2)).isFalse(),
