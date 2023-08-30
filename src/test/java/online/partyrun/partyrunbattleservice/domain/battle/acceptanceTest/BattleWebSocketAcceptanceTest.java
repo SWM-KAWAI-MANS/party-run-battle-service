@@ -188,23 +188,24 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         () -> assertThat(박성우_response.getData().get("startTime"))
                                 .isEqualTo(LocalDateTime.now(clock).plusSeconds(5).toString()));
             }
+        }
 
-            @Nested
-            @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-            class 모두_보내지_않았다면 {
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class 모두_보내지_않았다면 {
 
-                @Test
-                @DisplayName("응답을 받지 못한다.")
-                void getBattleStartTime() throws InterruptedException {
-                    BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                    BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                    BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+            @Test
+            @DisplayName("응답을 받지 못한다.")
+            void getBattleStartTime() throws InterruptedException {
+                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
 
-                    assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
-                }
+                assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
             }
         }
     }
+
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
