@@ -63,7 +63,7 @@ class BattleServiceTest {
         장세연 = new Runner(memberRepository.save(멤버_장세연).getId());
         이승열 = new Runner(memberRepository.save(멤버_이승열).getId());
 
-        배틀 = battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
+        배틀 = battleRepository.save(new Battle(10, List.of(박성우, 노준혁), now));
     }
 
     @AfterEach
@@ -269,13 +269,13 @@ class BattleServiceTest {
         Battle 진행중인_배틀;
         LocalDateTime now = LocalDateTime.now().plusMinutes(1);
         GpsRequest GPS_REQUEST0 = new GpsRequest(0, 0, 0, now);
-        GpsRequest GPS_REQUEST1 = new GpsRequest(0.001, 0.001, 0.001, now);
-        GpsRequest GPS_REQUEST2 = new GpsRequest(0.002, 0.002, 0.002, now.plusSeconds(1));
-        GpsRequest GPS_REQUEST3 = new GpsRequest(0.003, 0.003, 0.003, now.plusSeconds(2));
-        GpsRequest GPS_REQUEST4 = new GpsRequest(0.004, 0.004, 0.004, now.plusSeconds(3));
-        GpsRequest GPS_REQUEST5 = new GpsRequest(0.005, 0.005, 0.005, now.plusSeconds(4));
-        GpsRequest GPS_REQUEST6 = new GpsRequest(0.006, 0.006, 0.006, now.plusSeconds(5));
-        GpsRequest GPS_REQUEST7 = new GpsRequest(0.007, 0.007, 0.007, now.plusSeconds(6));
+        GpsRequest GPS_REQUEST1 = new GpsRequest(0.00001, 0.00001, 0.001, now);
+        GpsRequest GPS_REQUEST2 = new GpsRequest(0.00002, 0.00002, 0.002, now.plusSeconds(1));
+        GpsRequest GPS_REQUEST3 = new GpsRequest(0.00003, 0.00003, 0.003, now.plusSeconds(2));
+        GpsRequest GPS_REQUEST4 = new GpsRequest(0.00004, 0.00004, 0.004, now.plusSeconds(3));
+        GpsRequest GPS_REQUEST5 = new GpsRequest(0.00005, 0.00005, 0.005, now.plusSeconds(4));
+        GpsRequest GPS_REQUEST6 = new GpsRequest(0.00006, 0.00006, 0.006, now.plusSeconds(5));
+        GpsRequest GPS_REQUEST7 = new GpsRequest(0.00007, 0.00007, 0.007, now.plusSeconds(6));
         RunnerRecordRequest RECORD_REQUEST1 =
                 new RunnerRecordRequest(
                         List.of(GPS_REQUEST0, GPS_REQUEST1, GPS_REQUEST2, GPS_REQUEST3));
@@ -348,8 +348,8 @@ class BattleServiceTest {
             배틀.setStartTime(now.minusMinutes(1));
 
             gpsData0 = GpsData.of(0, 0, 0, now);
-            gpsData1 = GpsData.of(1, 1, 0, now.plusSeconds(1));
-            gpsData2 = GpsData.of(0.0001, 0.0001, 0, now.plusSeconds(2));
+            gpsData1 = GpsData.of(0.00001, 0.00001, 0, now.plusSeconds(1));
+            gpsData2 = GpsData.of(0.00002, 0.00002, 0, now.plusSeconds(2));
 
             배틀.addRecords(박성우.getId(), List.of(gpsData0, gpsData1));
 

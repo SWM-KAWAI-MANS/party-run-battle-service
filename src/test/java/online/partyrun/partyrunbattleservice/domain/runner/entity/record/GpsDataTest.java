@@ -1,23 +1,23 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.GpsTimeNullException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.PastGpsDataTimeException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DisplayName("GpsData")
 class GpsDataTest {
     LocalDateTime time = LocalDateTime.now();
-    GpsData GPSDATA_0 = GpsData.of(1, 1, 1, time);
-    GpsData GPSDATA_1 = GpsData.of(1, 1, 1, time.plusSeconds(1));
-    GpsData GPSDATA_2 = GpsData.of(2, 2, 2, time.plusSeconds(2));
+    int durationNano = 500_000_000;
+    GpsData GPSDATA_0 = GpsData.of(0, 0, 1, time);
+    GpsData GPSDATA_1 = GpsData.of(0.0001, 0.0001, 1, time.plusNanos(durationNano * 2L));
+    GpsData GPSDATA_2 = GpsData.of(0.0002, 0.0002, 2, time.plusNanos(durationNano * 3L));
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -83,5 +83,22 @@ class GpsDataTest {
     void throwException() {
         assertThatThrownBy(() -> GpsData.of(1, 1, 1, null))
                 .isInstanceOf(GpsTimeNullException.class);
+    }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class GpsData_사이의_시간을_측정_시 {
+
+        @Test
+        @DisplayName("소숫점의 초 단위로 반환한다.")
+        void returnDuration() {
+            final double duration1 = GPSDATA_0.calculateDuration(GPSDATA_1);
+            final double duration2 = GPSDATA_1.calculateDuration(GPSDATA_2);
+
+            assertAll(
+                    () -> assertThat(duration1).isEqualTo(1),
+                    () ->  assertThat(duration2).isEqualTo(0.5)
+            );
+        }
     }
 }

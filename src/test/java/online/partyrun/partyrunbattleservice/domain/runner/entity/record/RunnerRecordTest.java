@@ -1,21 +1,23 @@
 package online.partyrun.partyrunbattleservice.domain.runner.entity.record;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import online.partyrun.partyrunbattleservice.domain.runner.exception.IllegalRecordDistanceException;
 import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidGpsDataException;
-
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("RunnerRecord")
 class RunnerRecordTest {
 
     LocalDateTime time = LocalDateTime.now();
-    GpsData GPSDATA_1 = GpsData.of(1, 1, 1, time);
-    GpsData GPSDATA_2 = GpsData.of(2, 2, 2, time.plusSeconds(1));
+    GpsData GPSDATA_0 = GpsData.of(0, 0, 1, time);
+    GpsData GPSDATA_1 = GpsData.of(0.00001, 0.00001, 1, time.plusSeconds(1));
+    GpsData GPSDATA_2 = GpsData.of(0.00002, 0.00002, 1, time.plusSeconds(2));
+    GpsData GPSDATA_3 = GpsData.of(0.0001, 0.0001, 1, time.plusSeconds(1));
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -46,14 +48,33 @@ class RunnerRecordTest {
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
     class 현재_기록으로부터_새로운_기록_생성_시 {
 
-        RunnerRecord runnerRecord = new RunnerRecord(GPSDATA_1, 1);
+        RunnerRecord runnerRecord = new RunnerRecord(GPSDATA_0, 1);
 
         @Test
         @DisplayName("거리 차이를 통해 새로운 기록을 생성한다.")
         void createNewRecord() {
-            RunnerRecord newRecord = runnerRecord.createNextRecord(GPSDATA_2);
+            Optional<RunnerRecord> newRecord = runnerRecord.createNextRecord(GPSDATA_1);
 
-            assertThat(newRecord.getDistance()).isGreaterThan(runnerRecord.getDistance());
+            assertAll(
+                    () -> assertThat(newRecord).isNotEmpty(),
+                    () ->  assertThat(newRecord.get().getDistance()).isGreaterThan(runnerRecord.getDistance())
+
+            );
+        }
+
+        @Test
+        @DisplayName("같은 시각의 GPS Data가 이미 존재하는 경우, 기록으로 추가하지 않는다.")
+        void cannotCreateNewRecord() {
+            Optional<RunnerRecord> newRecord = runnerRecord.createNextRecord(GPSDATA_0);
+
+            assertThat(newRecord).isEmpty();
+        }
+
+        @Test
+        @DisplayName("제한 속력을 넘어가면, 기록으로 추가하지 않는다.")
+        void invalidSpeed() {
+            Optional<RunnerRecord> newRecord = runnerRecord.createNextRecord(GPSDATA_3);
+            assertThat(newRecord).isEmpty();
         }
     }
 
