@@ -244,7 +244,7 @@ class BattleRepositoryTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class updateReadyOrRunningRunnerStatus는 {
+    class findBattleByRunnerStatus는 {
 
         Battle 배틀1;
         Battle 배틀2;
@@ -257,27 +257,35 @@ class BattleRepositoryTest {
         }
 
         @Test
-        @DisplayName("Ready 또는 Running 상태의 러너를 Finished 상태로 변경한다.")
-        void changeStatus() {
-            battleRepository.updateReadyOrRunningRunnerStatus(
+        @DisplayName("특정 상태의 러너를 가진 배틀을 조회한다.")
+        void returnBattle() {
+            final Battle battle1 = battleRepository.findBattleByRunnerStatus(
                     박성우.getId(),
-                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
-                    RunnerStatus.FINISHED);
-            battleRepository.updateReadyOrRunningRunnerStatus(
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING)).orElseThrow();
+            final Battle battle2 = battleRepository.findBattleByRunnerStatus(
                     노준혁.getId(),
-                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING),
-                    RunnerStatus.FINISHED);
-
-            Battle result1 = battleRepository.findById(배틀1.getId()).orElseThrow();
-            Battle result2 = battleRepository.findById(배틀2.getId()).orElseThrow();
+                    List.of(RunnerStatus.READY, RunnerStatus.RUNNING)).orElseThrow();
 
             assertAll(
-                    () ->
-                            assertThat(result1.getRunnerStatus(박성우.getId()))
-                                    .isEqualTo(RunnerStatus.FINISHED),
-                    () ->
-                            assertThat(result2.getRunnerStatus(노준혁.getId()))
-                                    .isEqualTo(RunnerStatus.FINISHED));
+                    () -> assertThat(battle1.getId()).isEqualTo(배틀1.getId()),
+                    () -> assertThat(battle2.getId()).isEqualTo(배틀2.getId())
+            );
+        }
+
+        @Test
+        @DisplayName("특정 상태의 러너가 없다면 배틀을 반환하지 않는다.")
+        void returnNull() {
+            final Optional<Battle> battle1 = battleRepository.findBattleByRunnerStatus(
+                    박성우.getId(),
+                    List.of(RunnerStatus.FINISHED));
+            final Optional<Battle> battle2 = battleRepository.findBattleByRunnerStatus(
+                    노준혁.getId(),
+                    List.of(RunnerStatus.FINISHED));
+
+            assertAll(
+                    () -> assertThat(battle1).isEmpty(),
+                    () -> assertThat(battle2).isEmpty()
+            );
         }
     }
 }

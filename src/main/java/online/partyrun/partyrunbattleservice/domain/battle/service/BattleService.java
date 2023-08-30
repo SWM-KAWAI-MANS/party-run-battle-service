@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -138,8 +139,8 @@ public class BattleService {
     }
 
     public MessageResponse changeRunnerFinished(String runnerId) {
-        battleRepository.updateReadyOrRunningRunnerStatus(
-                runnerId, List.of(RunnerStatus.READY, RunnerStatus.RUNNING), RunnerStatus.FINISHED);
+        final Optional<Battle> battle = battleRepository.findBattleByRunnerStatus(runnerId, List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+        battle.ifPresent(value -> battleDao.updateRunnerStatus(value.getId(), runnerId, RunnerStatus.FINISHED));
 
         return new MessageResponse("요청이 정상적으로 처리되었습니다.");
     }
