@@ -381,7 +381,8 @@ class BattleServiceTest {
     class 러너의_상태를_종료할_때 {
 
         @Test
-        void changeRunnerFinished() {
+        @DisplayName("준비 상태의 러너를 종료한다.")
+        void changeReadyRunnerFinished() {
             MessageResponse response = battleService.changeRunnerFinished(노준혁.getId());
 
             final Battle battle = battleRepository.findById(배틀.getId()).get();
@@ -389,6 +390,22 @@ class BattleServiceTest {
                     () -> assertThat(response).isInstanceOf(MessageResponse.class),
                     () -> assertThat(battle.getRunnerStatus(노준혁.getId())).isEqualTo(RunnerStatus.FINISHED),
                     () -> assertThat(battle.getRunnerStatus(박성우.getId())).isEqualTo(RunnerStatus.READY)
+            );
+        }
+
+        @Test
+        @DisplayName("러닝 상태의 러너를 종료한다.")
+        void changeRunningRunnerFinished() {
+            battleService.setRunnerRunning(배틀.getId(), 노준혁.getId());
+            battleService.setRunnerRunning(배틀.getId(), 박성우.getId());
+
+            MessageResponse response = battleService.changeRunnerFinished(노준혁.getId());
+
+            final Battle battle = battleRepository.findById(배틀.getId()).get();
+            Assertions.assertAll(
+                    () -> assertThat(response).isInstanceOf(MessageResponse.class),
+                    () -> assertThat(battle.getRunnerStatus(노준혁.getId())).isEqualTo(RunnerStatus.FINISHED),
+                    () -> assertThat(battle.getRunnerStatus(박성우.getId())).isEqualTo(RunnerStatus.RUNNING)
             );
         }
     }
