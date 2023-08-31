@@ -82,6 +82,21 @@ class BattleRepositoryTest {
 
             assertThat(actual).isTrue();
         }
+
+        @Test
+        @DisplayName("러너가 속한 모든 배틀이 이미 종료되었다면 READY, RUNNING으로 조회 시 false를 반환한다.")
+        void returnFalseOneRunner() {
+            노준혁.changeRunningStatus();
+            노준혁.changeFinishStatus();
+
+            final Battle 배틀 = battleRepository.save(new Battle(1000, List.of(노준혁), now));
+
+            boolean actual = battleRepository.existsByRunnersIdInAndRunnersStatusIn(
+                            List.of(박성우.getId(), 박현준.getId(), 노준혁.getId()),
+                            List.of(RunnerStatus.READY, RunnerStatus.RUNNING));
+
+            assertThat(actual).isFalse();
+        }
     }
 
     @Nested
