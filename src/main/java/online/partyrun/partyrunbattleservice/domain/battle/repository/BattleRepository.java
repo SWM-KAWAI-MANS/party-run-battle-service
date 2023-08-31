@@ -15,8 +15,6 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     boolean existsByIdAndRunnersIdAndRunnersStatus(
             String battleId, String runnerId, RunnerStatus status);
 
-    boolean existsByRunnersAndRunnersStatusIn(String runnerId, List<RunnerStatus> ready);
-
     boolean existsByRunnersIdInAndRunnersStatusIn(List<String> runnersId, List<RunnerStatus> ready);
 
     Optional<Battle> findByRunnersIdAndRunnersStatus(String runnerId, RunnerStatus runnerStatus);
