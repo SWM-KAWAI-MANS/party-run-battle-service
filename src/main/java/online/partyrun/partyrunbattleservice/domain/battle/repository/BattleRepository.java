@@ -15,10 +15,12 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     boolean existsByIdAndRunnersIdAndRunnersStatus(
             String battleId, String runnerId, RunnerStatus status);
 
-    boolean existsByRunnersAndRunnersStatusIn(String runnerId, List<RunnerStatus> ready);
+    @Query(value = "{'runners': {'$elemMatch': {'_id': {'$in': ?0}, 'status': {'$in': ?1}}}}", fields = "{'runners.runnerRecords': 0}")
+    List<Battle> findByRunnersIdInAndRunnersStatusIn(List<String> runnersId, List<RunnerStatus> runnerStatuses);
 
-    boolean existsByRunnersIdInAndRunnersStatusIn(List<String> runnersId, List<RunnerStatus> ready);
-
+    default boolean existsByRunnersIdInAndRunnersStatusIn(List<String> runnersId, List<RunnerStatus> runnerStatuses) {
+        return !findByRunnersIdInAndRunnersStatusIn(runnersId, runnerStatuses).isEmpty();
+    }
     Optional<Battle> findByRunnersIdAndRunnersStatus(String runnerId, RunnerStatus runnerStatus);
 
     @Query(value = "{ 'id': ?0, 'runners.id': ?1 }", fields = "{'runners.runnerRecords': 0}")
