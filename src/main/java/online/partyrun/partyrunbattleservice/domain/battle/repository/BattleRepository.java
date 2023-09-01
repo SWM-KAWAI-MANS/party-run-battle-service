@@ -36,8 +36,7 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
             List<RunnerRecord> runnerRecords,
             RunnerRecord recentRecord,
             RunnerStatus runnerStatus);
-
-    @Query(value = "{'runners.id': ?0, 'runners.status': { $in: ?1 }}", fields = "{'runners.runnerRecords': 0}")
+    @Query(value = "{'runners': {'$elemMatch': {'_id': ?0, 'status': {'$in': ?1}}}}", fields = "{'runners.runnerRecords': 0}")
     Optional<Battle> findBattleByRunnerStatus(String runnerId, List<RunnerStatus> preRunnerStatus);
 
     Optional<Battle> findByIdAndRunnersId(String battleId, String runnerId);
