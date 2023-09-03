@@ -1,9 +1,10 @@
-package online.partyrun.partyrunbattleservice.global.controller;
+package online.partyrun.partyrunbattleservice.domain.battle.controller;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import online.partyrun.partyrunbattleservice.global.controller.ExceptionResponse;
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
 import online.partyrun.partyrunbattleservice.global.exception.NotFoundException;
 
@@ -34,7 +35,7 @@ public class HttpControllerAdvice {
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBadRequestException(BadRequestException exception) {
-        log.warn(exception.getMessage());
+        log.warn("[EXCEPTION] {}", exception.getMessage());
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
     }
 
@@ -51,21 +52,21 @@ public class HttpControllerAdvice {
                                                 error.getDefaultMessage()))
                         .collect(Collectors.joining(", "));
 
-        log.warn(message);
+        log.warn("[EXCEPTION] {}", message);
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleNotFoundException(NotFoundException exception) {
-        log.warn(exception.getMessage());
+        log.warn("[EXCEPTION] {}", exception.getMessage());
         return new ExceptionResponse(NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     @ExceptionHandler({RuntimeException.class, Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleInternalServerErrorException(Exception exception) {
-        log.error(exception.getMessage());
+        log.error("[EXCEPTION] {}", exception.getMessage());
         return new ExceptionResponse(SERVER_ERROR_MESSAGE);
     }
 }
