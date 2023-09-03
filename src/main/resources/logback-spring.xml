@@ -13,6 +13,29 @@
         </appender>
     </springProfile>
 
+    <logger name="online.partyrun.partyrunbattleservice.global.logging.RequestCachingFilter" level="INFO">
+        <appender-ref ref="REQUEST_INFO_LOG"/>
+    </logger>
+
+    <appender name="REQUEST_INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/request_info.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/request_info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
         <file>${LOGS_ABSOLUTE_PATH}/info.log</file>
