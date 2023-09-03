@@ -34,7 +34,7 @@ public class HttpControllerAdvice {
         MissingRequestHeaderException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleBadRequestException(BadRequestException exception) {
+    public ExceptionResponse handleBadRequestException(Exception exception) {
         log.warn("[EXCEPTION] {}", exception.getMessage());
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
     }
