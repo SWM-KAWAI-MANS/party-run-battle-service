@@ -13,7 +13,7 @@
         </appender>
     </springProfile>
 
-    <logger name="org.springframework.web.filter.AbstractRequestLoggingFilter" level="DEBUG">
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG">
         <appender-ref ref="REQUEST_DEBUG_LOG"/>
     </logger>
 
