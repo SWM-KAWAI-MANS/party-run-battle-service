@@ -16,4 +16,12 @@ public class BattleCreateRequest {
 
     int distance;
     @NotNull List<String> runnerIds;
+
+    @Override
+    public String toString() {
+        return "BattleCreateRequest{" +
+                "distance=" + distance +
+                ", runnerIds=" + runnerIds +
+                '}';
+    }
 }
