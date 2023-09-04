@@ -13,12 +13,12 @@
         </appender>
     </springProfile>
 
-    <logger name="online.partyrun.partyrunbattleservice.global.logging.RequestCachingFilter" level="INFO" additivity="false">
-        <appender-ref ref="REQUEST_INFO_LOG"/>
+    <logger name="online.partyrun.partyrunbattleservice.global.logging.RequestLoggingFilter" level="INFO" additivity="false">
+        <appender-ref ref="HTTP_INFO_LOG"/>
     </logger>
 
-    <appender name="REQUEST_INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS_ABSOLUTE_PATH}/request_info.log</file>
+    <appender name="HTTP_INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/http_info.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
@@ -28,7 +28,7 @@
             <Pattern>${LOG_PATTERN}</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/request_info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/http_info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>

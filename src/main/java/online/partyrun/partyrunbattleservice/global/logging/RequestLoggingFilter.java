@@ -1,37 +1,37 @@
 package online.partyrun.partyrunbattleservice.global.logging;
 
-import io.micrometer.core.instrument.util.IOUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.Enumeration;
 
 @Component
 @Order(value = Ordered.HIGHEST_PRECEDENCE)
-@WebFilter(filterName = "RequestCachingFilter", urlPatterns = "/*")
-public class RequestCachingFilter extends OncePerRequestFilter {
+public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final CachedHttpServletRequest cachedRequest = new CachedHttpServletRequest(request);
-        final String requestLogMessage = getRequestLogMessage(request, cachedRequest);
-        logger.info(requestLogMessage);
+        ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
 
-        filterChain.doFilter(cachedRequest, response);
+        long startTime = System.currentTimeMillis();
+        filterChain.doFilter(cachingRequest, response);
+        long endTime = System.currentTimeMillis();
+
+        logRequestMessage(cachingRequest);
+        logResponseMessage(cachingRequest, response, endTime - startTime);
     }
 
-    private String getRequestLogMessage(HttpServletRequest request, CachedHttpServletRequest cachedRequest) {
+    private void logRequestMessage(ContentCachingRequestWrapper request) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("\n");
+        sb.append("\nREQUEST\n");
         sb.append(request.getMethod()).append("  ").append(request.getRequestURL()).append("\n");
         sb.append("Headers: ").append("\n");
 
@@ -50,7 +50,14 @@ public class RequestCachingFilter extends OncePerRequestFilter {
             sb.append("\n");
         }
 
-        sb.append("Request body: \n").append(IOUtils.toString(cachedRequest.getInputStream(), StandardCharsets.UTF_8)).append("\n");
-        return sb.toString();
+        sb.append("Request body: \n").append(new String(request.getContentAsByteArray(), StandardCharsets.UTF_8)).append("\n");
+        logger.info(sb.toString());
+    }
+
+    private void logResponseMessage(ContentCachingRequestWrapper request, HttpServletResponse response, long duration) {
+        String sb = "\nRESPONSE\n" + response.getStatus() + " " + request.getMethod() + " " + request.getRequestURL() +
+                " duration: " + duration + "ms\n";
+
+        logger.info(sb);
     }
 }
