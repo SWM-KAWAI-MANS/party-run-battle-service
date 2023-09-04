@@ -45,15 +45,10 @@ public class HttpControllerAdvice {
     public ExceptionResponse handleBindException(BindException exception) {
         final String message =
                 exception.getBindingResult().getAllErrors().stream()
-                        .map(
-                                error ->
-                                        String.format(
-                                                "%s: %s",
-                                                ((FieldError) error).getField(),
-                                                error.getDefaultMessage()))
+                        .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
                         .collect(Collectors.joining(", "));
 
-        log.warn("{} {}",EXCEPTION_MESSAGE, exception.getMessage());
+        log.warn("{} {}",EXCEPTION_MESSAGE, message);
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
     }
 
