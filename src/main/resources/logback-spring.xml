@@ -5,13 +5,11 @@
     <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{36} - %msg%n"/>
     <property name="MAX_HISTORY" value="30"/>
 
-    <springProfile name ="test,local">
-        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-            <layout class="ch.qos.logback.classic.PatternLayout">
-                <Pattern>${LOG_PATTERN}</Pattern>
-            </layout>
-        </appender>
-    </springProfile>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
 
     <logger name="online.partyrun.partyrunbattleservice.global.logging.RequestLoggingFilter" level="INFO" additivity="false">
         <appender-ref ref="HTTP_INFO_LOG"/>
