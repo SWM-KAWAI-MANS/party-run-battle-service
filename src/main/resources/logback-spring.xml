@@ -4,6 +4,7 @@
     <property name="LOGS_ABSOLUTE_PATH" value="./logs"/>
     <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{36} - %msg%n"/>
     <property name="MAX_HISTORY" value="30"/>
+    <springProperty name="SLACK_ERROR_URL" source="logging.slack.webhook-uri"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -94,11 +95,42 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_ERROR"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="SLACK_ERROR" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_ERROR_URL}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </layout>
+        <username>PARTY-RUN-BOT</username>
+        <iconEmoji>:oncoming_police_car:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+
+
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="INFO_LOG"/>
         <appender-ref ref="WARN_LOG"/>
         <appender-ref ref="ERROR_LOG"/>
     </root>
+
+    <springProfile name="test,local">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev,prd">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_SLACK"/>
+        </root>
+    </springProfile>
 
 </configuration>
