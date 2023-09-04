@@ -13,6 +13,6 @@ public record RunnerResponse(String id, int rank, LocalDateTime endTime, List<Ru
 
     @Override
     public String toString() {
-        return String.format("RunnerResponse{id: %s, rank: %d, endTime: %s)", id, rank, endTime);
+        return String.format("RunnerResponse{id: %s, rank: %d, endTime: %s}", id, rank, endTime);
     }
 }
