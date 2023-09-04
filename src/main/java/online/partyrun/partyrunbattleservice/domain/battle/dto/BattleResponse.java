@@ -26,4 +26,9 @@ public record BattleResponse(double targetDistance, LocalDateTime startTime, Lis
 
         return result;
     }
+
+    @Override
+    public String toString() {
+        return String.format("배틀 정보 \n거리: %f \n시작 시간: %s \n러너 정보: %s", targetDistance, startTime, runners);
+    }
 }
