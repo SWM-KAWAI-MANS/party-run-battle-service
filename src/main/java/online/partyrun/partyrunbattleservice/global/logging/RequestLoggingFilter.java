@@ -2,7 +2,6 @@ package online.partyrun.partyrunbattleservice.global.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
@@ -17,7 +16,6 @@ import java.util.Enumeration;
 
 @Component
 @Order(value = Ordered.HIGHEST_PRECEDENCE)
-@WebFilter(filterName = "RequestCachingFilter", urlPatterns = "/*")
 public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
