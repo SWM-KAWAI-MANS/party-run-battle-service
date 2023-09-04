@@ -19,7 +19,7 @@ import java.util.Enumeration;
 @Component
 @Order(value = Ordered.HIGHEST_PRECEDENCE)
 @WebFilter(filterName = "RequestCachingFilter", urlPatterns = "/*")
-public class RequestCachingFilter extends OncePerRequestFilter {
+public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
