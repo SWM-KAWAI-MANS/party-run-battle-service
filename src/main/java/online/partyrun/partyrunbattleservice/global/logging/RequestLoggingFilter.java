@@ -61,8 +61,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     }
 
     private void logResponseMessage(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, long duration) {
-        String sb = "\nRESPONSE\n" + request.getMethod() + " " + request.getRequestURL() +
-                " Status: " + response.getStatus() + " duration: " + duration + "ms\n";
+        String sb = "\nRESPONSE\n" + response.getStatus() + " " + request.getMethod() + " " + request.getRequestURL() +
+                " duration: " + duration + "ms\n";
 
         logger.info(sb);
     }
