@@ -10,7 +10,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,16 +22,13 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
-        ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
 
         long startTime = System.currentTimeMillis();
-        filterChain.doFilter(cachingRequest, cachingResponse);
+        filterChain.doFilter(cachingRequest, response);
         long endTime = System.currentTimeMillis();
 
         logRequestMessage(cachingRequest);
-        logResponseMessage(cachingRequest, cachingResponse, endTime - startTime);
-
-        cachingResponse.copyBodyToResponse();
+        logResponseMessage(cachingRequest, response, endTime - startTime);
     }
 
     private void logRequestMessage(ContentCachingRequestWrapper request) {
@@ -60,7 +56,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         logger.info(sb.toString());
     }
 
-    private void logResponseMessage(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, long duration) {
+    private void logResponseMessage(ContentCachingRequestWrapper request, HttpServletResponse response, long duration) {
         String sb = "\nRESPONSE\n" + response.getStatus() + " " + request.getMethod() + " " + request.getRequestURL() +
                 " duration: " + duration + "ms\n";
 
