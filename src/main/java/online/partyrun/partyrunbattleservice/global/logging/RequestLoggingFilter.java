@@ -25,10 +25,12 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
         ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
 
+        long startTime = System.currentTimeMillis();
         filterChain.doFilter(cachingRequest, cachingResponse);
+        long endTime = System.currentTimeMillis();
 
         logRequestMessage(cachingRequest);
-        logResponseMessage(cachingRequest, cachingResponse);
+        logResponseMessage(cachingRequest, cachingResponse, endTime - startTime);
 
         cachingResponse.copyBodyToResponse();
     }
@@ -58,8 +60,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         logger.info(sb.toString());
     }
 
-    private void logResponseMessage(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response) {
-        String sb = "\nRESPONSE\n" + request.getMethod() + " " + request.getRequestURL() + " Status: " + response.getStatus();
+    private void logResponseMessage(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, long duration) {
+        String sb = "\nRESPONSE\n" + request.getMethod() + " " + request.getRequestURL() +
+                " Status: " + response.getStatus() + " duration: " + duration + "ms\n";
 
         logger.info(sb);
     }
