@@ -79,6 +79,7 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 
     testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

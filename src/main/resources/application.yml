@@ -68,3 +68,8 @@ jwt:
   access-expire-second: ${JWT_ACCESS_EXPIRE_LENGTH}
   refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
   refresh-expire-second: ${JWT_REFRESH_EXPIRE_LENGTH}
+
+logging:
+  slack:
+    webhook-uri: ${SLACK_ERROR_URL}
+  config: classpath:logback-spring.xml
