@@ -3,11 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.battle.config;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import online.partyrun.partyrunbattleservice.domain.battle.exception.InvalidSubscribeRequestException;
-import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
-import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
-
+import online.partyrun.partyrunbattleservice.domain.battle.service.BattleService;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -24,14 +20,17 @@ import java.util.Objects;
 public class BattleChannelInterceptor implements ChannelInterceptor {
 
     private static final String BATTLE_TOPIC_PREFIX = "/topic/battles/";
-    BattleRepository battleRepository;
+
+    BattleService battleService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (isSubscribeToBattleTopic(accessor)) {
-            validateSubscription(accessor);
+            final String battleId = extractBattleId(accessor);
+            final String runnerId = getRunnerId(accessor);
+            battleService.setRunnerRunning(battleId, runnerId);
         }
 
         return message;
@@ -44,25 +43,15 @@ public class BattleChannelInterceptor implements ChannelInterceptor {
                 && destination.contains(BATTLE_TOPIC_PREFIX);
     }
 
-    private void validateSubscription(StompHeaderAccessor accessor) {
-        final String runnerId = getRunnerId(accessor);
-        String battleId = extractBattleId(accessor);
-
-        if (!battleRepository.existsByIdAndRunnersIdAndRunnersStatus(
-                battleId, runnerId, RunnerStatus.READY)) {
-
-            throw new InvalidSubscribeRequestException(battleId, runnerId);
-        }
-    }
-
-    private String getRunnerId(StompHeaderAccessor accessor) {
-        final Principal auth = Objects.requireNonNull(accessor.getUser());
-        return Objects.requireNonNull(auth.getName());
-    }
 
     private String extractBattleId(StompHeaderAccessor accessor) {
         final String destination = Objects.requireNonNull(accessor.getDestination());
         final String[] parts = destination.split(BATTLE_TOPIC_PREFIX);
         return parts[parts.length - 1];
+    }
+
+    private String getRunnerId(StompHeaderAccessor accessor) {
+        final Principal auth = Objects.requireNonNull(accessor.getUser());
+        return Objects.requireNonNull(auth.getName());
     }
 }

@@ -94,10 +94,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                 new StompFrameHandlerImpl(queue));
     }
 
-    private void 준비완료_요청(StompSession session, Battle battle) {
-        session.send(String.format("%s/%s/ready", PUB_BATTLE_PREFIX, battle.getId()), "준비 완료");
-    }
-
     @BeforeEach
     void setUpWebSocket() {
         Runner 박성우 = 러너_생성(멤버_박성우);
@@ -156,54 +152,41 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-    class 러너들이_준비_완료_요청을_보냈을_때 {
+    class 러너들이_구독_요청을_보냈을_때 {
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 모두_보냈다면 {
+        @Test
+        @DisplayName("모두_보냈다면 배틀 시작 시간을 응답한다.")
+        void getBattleStartTime() throws InterruptedException {
+            구독_요청(박성우_Session, 박성우_Queue, 배틀);
+            구독_요청(박현준_Session, 박현준_Queue, 배틀);
+            구독_요청(노준혁_Session, 노준혁_Queue, 배틀);
 
-            @BeforeEach
-            void setUp() {
-                구독_요청(박성우_Session, 박성우_Queue, 배틀);
-                구독_요청(박현준_Session, 박현준_Queue, 배틀);
-                구독_요청(노준혁_Session, 노준혁_Queue, 배틀);
+            final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(3, TimeUnit.SECONDS);
+            final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(3, TimeUnit.SECONDS);
+            final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(3, TimeUnit.SECONDS);
 
-                준비완료_요청(박성우_Session, 배틀);
-                준비완료_요청(박현준_Session, 배틀);
-            }
-
-            @Test
-            @DisplayName("배틀 시작 시간을 응답한다.")
-            void getBattleStartTime() throws InterruptedException {
-                준비완료_요청(노준혁_Session, 배틀);
-
-                final BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(3, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(3, TimeUnit.SECONDS);
-                final BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(3, TimeUnit.SECONDS);
-
-                assertAll(() -> assertThat(박성우_response)
-                                .isEqualTo(박현준_response)
-                                .isEqualTo(노준혁_response)
-                                .isNotNull(),
-                        () -> assertThat(박성우_response.getData().get("startTime"))
-                                .isEqualTo(LocalDateTime.now(clock).plusSeconds(5).toString()));
-            }
+            assertAll(() -> assertThat(박성우_response)
+                            .isEqualTo(박현준_response)
+                            .isEqualTo(노준혁_response)
+                            .isNotNull(),
+                    () -> assertThat(박성우_response.getData().get("startTime"))
+                            .isEqualTo(LocalDateTime.now(clock).plusSeconds(5).toString()));
         }
 
-        @Nested
-        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-        class 모두_보내지_않았다면 {
 
-            @Test
-            @DisplayName("응답을 받지 못한다.")
-            void getBattleStartTime() throws InterruptedException {
-                BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+        @Test
+        @DisplayName("모두_보내지_않았다면 응답을 받지 못한다.")
+        void getNoResponse() throws InterruptedException {
+            구독_요청(박성우_Session, 박성우_Queue, 배틀);
+            구독_요청(박현준_Session, 박현준_Queue, 배틀);
 
-                assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
-            }
+            BattleWebSocketResponse 박성우_response = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+            BattleWebSocketResponse 박현준_response = 박현준_Queue.poll(1, TimeUnit.SECONDS);
+            BattleWebSocketResponse 노준혁_response = 노준혁_Queue.poll(1, TimeUnit.SECONDS);
+
+            assertThat(박성우_response).isEqualTo(박현준_response).isEqualTo(노준혁_response).isNull();
         }
+
     }
 
 
@@ -230,10 +213,6 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             구독_요청(박성우_Session, 박성우_Queue, 배틀);
             구독_요청(박현준_Session, 박현준_Queue, 배틀);
             구독_요청(노준혁_Session, 노준혁_Queue, 배틀);
-
-            준비완료_요청(박성우_Session, 배틀);
-            준비완료_요청(박현준_Session, 배틀);
-            준비완료_요청(노준혁_Session, 배틀);
 
             // 시작 시간 응답
             assertAll(
