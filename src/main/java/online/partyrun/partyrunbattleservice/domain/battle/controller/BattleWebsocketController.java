@@ -25,12 +25,6 @@ public class BattleWebsocketController {
     BattleService battleService;
     RedisPublisher messagePublisher;
 
-    @MessageMapping("/battles/{battleId}/ready")
-    public void setRunnerRunning(@DestinationVariable String battleId, Authentication auth) {
-        final String memberId = auth.getName();
-        battleService.setRunnerRunning(battleId, memberId);
-    }
-
     @MessageMapping("/battles/{battleId}/record")
     public void calculateDistance(@DestinationVariable String battleId, Authentication auth, @Valid RunnerRecordRequest request) {
         final String runnerId = auth.getName();
