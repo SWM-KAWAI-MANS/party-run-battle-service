@@ -74,6 +74,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.github.SWM-KAWAI-MANS:spring-security-authorization-manager:1.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
