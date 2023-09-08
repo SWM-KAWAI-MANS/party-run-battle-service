@@ -5,15 +5,15 @@ import online.partyrun.partyrunbattleservice.global.exception.BadRequestExceptio
 import online.partyrun.partyrunbattleservice.global.exception.NotFoundException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.util.stream.Collectors;
 
 @Slf4j
-@Controller
+@ControllerAdvice
 public class BattleMessageControllerAdvice {
 
     private static final String EXCEPTION_MESSAGE = "[EXCEPTION]";
