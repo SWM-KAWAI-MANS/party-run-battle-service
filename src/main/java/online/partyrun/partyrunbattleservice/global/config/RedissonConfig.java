@@ -6,15 +6,26 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import java.util.List;
 
 @Configuration
 public class RedissonConfig {
 
-    @Value("${spring.data.redis.url}")
-    private String redisUrl;
+    @Bean
+    @Profile("prd")
+    public RedissonClient clusterRedissonClient(@Value("${spring.data.redis.cluster.nodes}") List<String> nodes) {
+        Config config = new Config();
+        config.useClusterServers()
+                .addNodeAddress(nodes.toArray(new String[nodes.size()]));
+
+        return Redisson.create(config);
+    }
 
     @Bean
-    public RedissonClient redissonClient() {
+    @Profile("dev")
+    public RedissonClient singleRedissonClient(@Value("${spring.data.redis.url}") String redisUrl) {
         Config config = new Config();
         config.useSingleServer().setAddress(redisUrl);
         return Redisson.create(config);
