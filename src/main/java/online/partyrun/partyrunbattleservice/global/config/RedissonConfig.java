@@ -24,7 +24,7 @@ public class RedissonConfig {
     }
 
     @Bean
-    @Profile("dev")
+    @Profile("!prd")
     public RedissonClient singleRedissonClient(@Value("${spring.data.redis.url}") String redisUrl) {
         Config config = new Config();
         config.useSingleServer().setAddress(redisUrl);
