@@ -10,12 +10,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
 public class BattleMessageControllerAdvice {
-
+    private static final String RIGHT_ARROW = " -> ";
     private static final String EXCEPTION_MESSAGE = "[EXCEPTION]";
 
     @MessageExceptionHandler({
@@ -44,6 +45,12 @@ public class BattleMessageControllerAdvice {
 
     @MessageExceptionHandler({RuntimeException.class, Exception.class})
     public void handleInternalServerErrorException(Exception exception) {
-        log.error("{} {}", EXCEPTION_MESSAGE, exception.getMessage());
+        log.error("{} {} \n {}", EXCEPTION_MESSAGE, exception.getMessage(), makeStackTraceMessage(exception));
+    }
+
+    private String makeStackTraceMessage(Exception e) {
+        return Arrays.stream(e.getStackTrace())
+                .map(StackTraceElement::toString)
+                .collect(Collectors.joining(RIGHT_ARROW));
     }
 }
