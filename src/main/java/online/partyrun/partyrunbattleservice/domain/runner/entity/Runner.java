@@ -58,7 +58,9 @@ public class Runner {
         final List<RunnerRecord> newRecords = createRecords(gpsData);
 
         this.runnerRecords.addAll(newRecords);
-        this.recentRunnerRecord = Collections.max(this.runnerRecords);
+        if (!this.runnerRecords.isEmpty()) {
+            this.recentRunnerRecord = Collections.max(this.runnerRecords);
+        }
     }
 
     private void validateIsNotRunningStatus() {

@@ -319,6 +319,22 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
                         () -> assertThat(Objects.isNull(response1) || Objects.isNull(response2)).isTrue()
                 );
             }
+
+            @Test
+            @DisplayName("제한 속도를 넘어가면, GPS 기록에 반영되지 않는다.")
+            void exceptExceedSpeed() throws InterruptedException {
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
+                Thread.sleep(300);
+
+                GpsRequest INVALID_GPS_REQUEST = new GpsRequest(1, 1, 0, gpsTime.plusSeconds(3));
+                RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(INVALID_GPS_REQUEST, INVALID_GPS_REQUEST, INVALID_GPS_REQUEST));
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST3);
+
+                BattleWebSocketResponse response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                BattleWebSocketResponse response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+
+                assertThat(response1).isEqualTo(response2);
+            }
         }
     }
 }
