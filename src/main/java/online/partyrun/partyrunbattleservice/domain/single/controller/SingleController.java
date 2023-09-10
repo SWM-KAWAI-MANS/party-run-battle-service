@@ -10,10 +10,7 @@ import online.partyrun.partyrunbattleservice.domain.single.service.SingleService
 import online.partyrun.partyrunbattleservice.global.logging.Logging;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Logging
 @RestController
@@ -26,7 +23,7 @@ public class SingleController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SingleIdResponse createSingle(Authentication auth, @Valid SingleRunnerRecordsRequest request) {
+    public SingleIdResponse createSingle(Authentication auth, @RequestBody @Valid SingleRunnerRecordsRequest request) {
         final String runnerId = auth.getName();
         return singleService.create(runnerId, request);
     }
