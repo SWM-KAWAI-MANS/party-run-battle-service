@@ -41,3 +41,8 @@ operation::battle not found[snippets='http-request,http-response']
 러너가 배틀이 끝나고 결과를 조회할 때 (배틀을 끝낸 러너들만 조회 대상이 된다.)
 
 operation::get finished battle[snippets='http-request,http-response']
+
+=== 싱글 기록 저장
+싱글 경기에 대한 기록을 저장할 때
+
+operation::create single[snippets='http-request,http-response']
