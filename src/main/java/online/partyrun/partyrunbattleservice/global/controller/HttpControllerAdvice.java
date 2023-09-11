@@ -1,4 +1,4 @@
-package online.partyrun.partyrunbattleservice.domain.battle.controller;
+package online.partyrun.partyrunbattleservice.global.controller;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -48,7 +48,7 @@ public class HttpControllerAdvice {
                         .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
                         .collect(Collectors.joining(", "));
 
-        log.warn("{} {}",EXCEPTION_MESSAGE, message);
+        log.warn("{} {}", EXCEPTION_MESSAGE, message);
         return new ExceptionResponse(BAD_REQUEST_MESSAGE);
     }
 
