@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleRunnerRecordsRequest;
+import online.partyrun.partyrunbattleservice.domain.single.entity.RunningTime;
 import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 import online.partyrun.partyrunbattleservice.domain.single.repository.SingleRepository;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,9 @@ public class SingleService {
     SingleRepository singleRepository;
 
     public SingleIdResponse create(String runnerId, SingleRunnerRecordsRequest request) {
-        final List<RunnerRecord> records = request.toRunnerRecords();
-        final Single newSingleRecord = singleRepository.save(new Single(runnerId, records));
+        final RunningTime runningTime = request.getRunningTime();
+        final List<RunnerRecord> records = request.getRunnerRecords();
+        final Single newSingleRecord = singleRepository.save(new Single(runnerId, runningTime, records));
         return new SingleIdResponse(newSingleRecord.getId());
     }
 }

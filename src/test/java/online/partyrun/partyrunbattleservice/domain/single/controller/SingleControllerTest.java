@@ -1,5 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.single.controller;
 
+import online.partyrun.partyrunbattleservice.domain.single.dto.RunningTimeRequest;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleRunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleRunnerRecordsRequest;
@@ -43,6 +44,7 @@ class SingleControllerTest extends RestControllerTest {
             @DisplayName("싱글을_생성한다")
             void createSingle() throws Exception {
                 SingleRunnerRecordsRequest request = new SingleRunnerRecordsRequest(
+                        new RunningTimeRequest(0,0,1),
                         List.of(
                                 new SingleRunnerRecordRequest(0, 0, 0, now, 0),
                                 new SingleRunnerRecordRequest(0.0001, 0.0001, 0.0001, now, 1)

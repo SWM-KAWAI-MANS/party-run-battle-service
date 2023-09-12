@@ -19,11 +19,13 @@ public class Single {
     @Id
     String id;
     String runnerId;
+    RunningTime runningTime;
     List<RunnerRecord> runnerRecords;
 
-    public Single(String runnerId, List<RunnerRecord> runnerRecords) {
+    public Single(String runnerId, RunningTime runningTime, List<RunnerRecord> runnerRecords) {
         validateRunnerRecords(runnerRecords);
         this.runnerId = runnerId;
+        this.runningTime = runningTime;
         this.runnerRecords = runnerRecords;
     }
 
