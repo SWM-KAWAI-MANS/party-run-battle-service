@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import online.partyrun.partyrunbattleservice.domain.single.exception.IllegalRunningTimeException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
