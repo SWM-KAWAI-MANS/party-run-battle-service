@@ -12,7 +12,7 @@ import online.partyrun.partyrunbattleservice.domain.single.exception.IllegalRunn
 public class RunningTime {
 
     private static final int MIN_TIME = 0;
-    private static final int MAX_TIME = 60;
+    private static final int MAX_TIME = 59;
 
     int hours;
     int minutes;
@@ -20,7 +20,7 @@ public class RunningTime {
 
     public RunningTime(int hours, int minutes, int seconds) {
         validateNoTime(hours, minutes, seconds);
-        validateIsPositive(hours, minutes, seconds);
+        validateIsCorrectTime(hours, minutes, seconds);
 
 
         this.hours = hours;
@@ -34,7 +34,7 @@ public class RunningTime {
         }
     }
 
-    private void validateIsPositive(int hours, int minutes, int seconds) {
+    private void validateIsCorrectTime(int hours, int minutes, int seconds) {
         if (isNotCorrectHours(hours) || isNotCorrectMinutes(minutes) || isNotCorrectSeconds(seconds)) {
             throw new IllegalRunningTimeException(hours, minutes, seconds);
         }
