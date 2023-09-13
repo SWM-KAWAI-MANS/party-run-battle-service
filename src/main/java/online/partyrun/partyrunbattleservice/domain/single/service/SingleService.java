@@ -21,7 +21,7 @@ public class SingleService {
 
     public SingleIdResponse create(String runnerId, SingleRunnerRecordsRequest request) {
         final RunningTime runningTime = request.getRunningTime();
-        final List<RunnerRecord> records = request.getRunnerRecords();
+        final List<RunnerRecord> records = request.runnerRecords();
         final Single newSingleRecord = singleRepository.save(new Single(runnerId, runningTime, records));
         return new SingleIdResponse(newSingleRecord.getId());
     }
