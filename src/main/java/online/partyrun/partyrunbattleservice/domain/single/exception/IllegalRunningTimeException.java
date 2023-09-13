@@ -1,4 +1,4 @@
-package online.partyrun.partyrunbattleservice.domain.single.entity;
+package online.partyrun.partyrunbattleservice.domain.single.exception;
 
 import online.partyrun.partyrunbattleservice.global.exception.BadRequestException;
 
