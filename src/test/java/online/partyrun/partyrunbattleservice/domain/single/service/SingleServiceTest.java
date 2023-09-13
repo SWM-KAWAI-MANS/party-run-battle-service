@@ -1,5 +1,6 @@
 package online.partyrun.partyrunbattleservice.domain.single.service;
 
+import online.partyrun.partyrunbattleservice.domain.single.dto.RunningTimeRequest;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleIdResponse;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleRunnerRecordRequest;
 import online.partyrun.partyrunbattleservice.domain.single.dto.SingleRunnerRecordsRequest;
@@ -31,6 +32,7 @@ class SingleServiceTest {
         final SingleIdResponse response = singleService.create(
                 runnerId,
                 new SingleRunnerRecordsRequest(
+                        new RunningTimeRequest(1,1,1),
                         List.of(
                                 new SingleRunnerRecordRequest(0, 0, 0, now, 0),
                                 new SingleRunnerRecordRequest(0.0001, 0.0001, 0.0001, now, 1)

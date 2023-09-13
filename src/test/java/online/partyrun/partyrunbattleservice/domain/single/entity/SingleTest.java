@@ -24,7 +24,7 @@ class SingleTest {
         @NullAndEmptySource
         @ParameterizedTest
         void throwException(List<RunnerRecord> records) {
-            assertThatThrownBy(() -> new Single("runnerId", records))
+            assertThatThrownBy(() -> new Single("runnerId", new RunningTime(1, 1, 1), records))
                     .isInstanceOf(SingleRunnerRecordEmptyException.class);
         }
     }
