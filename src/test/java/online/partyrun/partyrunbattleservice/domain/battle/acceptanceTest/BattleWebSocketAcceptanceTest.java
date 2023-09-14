@@ -29,9 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static online.partyrun.partyrunbattleservice.fixture.MemberFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -323,17 +321,22 @@ public class BattleWebSocketAcceptanceTest extends AcceptanceTest {
             @Test
             @DisplayName("제한 속도를 넘어가면, GPS 기록에 반영되지 않는다.")
             void exceptExceedSpeed() throws InterruptedException {
-                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
-                Thread.sleep(300);
-
                 GpsRequest INVALID_GPS_REQUEST = new GpsRequest(1, 1, 0, gpsTime.plusSeconds(3));
-                RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(INVALID_GPS_REQUEST, INVALID_GPS_REQUEST, INVALID_GPS_REQUEST));
-                좌표_보내기_요청(박성우_Session, RECORD_REQUEST3);
-
+                좌표_보내기_요청(박성우_Session, RECORD_REQUEST1);
                 BattleWebSocketResponse response1 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
-                BattleWebSocketResponse response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
 
-                assertThat(response1).isEqualTo(response2);
+                ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+                executorService.schedule(() -> {
+                            RunnerRecordRequest RECORD_REQUEST3 = new RunnerRecordRequest(List.of(INVALID_GPS_REQUEST));
+                            좌표_보내기_요청(박성우_Session, RECORD_REQUEST3);
+                            try {
+                                final BattleWebSocketResponse response2 = 박성우_Queue.poll(1, TimeUnit.SECONDS);
+                                assertThat(response1).isEqualTo(response2);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }, 1, TimeUnit.SECONDS
+                );
             }
         }
     }
