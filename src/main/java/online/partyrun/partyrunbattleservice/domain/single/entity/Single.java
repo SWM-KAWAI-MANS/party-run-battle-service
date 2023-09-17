@@ -34,4 +34,8 @@ public class Single {
             throw new SingleRunnerRecordEmptyException();
         }
     }
+
+    public boolean isOwner(String runnerId) {
+        return this.runnerId.equals(runnerId);
+    }
 }
