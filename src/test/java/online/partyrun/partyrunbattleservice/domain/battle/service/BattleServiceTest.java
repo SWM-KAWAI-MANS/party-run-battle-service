@@ -1,7 +1,5 @@
 package online.partyrun.partyrunbattleservice.domain.battle.service;
 
-import online.partyrun.partyrunbattleservice.domain.battle.config.TestApplicationContextConfig;
-import online.partyrun.partyrunbattleservice.domain.battle.config.TestTimeConfig;
 import online.partyrun.partyrunbattleservice.domain.battle.dto.*;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.event.BattleRunningEvent;
@@ -14,12 +12,10 @@ import online.partyrun.partyrunbattleservice.domain.member.repository.MemberRepo
 import online.partyrun.partyrunbattleservice.domain.runner.entity.Runner;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.RunnerStatus;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.GpsData;
-import online.partyrun.testmanager.redis.EnableRedisTest;
+import online.partyrun.partyrunbattleservice.global.ServiceTest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.time.Clock;
@@ -34,11 +30,8 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-@SpringBootTest
-@EnableRedisTest
-@Import({TestApplicationContextConfig.class, TestTimeConfig.class})
 @DisplayName("BattleService")
-class BattleServiceTest {
+class BattleServiceTest extends ServiceTest {
 
     @Autowired BattleService battleService;
     @Autowired BattleRepository battleRepository;

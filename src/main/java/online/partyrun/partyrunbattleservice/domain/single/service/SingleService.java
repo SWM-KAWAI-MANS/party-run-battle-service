@@ -29,7 +29,7 @@ public class SingleService {
         return new SingleIdResponse(newSingleRecord.getId());
     }
 
-    public SingleResponse getSingle(String runnerId, String singleId) {
+    public SingleResponse getSingle(String singleId, String runnerId) {
         final Single single = singleRepository.findById(singleId).orElseThrow(() -> new SingleNotFoundException(singleId));
         if (!single.isOwner(runnerId)) {
             throw new InvalidSingleOwnerException(singleId, runnerId);

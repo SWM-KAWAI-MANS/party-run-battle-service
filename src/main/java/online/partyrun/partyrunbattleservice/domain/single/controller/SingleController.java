@@ -33,6 +33,6 @@ public class SingleController {
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse getSingle(Authentication auth, @PathVariable String singleId) {
         final String runnerId = auth.getName();
-        return singleService.getSingle(runnerId, singleId);
+        return singleService.getSingle(singleId, runnerId);
     }
 }
