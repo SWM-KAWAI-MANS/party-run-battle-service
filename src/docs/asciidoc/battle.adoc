@@ -46,3 +46,8 @@ operation::get finished battle[snippets='http-request,http-response']
 싱글 경기에 대한 기록을 저장할 때
 
 operation::create single[snippets='http-request,http-response']
+
+=== 싱글 기록 조회
+싱글 경기에 대한 기록을 조회할 때
+
+operation::get single[snippets='http-request,http-response']
