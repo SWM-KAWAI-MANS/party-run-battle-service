@@ -12,6 +12,7 @@ import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 import online.partyrun.partyrunbattleservice.domain.single.exception.InvalidSingleOwnerException;
 import online.partyrun.partyrunbattleservice.domain.single.exception.SingleNotFoundException;
 import online.partyrun.partyrunbattleservice.domain.single.repository.SingleRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class SingleService {
         return new SingleIdResponse(newSingleRecord.getId());
     }
 
+    @Cacheable(value = "single", key = "#singleId.concat('-').concat(#runnerId)")
     public SingleResponse getSingle(String singleId, String runnerId) {
         final Single single = singleRepository.findById(singleId).orElseThrow(() -> new SingleNotFoundException(singleId));
         if (!single.isOwner(runnerId)) {
