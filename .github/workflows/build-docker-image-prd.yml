@@ -7,7 +7,7 @@ on:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
-      DOCKER_BATTLE_IMAGE_NAME:
+      PRD_DOCKER_BATTLE_IMAGE_NAME:
         required: true
 
 jobs:
