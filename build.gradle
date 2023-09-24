@@ -1,0 +1,173 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'jacoco'
+    id 'com.google.cloud.tools.jib' version '3.2.1'
+}
+
+group = 'online.partyrun'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+jib {
+    from {
+        image = "openjdk:17"
+    }
+    to {
+        tags = ["latest"]
+    }
+    container {
+        jvmFlags = ["-Xms128m", "-Xmx128m"]
+    }
+}
+
+
+configurations {
+    asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceFile()
+    inputs.dir snippetsDir
+
+    dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('build/resources/main/static/docs')
+}
+
+task createDocument(type: Copy) {
+    dependsOn asciidoctor
+
+    from file("${asciidoctor.outputDir}")
+    into file("build/resources/main/static/docs")
+}
+
+bootJar {
+    dependsOn createDocument
+}
+
+dependencies {
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.github.SWM-KAWAI-MANS:spring-security-authorization-manager:1.0.1'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
+    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
+
+    testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'com.github.SWM-KAWAI-MANS:jwt-manager:1.2.0'
+    testCompileOnly 'org.projectlombok:lombok:1.18.26'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+jar {
+    enabled = false
+}
+
+jacoco {
+    toolVersion = '0.8.7'
+}
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            // 각 클래스
+            element = 'CLASS'
+
+            // 분기문 커버리지
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 1.0
+            }
+
+            // 라인 커버리지
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 1.0
+            }
+
+            // 코드에서 사용하는 메소드 중, 테스트가 실행된 메소드의 비율
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 1.0
+            }
+
+            excludes = [
+                    '**.*Application*',
+                    '**.*Request*',
+                    '**.*Response*',
+                    '**.*config*',
+                    '**.*Exception*',
+                    '**.*Mapper*',
+                    '**.*ControllerAdvice*',
+                    '**.*Interceptor*',
+                    '**.*Event*',
+                    '**.*Advisor*',
+                    '**.*Parser*',
+                    '**.*Listener*',
+                    '**.*Message*',
+                    '**.*logging*.**'
+            ]
+        }
+
+        rule {
+            element = 'METHOD'
+
+            // 최대 method 라인 수
+            limit {
+                counter = 'LINE'
+                value = 'TOTALCOUNT'
+                maximum = 20
+            }
+        }
+    }
+}

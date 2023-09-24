@@ -1,0 +1,32 @@
+name : cd - prd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-back-docker-img:
+    uses: ./.github/workflows/build-docker-image-prd.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      PRD_DOCKER_BATTLE_IMAGE_NAME: ${{ secrets.PRD_DOCKER_BATTLE_IMAGE_NAME }}
+
+  deploy:
+    needs: build-back-docker-img
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PRD_HOST }}
+          username: ${{ secrets.PRD_HOST_USER_NAME }}
+          key: ${{ secrets.PRD_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.PRD_DEPLOY_DIRECTORY }}
+            docker compose stop ${{ secrets.PRD_DOCKER_BATTLE_CONTAINER_NAME }}
+            docker compose rm -f ${{ secrets.PRD_DOCKER_BATTLE_CONTAINER_NAME }}
+            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PRD_DOCKER_BATTLE_IMAGE_NAME }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PRD_DOCKER_BATTLE_IMAGE_NAME }}
+            docker compose up -d

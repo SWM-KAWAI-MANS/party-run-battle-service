@@ -1,0 +1,75 @@
+server:
+  servlet:
+    context-path: /api
+
+auth:
+  filter:
+    exclusions: "/docs/index.html"
+
+---
+
+spring:
+  profiles:
+    active: test
+
+  data:
+    redis:
+      url: redis://localhost:16379
+
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: TESTAWSSQSACCES
+        secret-key: AWSSQSSECRETKEY
+
+      sqs:
+        queue-url: https://sqs.ap-northeast-2.amazonaws.com/111111111111/testqueue-dev
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+
+jwt:
+  access-secret-key: "asfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasd"
+  access-expire-second: 1000000
+  refresh-secret-key: "assfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasdfasdfaasfasdfasdfadfasdfasads"
+  refresh-expire-second: 2000000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local, dev, prd
+  data:
+    mongodb:
+      uri: ${DB_URI}
+    redis:
+      url: ${REDIS_URL}
+
+  cloud:
+    aws:
+      region:
+        static: ${AWS_SQS_REGION}
+      credentials:
+        access-key: ${AWS_SQS_ACCESS_KEY}
+        secret-key: ${AWS_SQS_SECRET_KEY}
+      sqs:
+        queue-url: ${AWS_SQS_QUEUE_URL}
+
+jwt:
+  access-secret-key: ${JWT_ACCESS_SECRET_KEY}
+  access-expire-second: ${JWT_ACCESS_EXPIRE_LENGTH}
+  refresh-secret-key: ${JWT_REFRESH_SECRET_KEY}
+  refresh-expire-second: ${JWT_REFRESH_EXPIRE_LENGTH}
+
+logging:
+  slack:
+    webhook-uri: ${SLACK_ERROR_URL}
+  config: classpath:logback-spring.xml

@@ -1,0 +1,53 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+= Battle
+
+=== 배틀 생성
+
+operation::create battle[snippets='http-request,http-response']
+---
+
+=== 배틀 생성 실패
+body가 null일 때
+
+operation::runner request is invalid, body is null[snippets='http-request,http-response']
+---
+
+number of runners error
+
+operation::runner request is invalid, number of runners error[snippets='http-request,http-response']
+---
+
+runner is null
+
+operation::runner request is invalid, runner is null[snippets='http-request,http-response']
+---
+
+=== 배틀 조회
+operation::get battle[snippets='http-request,http-response']
+---
+
+=== 배틀 조회 실패
+현재 배틀을 진행하고 있지 않은 러너가 조회요청을 했을 때
+
+operation::battle not found[snippets='http-request,http-response']
+
+=== 배틀 결과 조회
+러너가 배틀이 끝나고 결과를 조회할 때 (배틀을 끝낸 러너들만 조회 대상이 된다.)
+
+operation::get finished battle[snippets='http-request,http-response']
+
+=== 싱글 기록 저장
+싱글 경기에 대한 기록을 저장할 때
+
+operation::create single[snippets='http-request,http-response']
+
+=== 싱글 기록 조회
+싱글 경기에 대한 기록을 조회할 때
+
+operation::get single[snippets='http-request,http-response']
