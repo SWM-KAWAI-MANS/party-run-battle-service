@@ -51,4 +51,8 @@ public class RunningTime {
     private boolean isNotCorrectSeconds(int seconds) {
         return seconds < MIN_TIME || seconds > MAX_TIME;
     }
+
+    public int getTotalSeconds() {
+        return hours * 60 * 60 + minutes * 60 + seconds;
+    }
 }

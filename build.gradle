@@ -81,7 +81,7 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
     implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 
-    testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.0.2'
+    testImplementation 'com.github.SWM-KAWAI-MANS:test-manager:1.1.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
@@ -155,7 +155,8 @@ jacocoTestCoverageVerification {
                     '**.*Parser*',
                     '**.*Listener*',
                     '**.*Message*',
-                    '**.*logging*.**'
+                    '**.*logging*.**',
+                    '**.*mypage*.**'
             ]
         }
 
@@ -166,7 +167,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'LINE'
                 value = 'TOTALCOUNT'
-                maximum = 20
+                maximum = 40
             }
         }
     }

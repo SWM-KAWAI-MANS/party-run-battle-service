@@ -40,4 +40,7 @@ public interface BattleRepository extends MongoRepository<Battle, String> {
     Optional<Battle> findBattleByRunnerStatus(String runnerId, List<RunnerStatus> preRunnerStatus);
 
     Optional<Battle> findByIdAndRunnersId(String battleId, String runnerId);
+
+    @Query(value = "{ 'runners.id': ?0 }", fields = "{'runners.runnerRecords': 0}")
+    List<Battle> findAllByRunnersIdExceptRunnerRecords(String runnerId);
 }
