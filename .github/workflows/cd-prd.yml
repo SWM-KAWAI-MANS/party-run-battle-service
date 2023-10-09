@@ -12,7 +12,7 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       PRD_DOCKER_BATTLE_IMAGE_NAME: ${{ secrets.PRD_DOCKER_BATTLE_IMAGE_NAME }}
-
+      TC_CLOUD_TOKEN: ${{ secrets.TC_CLOUD_TOKEN }}
   deploy:
     needs: build-back-docker-img
     runs-on: ubuntu-latest
