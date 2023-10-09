@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.battle.repository.BattleRepository;
+import online.partyrun.partyrunbattleservice.domain.mypage.dto.MyPageHistoryResponse;
 import online.partyrun.partyrunbattleservice.domain.mypage.dto.MyPageTotalResponse;
 import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 import online.partyrun.partyrunbattleservice.domain.single.repository.SingleRepository;
@@ -25,5 +26,17 @@ public class MyPageService {
         final List<Single> singles = singleRepository.findAllByRunnerId(memberId);
 
         return MyPageTotalResponse.of(memberId, battles, singles);
+    }
+
+    public MyPageHistoryResponse getMyPageBattle(String memberId) {
+        final List<Battle> battles = battleRepository.findAllByRunnersIdExceptRunnerRecords(memberId);
+
+        return MyPageHistoryResponse.ofBattles(battles, memberId);
+    }
+
+    public MyPageHistoryResponse getMyPageSingle(String memberId) {
+        final List<Single> singles = singleRepository.findAllByRunnerId(memberId);
+
+        return MyPageHistoryResponse.ofSingle(singles);
     }
 }
