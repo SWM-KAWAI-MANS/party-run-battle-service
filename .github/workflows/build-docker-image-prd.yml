@@ -9,6 +9,8 @@ on:
         required: true
       PRD_DOCKER_BATTLE_IMAGE_NAME:
         required: true
+      TC_CLOUD_TOKEN:
+        required: true
 
 jobs:
   build:
