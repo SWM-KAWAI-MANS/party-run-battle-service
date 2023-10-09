@@ -3,6 +3,7 @@ package online.partyrun.partyrunbattleservice.domain.mypage.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import online.partyrun.partyrunbattleservice.domain.mypage.dto.MyPageHistoryResponse;
 import online.partyrun.partyrunbattleservice.domain.mypage.dto.MyPageTotalResponse;
 import online.partyrun.partyrunbattleservice.domain.mypage.service.MyPageService;
 import online.partyrun.partyrunbattleservice.global.logging.Logging;
@@ -20,8 +21,18 @@ public class MyPageController {
 
     MyPageService myPageService;
 
-    @GetMapping("/total")
+    @GetMapping("total")
     public MyPageTotalResponse getMyPageTotalResponse(Authentication auth) {
         return myPageService.getMyPageTotal(auth.getName());
+    }
+
+    @GetMapping("battles")
+    public MyPageHistoryResponse getMyPageBattleResponse(Authentication auth) {
+        return myPageService.getMyPageBattle(auth.getName());
+    }
+
+    @GetMapping("singles")
+    public MyPageHistoryResponse getMyPageSingleResponse(Authentication auth) {
+        return myPageService.getMyPageSingle(auth.getName());
     }
 }

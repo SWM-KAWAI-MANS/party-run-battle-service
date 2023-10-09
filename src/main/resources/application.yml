@@ -14,7 +14,7 @@ spring:
 
   data:
     redis:
-      url: redis://localhost:6379/0
+      url: redis://localhost:16379
 
   cloud:
     aws:
