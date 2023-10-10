@@ -11,6 +11,10 @@ import java.util.List;
 public record MyPageTotalResponse(double totalDistance, double averagePace, RunningTimeResponse totalRunningTime) {
 
     public static MyPageTotalResponse of(String memberId, List<Battle> battles, List<Single> singles) {
+        if (battles.isEmpty() && singles.isEmpty()) {
+            return new MyPageTotalResponse(0, 0, new RunningTimeResponse(0, 0, 0));
+        }
+
         final double totalBattleDistance = battles.stream()
                 .mapToDouble(battle -> battle.getRunnerRecentDistance(memberId))
                 .sum();
