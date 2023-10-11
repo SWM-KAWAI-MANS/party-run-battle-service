@@ -2,6 +2,7 @@ package online.partyrun.partyrunbattleservice.domain.mypage.dto;
 
 import online.partyrun.partyrunbattleservice.domain.battle.entity.Battle;
 import online.partyrun.partyrunbattleservice.domain.runner.entity.record.RunnerRecord;
+import online.partyrun.partyrunbattleservice.domain.runner.exception.InvalidRecentRunnerRecordException;
 import online.partyrun.partyrunbattleservice.domain.single.dto.RunningTimeResponse;
 import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 
@@ -16,11 +17,27 @@ public record MyPageTotalResponse(double totalDistance, double averagePace, Runn
         }
 
         final double totalBattleDistance = battles.stream()
-                .mapToDouble(battle -> battle.getRunnerRecentDistance(memberId))
+                .mapToDouble(
+                        battle -> {
+                            try {
+                                return battle.getRunnerRecentDistance(memberId);
+                            } catch (InvalidRecentRunnerRecordException exception) {
+                                return 0;
+                            }
+                        }
+                )
                 .sum();
 
         final long totalBattleRunningTime = battles.stream()
-                .mapToLong(battle -> Duration.between(battle.getCreatedAt(), battle.getRunnerRecentRecord(memberId).getTime()).toSeconds())
+                .mapToLong(
+                        battle -> {
+                            try {
+                                return Duration.between(battle.getCreatedAt(), battle.getRunnerRecentRecord(memberId).getTime()).toSeconds();
+                            } catch (InvalidRecentRunnerRecordException exception) {
+                                return 0;
+                            }
+                        }
+                )
                 .sum();
 
         final double totalSingleDistance = singles.stream()
@@ -40,7 +57,7 @@ public record MyPageTotalResponse(double totalDistance, double averagePace, Runn
 
         int totalHour = (int) totalRunningTime / 3600;
         int totalMinute = (int) (totalRunningTime % 3600) / 60;
-        int totalSecond = (int)  totalRunningTime % 60;
+        int totalSecond = (int) totalRunningTime % 60;
 
         return new MyPageTotalResponse(totalDistance, totalDistance / totalRunningTime, new RunningTimeResponse(totalHour, totalMinute, totalSecond));
     }
