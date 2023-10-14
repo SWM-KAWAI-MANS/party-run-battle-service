@@ -303,4 +303,22 @@ class BattleRepositoryTest {
             );
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class findAllByRunnersIdExceptRunnerRecords는 {
+
+        @BeforeEach
+        void setUp() {
+            battleRepository.save(new Battle(1000, List.of(박성우, 박현준), now));
+            battleRepository.save(new Battle(1000, List.of(박성우, 노준혁), now));
+        }
+        @Test
+        @DisplayName("러너가 속한 모든 배틀을 반환한다.")
+        void returnResult() {
+            final List<Battle> battles = battleRepository.findAllByRunnersIdExceptRunnerRecords(박성우.getId());
+
+            assertThat(battles).hasSize(2);
+        }
+    }
 }
