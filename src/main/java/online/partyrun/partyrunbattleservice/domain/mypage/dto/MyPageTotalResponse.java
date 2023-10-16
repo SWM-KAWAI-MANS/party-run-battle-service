@@ -33,7 +33,7 @@ public record MyPageTotalResponse(double totalDistance, double averagePace, Runn
                         battle -> {
                             try {
                                 return Duration.between(battle.getCreatedAt(), battle.getRunnerRecentRecord(memberId).getTime()).toSeconds();
-                            } catch (InvalidRecentRunnerRecordException exception) {
+                            } catch (NullPointerException exception) {
                                 return 0;
                             }
                         }
