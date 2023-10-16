@@ -9,6 +9,7 @@ import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public record MyPageRunningResponse(String id,
                                     LocalDateTime startTime,
@@ -17,8 +18,17 @@ public record MyPageRunningResponse(String id,
 
     public static MyPageRunningResponse of(Battle battle, String memberId) {
         final RunnerRecord runnerRecentRecord = battle.getRunnerRecentRecord(memberId);
-
         final LocalDateTime startTime = battle.getStartTime();
+
+        if (Objects.isNull(runnerRecentRecord)) {
+            return new MyPageRunningResponse(
+                    battle.getId(),
+                    startTime,
+                    new RunningTimeResponse(0, 0, 0),
+                    0
+            );
+        }
+
         final LocalDateTime endTime = runnerRecentRecord.getTime();
         final Duration duration = Duration.between(startTime, endTime);
 
