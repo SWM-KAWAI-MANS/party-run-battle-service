@@ -8,6 +8,7 @@ import online.partyrun.partyrunbattleservice.domain.single.entity.Single;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 public record MyPageTotalResponse(double totalDistance, double averagePace, RunningTimeResponse totalRunningTime) {
 
@@ -31,11 +32,11 @@ public record MyPageTotalResponse(double totalDistance, double averagePace, Runn
         final long totalBattleRunningTime = battles.stream()
                 .mapToLong(
                         battle -> {
-                            try {
-                                return Duration.between(battle.getCreatedAt(), battle.getRunnerRecentRecord(memberId).getTime()).toSeconds();
-                            } catch (InvalidRecentRunnerRecordException exception) {
+                            final RunnerRecord runnerRecentRecord = battle.getRunnerRecentRecord(memberId);
+                            if (Objects.isNull(runnerRecentRecord)) {
                                 return 0;
                             }
+                            return Duration.between(battle.getCreatedAt(), runnerRecentRecord.getTime()).toSeconds();
                         }
                 )
                 .sum();
